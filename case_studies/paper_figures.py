@@ -8,6 +8,7 @@ from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
+import matplotlib.patches  # noqa: F401  (legend patch)
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
@@ -322,11 +323,16 @@ def prov_rgb(pm):
     return cols[pm]
 
 
+def frame_provenance(d, frame):
+    return np.load(d / f"{frame.replace(' ', '_').replace(':', '')}_provenance.npy").astype(int)
+
+
 def fig_thermal(case, rows, name):
     fig, axs = plt.subplots(len(rows), 3, figsize=(7.2, 1.95 * len(rows)))
     for r, (cam, f1, f2) in enumerate(rows):
         d, seg, pm = load_view(case, cam)
-        axs[r, 0].imshow(prov_rgb(pm)); axs[r, 0].set_title(f"{cam}: pixel provenance", fontsize=7.5)
+        axs[r, 0].imshow(prov_rgb(frame_provenance(d, f2)))
+        axs[r, 0].set_title(f"{cam}: provenance, {f2.split(' ')[0].lower()} {f2.split(' ')[-1]}", fontsize=7.5)
         for c, f in ((1, f1), (2, f2)):
             a = np.load(d / f"{f.replace(' ', '_').replace(':', '')}_apparent.npy")
             im = axs[r, c].imshow(a, cmap="inferno", vmin=np.percentile(a, 1), vmax=np.percentile(a, 99.5))
@@ -361,9 +367,11 @@ def fig_timeseries():
                     color="gray", alpha=0.18, step="mid"); a2.set_ylabel("room supply flow (g/s)", fontsize=7)
     a.set_zorder(a2.get_zorder() + 1); a.patch.set_visible(False)       # curves above the flow shading
     for ax_ in (a, a2):                                                   # empty strip at the bottom for the legend
-        lo, hi = ax_.get_ylim(); ax_.set_ylim(lo - 0.2 * (hi - lo), hi)
+        lo, hi = ax_.get_ylim(); ax_.set_ylim(lo - 0.3 * (hi - lo), hi)
     a2.set_yticks([t for t in a2.get_yticks() if 0 <= t <= a2.get_ylim()[1]])   # no negative flow ticks
-    a.set_title("(b) Terminal and diffuser, winter day"); a.legend(fontsize=6.2, frameon=False, loc="lower center", ncol=3)
+    hs, ls = a.get_legend_handles_labels()
+    hs.append(matplotlib.patches.Patch(color="gray", alpha=0.18)); ls.append("room supply flow (right axis)")
+    a.set_title("(b) Terminal and diffuser, winter day"); a.legend(hs, ls, fontsize=6.2, frameon=False, loc="lower center", ncol=2)
     a = axs[1, 0]
     a.plot(h, g("/World/Plenum/Elements/HW_Control_Valve", T, win), c="#c53030", lw=1.6, label="reheat valve (bare)")
     a.plot(h, g("/World/Plenum/Elements/HW_Supply_Pipe", T, win), c="#dd6b20", lw=1.6, label="HW pipe jacket")
@@ -392,7 +400,7 @@ def fig_provenance_shares():
     rows = []
     for case, tag in (("B_hvac_system", "B"), ("C_doe_medium_office", "C")):
         for f in sorted((CS / case / "output/renders").glob("*/provenance_share.json")):
-            rows.append((f"{tag}: {f.parent.name.replace('Camera', '')}", json.loads(f.read_text(encoding="utf-8"))))
+            rows.append((f"{tag}: {f.parent.name.replace('Camera', '')}", json.loads(f.read_text(encoding="utf-8"))["mean"]))
     fig, ax = plt.subplots(figsize=(7.2, 2.6))
     left = np.zeros(len(rows))
     for k in ("simulated", "physics", "engineering_rule", "heuristic", "assumed_layout", "background"):
@@ -422,10 +430,72 @@ def fig_thermal_cases():
                                         ("RooftopCamera", "WINTER 01-15 03:00", "SUMMER 07-16 15:00")], "fig7_thermal_caseC.png")
 
 
+def fig_graphical_abstract():
+    """Graphical abstract (Elsevier: >= 1328 x 531 px, ~2.5:1, readable at 5 x 13 cm). 8 x 3.2 in at 500 dpi."""
+    B = CS / "B_hvac_system/output/B_hvac_system.usda"
+    W, H = 8.0, 3.2
+    fig = plt.figure(figsize=(W, H))
+    gap = 0.04
+    pw = (1 - 0.03 - 3 * gap) / 4                              # four equal 4:3 panels
+    ph = pw * W * 0.75 / H
+    y0 = 0.42
+    xs = [0.015 + k * (pw + gap) for k in range(4)]
+    axs = [fig.add_axes([x, y0, pw, ph]) for x in xs]
+    titles = ["EnergyPlus model", "Generated 3D scene", "Simulated thermal image", "Pixel provenance"]
+    for x, t in zip(xs, titles):
+        fig.text(x + pw / 2, y0 + ph + 0.04, t, ha="center", va="bottom", fontsize=11, weight="bold", color="#1a202c")
+    # 1: the input
+    a = axs[0]; a.axis("off"); a.set_xlim(0, 1); a.set_ylim(0, 1)
+    a.add_patch(FancyBboxPatch((0.02, 0.02), 0.96, 0.96, boxstyle="round,pad=0,rounding_size=0.05", fc="#fefcbf", ec="#4a5568", lw=1.0))
+    for k, line in enumerate(["zones and surfaces", "HVAC node graph", "weather file", "+ one zone name"]):
+        a.text(0.5, 0.82 - k * 0.19, line, ha="center", va="center", fontsize=9.5, color="#2d3748")
+    # 2: generated geometry (cut-away office and plenum of case B)
+    hide = ("/Plenum/Surfaces/Plenum_Slab", "/Plenum/Surfaces/Plenum_South", "/Plenum/Surfaces/Plenum_West",
+            "/Office/Surfaces/South", "/Office/Surfaces/West", "/Outdoors/", "Insulation_Void")
+    geometry_render(B, (-2.2, -3.0, 6.2), (2.6, 2.2, 2.6), 55, (800, 600), hide, axs[1], "")
+    # 3 and 4: the plenum camera during morning reheat, apparent temperature and pixel provenance
+    d, _, _ = load_view("B_hvac_system", "PlenumCamera")
+    pm = frame_provenance(d, "WINTER 01-15 07:30")
+    app = np.load(d / "WINTER_01-15_0730_apparent.npy")
+    im = axs[2].imshow(app, cmap="inferno", vmin=np.percentile(app, 1), vmax=np.percentile(app, 99.5), aspect="auto")
+    axs[3].imshow(prov_rgb(pm), aspect="auto")
+    for ax in axs[2:]:
+        ax.axis("off")
+    cax = fig.add_axes([xs[2] + 0.025, y0 - 0.075, pw - 0.05, 0.035])
+    cb = fig.colorbar(im, cax=cax, orientation="horizontal"); cb.ax.tick_params(labelsize=8, length=2, pad=1)
+    cb.set_label("apparent temperature (°C)", fontsize=8, labelpad=1)
+    handles = [plt.Rectangle((0, 0), 1, 1, color=PROV_COLORS[k]) for k in ("simulated", "physics", "heuristic")]
+    fig.legend(handles, ["simulated", "physics", "heuristic"], loc="upper center", ncol=3, fontsize=8, frameon=False,
+               bbox_to_anchor=(xs[3] + pw / 2, y0 - 0.02), handlelength=1.0, columnspacing=0.7, handletextpad=0.4)
+    for k in range(3):                                         # flow arrows between panels
+        fig.add_artist(FancyArrowPatch((xs[k] + pw + 0.006, y0 + ph / 2), (xs[k + 1] - 0.006, y0 + ph / 2),
+                                       transform=fig.transFigure, arrowstyle="-|>", mutation_scale=15, color="#2d3748", lw=1.5))
+    # bottom band: the energy finding of the paper (one TMY3 year of case B, from case_studies/annual.json)
+    ann = json.loads((CS / "annual.json").read_text(encoding="utf-8"))
+    gap_r = next(v for k, v in ann.items() if "duct insulation gap" in k.lower())
+    void_r = next(v for k, v in ann.items() if k.startswith("B envelope void") or k == "envelope void")
+    flow_1k = float(gap_r["apparent contrast while air flows, share of flowing steps (%)"][">= 1.0 K"])
+    cool = float(gap_r["extra gain as share of the office's sensible cooling (%)"])
+    days = void_r["days with both a >= +0.5 K and a <= -0.5 K contrast"].split(" of ")
+    g0, g1 = void_r[next(k for k in void_r if "annual heat gain" in k)]
+    fig.text(0.5, 0.215, "Visible is not the same as costly (one simulated year, Phoenix office):", ha="center", va="center",
+             fontsize=9.5, weight="bold", color="#1a202c")
+    for x, head, body in ((0.27, "Duct-insulation gap",
+                           f"visible (≥ 1 K) in {flow_1k:.0f} % of hours with air flow,\nadds {cool:.0f} % to the office's cooling"),
+                          (0.73, "Wall insulation void",
+                           f"contrast reverses sign on {days[0]} of {days[1]} days,\nadds {100 * (g1 / g0 - 1):.0f} % to the wall's heat gain")):
+        fig.add_artist(FancyBboxPatch((x - 0.215, 0.015), 0.43, 0.15, boxstyle="round,pad=0,rounding_size=0.015",
+                                      transform=fig.transFigure, fc="#edf2f7", ec="#a0aec0", lw=0.8))
+        fig.text(x, 0.135, head, ha="center", va="center", fontsize=9, weight="bold", color="#2d3748")
+        fig.text(x, 0.068, body, ha="center", va="center", fontsize=8.5, color="#2d3748", linespacing=1.3)
+    fig.savefig(OUT / "graphical_abstract.png", dpi=500); fig.savefig(OUT / "graphical_abstract.pdf"); plt.close(fig)
+
+
 if __name__ == "__main__":
     OUT.mkdir(parents=True, exist_ok=True)
     only = sys.argv[1:]
-    for f in (fig_pipeline, fig_ontology, fig_topology, fig_geometry, fig_timeseries, fig_provenance_shares, fig_thermal_cases):
+    for f in (fig_pipeline, fig_ontology, fig_topology, fig_geometry, fig_timeseries, fig_provenance_shares, fig_thermal_cases,
+              fig_graphical_abstract):
         if not only or f.__name__ in only:
             f()
     print("figures in", OUT)

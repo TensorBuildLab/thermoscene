@@ -1,0 +1,67 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  unit:
+    name: unit tests (Python ${{ matrix.python }})
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: pip install -r requirements.txt ruff
+      - name: lint (syntax errors, undefined names, unused code)
+        run: ruff check --select E9,F thermoscene case_studies tests
+      - name: tests that need no EnergyPlus (the others skip)
+        run: python -m pytest -q tests
+
+  pipeline:
+    name: case studies and paper numbers (EnergyPlus 22.2)
+    runs-on: ubuntu-22.04
+    env:
+      EP_URL: https://github.com/NREL/EnergyPlus/releases/download/v22.2.0/EnergyPlus-22.2.0-c249759bad-Linux-Ubuntu22.04-x86_64.tar.gz
+      THERMOSCENE_ENERGYPLUS: ${{ github.workspace }}/energyplus/energyplus
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - uses: actions/cache@v4
+        id: ep
+        with:
+          path: energyplus
+          key: energyplus-22.2.0-ubuntu22.04
+      - name: download EnergyPlus 22.2
+        if: steps.ep.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p energyplus
+          curl -fsSL "$EP_URL" | tar -xz -C energyplus --strip-components=1
+      - run: pip install -r requirements.txt
+      - name: build the three case studies
+        run: |
+          for c in A_single_room B_hvac_system C_doe_medium_office; do
+            python -m thermoscene build "case_studies/$c/case.yaml" --render
+          done
+      - name: all tests (renderer agreement, sanity, topology)
+        run: python -m pytest -q tests
+      - name: topology survey reproduces Table 7 (180/180)
+        run: |
+          python case_studies/topology_survey.py | tail -1 | grep "^180/180"
+          git diff --exit-code -- docs/topology_survey.md
+      - name: paper numbers reproduce (Sections 5.1-5.4)
+        run: |
+          git show HEAD:case_studies/paper_numbers.json > "$RUNNER_TEMP/committed.json"
+          python case_studies/paper_numbers.py --no-cost > /dev/null
+          python case_studies/compare_numbers.py "$RUNNER_TEMP/committed.json" case_studies/paper_numbers.json

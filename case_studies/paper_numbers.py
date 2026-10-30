@@ -118,11 +118,98 @@ def case_c(out):
     return n
 
 
+def case_sql(case):
+    """The cached EnergyPlus SQLite of a built case (same key as pipeline._cached_simulation)."""
+    import hashlib
+    from thermoscene import config as config_mod
+    cfg = config_mod.load(CS / case / "case.yaml")
+    h = hashlib.sha256()
+    for f in (CS / case / "output" / "prepared.idf", cfg["model"]["epw"]):
+        h.update(Path(f).read_bytes())
+    h.update(str(cfg["energyplus"]["executable"]).encode())
+    sql = CS / case / ".sim_cache" / h.hexdigest()[:16] / "eplusout.sql"
+    if not sql.exists():
+        raise FileNotFoundError(f"{sql}: rebuild {case} first")
+    return sql, cfg
+
+
+def envelope_energy(case, wall, defect):
+    """Daily conduction through the inside face of the host wall with the injected void, against the same wall
+    without it (the void's area at the insulated wall's flux). Wh per day; negative = heat leaving the room."""
+    from thermoscene.energyplus.results import Results
+    sql, _ = case_sql(case)
+    r = Results(sql)
+    dt = r.step_minutes / 60
+    var, var_a = "Surface Inside Face Conduction Heat Transfer Rate", "Surface Inside Face Conduction Heat Transfer Rate per Area"
+    qw, qd = r.series(var_a, wall), r.series(var_a, defect)
+    area = lambda key, q: float(np.median([p / a for p, a in zip(r.series(var, key), q) if abs(a) > 0.5]))
+    a_wall, a_def = area(wall, qw), area(defect, qd)
+    res = {"void area (m2) / insulated wall area (m2)": [round(a_def, 2), round(a_wall, 2)]}
+    for day in ("WINTER 01-15", "SUMMER 07-16"):
+        i = [k for k, lab in enumerate(r.labels) if lab.startswith(day)]
+        e_def = float(np.sum(qd[i])) * dt                      # Wh/m2 through the void
+        e_ins = float(np.sum(qw[i])) * dt                      # Wh/m2 through the insulated wall
+        with_void = a_wall * e_ins + a_def * e_def
+        without = (a_wall + a_def) * e_ins
+        res[f"{day}: void / insulated wall (Wh/m2 per day); ratio"] = [round(e_def, 1), round(e_ins, 1), round(e_def / e_ins, 1)]
+        res[f"{day}: whole wall without / with void (Wh per day); change (%)"] = [round(without), round(with_void),
+                                                                                  round(100 * (with_void - without) / abs(without), 1)]
+    return res
+
+
+def duct_gap_energy():
+    """Heat picked up by the supply air through the unwrapped segment, minus what the same segment would pick up if
+    wrapped (the pipeline's insulated_flat and bare_duct relations), against the office's sensible cooling
+    m_dot c_p (T_zone - T_supply). Counted only while air flows. Per zone instance."""
+    import yaml
+    th = yaml.safe_load((ROOT / "thermoscene" / "defaults.yaml").read_text(encoding="utf-8"))["thermal"]
+    h_i, h_o, k = th["film_coefficients"]["inside_air"], th["film_coefficients"]["plenum"], th["insulation"]["conductivity"]
+    delta = th["insulation"]["duct_wrap_m"]
+    s = json.loads((CS / "B_hvac_system/output/summary.json").read_text(encoding="utf-8"))
+    size = {e["id"]: e["size"] for e in s["elements"]}
+    d = float(size["Plenum/Discharge_Duct_1"].split()[0]) / 1000
+    length = float(size["Plenum/Duct_Insulation_Gap"].split()[0])
+    area = np.pi * d * length
+    b = Stage("B_hvac_system")
+    duct, plenum, office = "/World/Plenum/Elements/Discharge_Duct_1", "/World/Plenum", "/World/Office"
+    res = {"unwrapped area (m2)": round(area, 3)}
+    for day in ("WINTER 01-15", "SUMMER 07-16"):
+        gain, cool = [], []
+        for lab in b.day(day):
+            m = b.get(duct, lab, MF)
+            if m <= 0:
+                continue
+            tf, ta, tz = b.get(duct, lab, TF), b.get(plenum, lab, AIR), b.get(office, lab, AIR)
+            gain.append(area * (ta - tf) * (1 / (1 / h_i + 1 / h_o) - 1 / (1 / h_i + delta / k + 1 / h_o)))
+            cool.append(m * 1005.0 * (tz - tf))
+        dt = 0.25
+        lab = "SUMMER 07-16 15:00"
+        if day.startswith("SUMMER"):
+            m, tf = b.get(duct, lab, MF), b.get(duct, lab, TF)
+            g15 = area * (b.get(plenum, lab, AIR) - tf) * (1 / (1 / h_i + 1 / h_o) - 1 / (1 / h_i + delta / k + 1 / h_o))
+            c15 = m * 1005.0 * (b.get(office, lab, AIR) - tf)
+            res["SUMMER 15:00: extra heat gain (W) / office sensible cooling (W); share (%)"] = [round(g15, 1), round(c15), round(100 * g15 / c15, 2)]
+        res[f"{day}: extra heat gain (Wh per day) / office sensible cooling (Wh per day); share (%)"] = [
+            round(sum(gain) * dt, 1), round(sum(cool) * dt), round(100 * sum(gain) / sum(cool), 2) if sum(cool) else None]
+    return res
+
+
+def energy(out):
+    out["energy"] = {"B envelope void": envelope_energy("B_hvac_system", "SOUTH_WALL", "TS_DEFECT_INSULATION_VOID"),
+                     "C envelope void": envelope_energy("C_doe_medium_office", "PERIMETER_TOP_ZN_1_WALL_SOUTH",
+                                                        "TS_DEFECT_INSULATION_VOID"),
+                     "B duct insulation gap": duct_gap_energy()}
+
+
 def provenance(out):
     rows = {}
     for case, tag in (("B_hvac_system", "B"), ("C_doe_medium_office", "C")):
         for f in sorted((CS / case / "output/renders").glob("*/provenance_share.json")):
-            rows[f"{tag} {f.parent.name}"] = {k: round(100 * v, 1) for k, v in json.loads(f.read_text(encoding="utf-8")).items()}
+            js = json.loads(f.read_text(encoding="utf-8"))
+            frames = js["frames"].values()
+            rows[f"{tag} {f.parent.name}"] = {k: [round(100 * v, 1), round(100 * min(s.get(k, 0) for s in frames), 1),
+                                                  round(100 * max(s.get(k, 0) for s in frames), 1)]
+                                              for k, v in js["mean"].items()}
     out["provenance_share_percent"] = rows
 
 
@@ -189,8 +276,17 @@ def markdown(out):
         lines += [f"## {title}", "", "| Quantity | Value |", "|---|---|"]
         lines += [f"| {k} | {' / '.join(map(str, v)) if isinstance(v, list) else v} |" for k, v in out[sec].items()]
         lines.append("")
-    lines += ["## Pixel provenance (Section 5.4, Fig. 8), % of pixels", "", "| Camera | Shares |", "|---|---|"]
-    lines += [f"| {k} | {', '.join(f'{a} {b}' for a, b in v.items())} |" for k, v in out["provenance_share_percent"].items()]
+    lines += ["## Energy relevance of the injected faults", "",
+              "Envelope voids: EnergyPlus inside-face conduction (negative = heat leaving the room). Duct gap: heat "
+              "gained through the unwrapped segment beyond what the wrapped segment would gain, while air flows, "
+              "against the office's sensible cooling (one zone instance).", "", "| Quantity | Value |", "|---|---|"]
+    for grp, vals in out["energy"].items():
+        lines += [f"| {grp}: {k} | {' / '.join(map(str, v)) if isinstance(v, list) else v} |" for k, v in vals.items()]
+    lines.append("")
+    lines += ["## Pixel provenance (Section 5.4, Fig. 8), % of pixels: mean over the camera's frames (min–max)", "",
+              "| Camera | Shares |", "|---|---|"]
+    lines += [f"| {k} | {', '.join(f'{a} {b[0]} ({b[1]}–{b[2]})' for a, b in v.items())} |"
+              for k, v in out["provenance_share_percent"].items()]
     lines += ["", "## Counts (Section 5.1-5.2, README)", "", "| Case | Surfaces | Elements | Components | Surface temperatures by provenance |",
               "|---|---|---|---|---|"]
     lines += [f"| {k} | {v['surfaces']} | {v['elements']} | {v['components']} | "
@@ -210,7 +306,7 @@ def main():
     logging.basicConfig(level=logging.WARNING)
     st = Usd.Stage.Open(str(CS / "B_hvac_system/output/B_hvac_system.usda"))
     out = {"engine": str(st.GetRootLayer().customLayerData.get("ts:source", "")).split(";")[0] or "EnergyPlus"}
-    case_b(out); case_c(out); provenance(out); counts(out)
+    case_b(out); case_c(out); energy(out); provenance(out); counts(out)
     if "--no-cost" not in sys.argv:
         cost(out)
     (CS / "paper_numbers.json").write_text(encoding="utf-8", data=json.dumps(out, indent=2, ensure_ascii=False))

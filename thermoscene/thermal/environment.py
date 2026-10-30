@@ -9,12 +9,14 @@ MONTH_START = np.cumsum([0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30])
 
 
 def site(model, epw_path) -> dict:
-    loc = next(iter(model.objs("Site:Location").values()), None)
-    if loc:
-        return dict(lat=float(loc["latitude"]), lon=float(loc["longitude"]), tz=float(loc["time_zone"]))
-    with open(epw_path, encoding="latin-1") as f:
-        h = f.readline().split(",")
-    return dict(lat=float(h[6]), lon=float(h[7]), tz=float(h[8]))
+    """Latitude, longitude, time zone of the simulated weather: EnergyPlus uses the weather file's LOCATION for
+    weather-file run periods, whatever Site:Location says; Site:Location only without a weather file."""
+    if epw_path:
+        with open(epw_path, encoding="latin-1") as f:
+            h = f.readline().split(",")
+        return dict(lat=float(h[6]), lon=float(h[7]), tz=float(h[8]))
+    loc = next(iter(model.objs("Site:Location").values()), {})
+    return dict(lat=float(loc.get("latitude", 0.0)), lon=float(loc.get("longitude", 0.0)), tz=float(loc.get("time_zone", 0.0)))
 
 
 def sun_altitude(time, site_, step_minutes) -> np.ndarray:

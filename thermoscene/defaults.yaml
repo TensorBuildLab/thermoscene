@@ -40,6 +40,7 @@ sizing:
   coil_face_velocity: 2.5               # m/s, sets AHU cross-section
   min_casing_m: {width: 1.2, height: 0.9}   # smallest catalogue rooftop unit / AHU cross-section
   min_rect_duct_m: 0.15                 # smallest rectangular duct side
+  max_rect_duct_aspect: 4.0             # widest rectangular duct = 4 x its height; above that the velocity rises (warned)
   ahu_section_length_m: {OutdoorAirMixer: 1.0, Filter: 0.6, CoolingCoil: 0.8, DXCoolingCoil: 0.8,
                          HeatingCoil: 0.5, HotWaterCoil: 0.5, Fan: 1.6, Discharge: 0.9, Condenser: 1.4}
   chiller_length_m: {base: 1.6, per_kw: 0.02}
@@ -54,6 +55,7 @@ layout:
   terminal_offset_from_main_m: 0.6
   roof_clearance_m: 2.0                 # between rooftop units
   roof_curb_m: 0.3
+  ceiling_from_roof_max_tilt_deg: 10.0  # zone without a ceiling: diffusers/grilles go on roof surfaces flatter than this
 
 # ---------------------------------------------------------------- materials (emissivity, solar absorptance)
 materials:
@@ -82,7 +84,10 @@ thermal:
   band_um: [8.0, 14.0]          # camera band (global: read by thermal/radiometry.py, written to every camera)
   film_coefficients: {inside_air: 20.0, plenum: 8.0, outdoor: 17.0, radiative: 5.0}   # W/m2K   (PHYSICS)
   insulation: {conductivity: 0.040, duct_wrap_m: 0.038, box_lining_m: 0.025, pipe_plenum_m: 0.025, pipe_roof_m: 0.038}
-  stagnation_tau_steps: {air: 2, water: 6, valve: 3}                                    # (HEURISTIC)
+  stagnation_tau_min: {air: 45, water: 120, valve: 30}    # relaxation time of trapped fluid when flow stops (HEURISTIC);
+                                                         # rounded lumped-capacitance estimates for a wrapped 200 mm duct, an
+                                                         # insulated DN15 pipe and a bare DN15 body (case_studies/benchmark.py)
+  provenance_threshold_k: 0.1        # a pixel is labelled by a heuristic overlay (ceiling jet) only where it changes T by >= this
   diffuser: {eta_max: 0.85, flow_exp: 0.25, jet_strength_max: 0.5, jet_len0: 0.15, jet_len1: 0.45}   # (HEURISTIC)
   return_grille_mix: 0.7                                                                # (HEURISTIC)
   casing_coupling: {ahu: 0.05, duct_outdoor: 0.08}                                      # (HEURISTIC)

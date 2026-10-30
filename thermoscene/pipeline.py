@@ -28,7 +28,7 @@ log = logging.getLogger("thermoscene")
 
 
 def expand_only(idf, exe, outdir) -> Path:
-    """Run ExpandObjects alone (HVACTemplate -> full objects) without simulating."""
+    """Run ExpandObjects alone (HVACTemplate -> full objects, GroundHeatTransfer objects removed) without simulating."""
     outdir = Path(outdir); outdir.mkdir(parents=True, exist_ok=True)
     shutil.copy(idf, outdir / "in.idf")
     for f in ("Energy+.idd",):
@@ -39,28 +39,41 @@ def expand_only(idf, exe, outdir) -> Path:
 
 def load_model(idf, exe, work) -> EPModel:
     from .energyplus.idf_text import IDFText
+    from .energyplus.runner import needs_expand
     src = Path(idf)
-    if any(c.startswith("HVACTEMPLATE:") for c in IDFText.read(src).classes()):
+    if needs_expand(IDFText.read(src)):
         src = expand_only(src, exe, Path(work) / "expand")
     return EPModel(to_epjson(src, exe, Path(work) / "epjson"))
 
 
-def _cached_simulation(prepared, epw, out, exe, cache_root):
-    """Re-use an EnergyPlus run when the prepared model, weather file and engine are unchanged."""
+def _cached_simulation(prepared, epw, out, exe, cache_root, model_dir=None):
+    """Re-use an EnergyPlus run when the prepared model, the files it references, weather file and engine are
+    unchanged. EnergyPlus runs in the folder of the user's model (`model_dir`) so relative file names resolve."""
     import hashlib
+    from .energyplus.idf_text import IDFText
+    from .energyplus.runner import external_files
     h = hashlib.sha256()
     for f in (prepared, epw):
         h.update(Path(f).read_bytes())
     h.update(str(exe).encode())
+    for f in external_files(IDFText.read(prepared), model_dir or Path(prepared).parent):
+        h.update(str(f).encode()); h.update(f.read_bytes())
     key = h.hexdigest()[:16]
     cdir = Path(cache_root) / key
-    if (cdir / "eplusout.sql").exists():
+    sql = cdir / "eplusout.sql"
+    if sql.exists() and sql.stat().st_size == 0:          # never re-use a run without results
+        shutil.rmtree(cdir, ignore_errors=True)
+    if sql.exists():
         log.info("EnergyPlus: re-using cached run %s", key)
         exp = cdir / "eplusout.expidf"
         err = (cdir / "eplusout.err").read_text(encoding="utf-8", errors="ignore")
         return dict(sql=cdir / "eplusout.sql", err=cdir / "eplusout.err", model_idf=exp if exp.exists() else prepared,
                     warnings=err.count("** Warning **"), severe=err.count("** Severe  **"), cached=True)
-    sim = simulate(prepared, epw, cdir, exe)
+    try:
+        sim = simulate(prepared, epw, cdir, exe, cwd=model_dir)
+    except Exception:
+        shutil.rmtree(cdir, ignore_errors=True)       # never leave a failed run where the next build would re-use it
+        raise
     for f in cdir.iterdir():                      # keep only what the pipeline reads
         if f.name not in ("eplusout.sql", "eplusout.err", "eplusout.expidf"):
             f.unlink()
@@ -86,7 +99,7 @@ def build(case_path, render: bool = False, overrides: dict | None = None) -> Pat
     prepare(cfg["model"]["idf"], prepared, cfg["energyplus"].get("run_periods"), extra, cfg["energyplus"].get("timesteps_per_hour"))
     # 2. simulate (cached) and read
     cache = cfg["energyplus"].get("cache_dir") or str(Path(cfg["case_dir"]) / ".sim_cache")
-    sim = _cached_simulation(prepared, cfg["model"]["epw"], out, exe, cache)
+    sim = _cached_simulation(prepared, cfg["model"]["epw"], out, exe, cache, Path(cfg["model"]["idf"]).parent)
     log.info("EnergyPlus: %d warnings, %d severe", sim["warnings"], sim["severe"])
     tph = cfg["energyplus"].get("timesteps_per_hour")
     results = Results(sim["sql"], 60 // int(tph) if tph else None)
@@ -95,6 +108,7 @@ def build(case_path, render: bool = False, overrides: dict | None = None) -> Pat
     # 3. spaces, surfaces, topology
     scene = SceneGraph()
     scene.meta["source"] = f"{engine_version(exe)}; model {Path(cfg['model']['idf']).name}; weather {Path(cfg['model']['epw']).name}"
+    scene.meta["north_axis_deg"] = model.north_axis()        # geometry stays in building coordinates
     ids = spaces.build(scene, model, cfg)
     zone_name = scene.get(ids["zone"]).sim_zone
     chain = graph.serving(zone_name) if zone_name.upper() in graph.zone_inlets else {"components": [], "inlet_nodes": [], "loops": []}
@@ -160,10 +174,13 @@ def inspect(idf, zone=None, exe=None) -> str:
         m = load_model(idf, exe, tmp)
         g = HVACGraph(m)
         lines = [f"{len(m.zone_names())} zones, {len(g.comps)} HVAC components, conditioned zones: {len(g.zone_inlets)}"]
-        for z in ([zone] if zone else m.zone_names()):
+        if zone and m.obj("Zone", zone)[0] is None:
+            raise KeyError(f"zone {zone} not in model; zones: {m.zone_names()}")
+        for z in ([m.obj("Zone", zone)[0]] if zone else m.zone_names()):
             srf = m.surfaces(z)
             lines.append(f"\nZone {z}: {len(srf)} surfaces, multiplier {m.zone_multiplier(z)}, plenum above: "
                          f"{spaces.find_plenum(m, z, 'auto')}")
             if z.upper() in g.zone_inlets:
                 lines.append(g.summary(z))
+        lines += [f"WARNING: {w}" for w in m.warnings]
         return "\n".join(lines)

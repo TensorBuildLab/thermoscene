@@ -88,24 +88,35 @@ Everything else falls back to `defaults.yaml`. Your model file is never modified
 | Case | EnergyPlus surfaces | Generated elements | Traced components | Element/surface temperatures: simulated / physics / heuristic |
 |---|---|---|---|---|
 | A | 8 | 12 | 8 | 8 / 0 / 12 |
-| B | 14 | 28 | 17 | 14 / 14 / 14 |
+| B | 14 | 28 | 17 | 14 / 11 / 17 |
 | C | 26 | 37 | 10 | 26 / 14 / 23 |
 
 ![plenum camera, case B](docs/img/caseB_plenum.png)
 
 ## Evaluation
 
-* **Topology generality** ([docs/topology_survey.md](docs/topology_survey.md)): 12 EnergyPlus example models, 8 HVAC
-  system types, **180 of 180 conditioned zones traced** without configuration.
+* **Topology correctness** ([docs/topology_survey.md](docs/topology_survey.md)): 12 EnergyPlus example models, 8 HVAC
+  system types, **180 of 180 conditioned zones traced** without configuration. Compared component by component with the
+  chain declared by each model's own system objects: **precision 1.000, recall 0.998**, 174 of 180 chains identical (the
+  six misses are zone exhaust fans, which are not upstream of their zones).
 * **Whole-building robustness** ([docs/zone_sweep.md](docs/zone_sweep.md)): scenes for **all 15 conditioned zones** of the
-  unmodified DOE reference medium office, 1.4–3.5 s each on a laptop CPU with one shared simulation.
-* **Sensitivity** ([docs/sensitivity.md](docs/sensitivity.md)): one-at-a-time variation of 7 non-simulated parameters;
-  each acts only on the elements it governs.
+  unmodified DOE reference medium office, 2–7 s each on a laptop CPU with one shared simulation.
+* **Benchmarks** ([docs/benchmark.md](docs/benchmark.md)): the physics-level element models agree with an independent
+  natural-convection and radiation calculation within 0.5 K (insulated pipe), 0.9 K (wrapped duct) and 1.1 K (bare
+  duct); a 2-D conduction section reproduces the 1-D envelope-void contrast to 0.01 K.
+* **Global sensitivity** ([docs/morris.md](docs/morris.md), [docs/sensitivity.md](docs/sensitivity.md)): Morris screening
+  and one-at-a-time variation of 14 non-simulated parameters on 8 apparent contrasts of case B.
+* **Faults over a year** ([docs/annual.md](docs/annual.md)): the duct-insulation gap of case B is visible (≥ 1 K) in 97 %
+  of the time steps with air flow but adds 1 % to the office's sensible cooling; the envelope void raises its wall's
+  annual conduction by about a fifth while its contrast changes sign on most days.
+* **Per-frame provenance**: every rendered frame has a provenance map; ceiling pixels count as heuristic only where the
+  jet model changes them by at least 0.1 K, and elements whose fluid is stagnant count as heuristic at those steps.
 * **Renderer agreement and sanity** (`tests/`): the Isaac Sim shading path reproduces the reference renderer to < 1e-4 K
   for every camera of every case (last preview frame); no missing or implausible temperatures.
 * **Numbers quoted in the paper's text** ([docs/paper_numbers.md](docs/paper_numbers.md)): every temperature, size,
-  provenance share, run time and file size in Sections 5.1–5.6, computed from the built cases by
-  `case_studies/paper_numbers.py`.
+  provenance share, run time and file size in Sections 5.1–5.7, computed from the built cases by
+  `case_studies/paper_numbers.py`. CI rebuilds the cases with EnergyPlus 22.2 on Linux and compares these numbers with
+  the committed ones.
 
 ## Limitations
 
@@ -113,7 +124,8 @@ Scenes are replay-only: thermal states are precomputed and do not respond to rob
 rule set (orthogonal routing in one plenum, no clash avoidance, rooftop units in a row). Heuristic models (equipment
 casings, motors, condensers, diffuser faces, ceiling jets) are uncalibrated; their parameters are centralised in
 `defaults.yaml`. One temperature per EnergyPlus surface; reflections approximated by one reflected temperature per
-space. The Isaac Sim rendering calls follow the documented 4.5–6.x API and were not executed by the authors (no GPU);
+space. Coupling is one-way: heat exchanged by generated elements is not returned to EnergyPlus (for the duct gap of
+case B it is 1 % of the zone's cooling). No image has yet been compared with field thermography. The Isaac Sim rendering calls follow the documented 4.5–6.x API and were not executed by the authors (no GPU);
 the shading path they feed is tested.
 
 ## Repository layout
@@ -131,12 +143,14 @@ thermoscene/               package
   isaac/thermal_camera.py  Isaac Sim thermal cameras
   web/                     export.py + viewer.html: self-contained real-time thermal viewer
 case_studies/              A, B, C (model + case.yaml), weather, topology_survey.py, zone_sweep.py,
-                           sensitivity.py, paper_numbers.py, paper_figures.py, *.json results
-docs/                      ontology, configuration, reproducing, survey / sweep / sensitivity tables,
-                           paper numbers, paper figures, viewers
+                           sensitivity.py, morris.py, benchmark.py, annual.py, paper_numbers.py,
+                           compare_numbers.py, paper_figures.py, *.json results
+docs/                      ontology, configuration, reproducing, survey / sweep / sensitivity / Morris /
+                           benchmark / annual tables, paper numbers, paper figures, viewers
 scripts/                   setup.sh / setup.ps1: one-command local setup
-paper/                     manuscript (export from the draft document)
+paper/                     manuscript (Energy and Buildings format), supplementary, cover letter, references
 tests/                     test_core.py
+.github/workflows/ci.yml   unit tests + lint; EnergyPlus 22.2 pipeline job reproducing the paper numbers
 ```
 
 ## Citation

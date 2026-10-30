@@ -13,6 +13,7 @@ from pxr import Usd, UsdGeom
 from ..thermal import radiometry as rad
 
 TEMP = "thermal:surfaceTemperature"
+LEVELS = ["simulated", "physics", "engineering_rule", "heuristic", "assumed_layout", "user"]
 
 
 def jet_delta(x, y, t_face, t_ceiling, strength, length, center, half):
@@ -81,23 +82,63 @@ def thermal_frame(stage, series: Series, tc, prims, owner, hits, cam_prim, seed=
     t_srf = np.array([series.get(p, TEMP, tc) for p in prims] + [t_bg])
     eps = np.array([p.GetAttribute("thermal:emissivity").Get() for p in prims] + [1.0])
     true_map = t_srf[owner].astype(float)
-    index = {str(p.GetPath()): i for i, p in enumerate(prims)}
-    for k, p in enumerate(prims):
-        rel = p.GetRelationship("thermal:ceilingJetTarget")
-        if not rel or not rel.GetTargets():
-            continue
-        j = index.get(str(rel.GetTargets()[0]))
-        mask = owner == j
-        if j is None or not mask.any():
-            continue
-        c = p.GetAttribute("thermal:ceilingJetCenter").Get()
-        pts = hits[mask]
-        true_map[mask] += jet_delta(pts[:, 0], pts[:, 1], t_srf[k], t_srf[j],
-                                    series.get(p, "thermal:ceilingJetStrength", tc),
-                                    series.get(p, "thermal:ceilingJetDecayLength", tc),
-                                    (c[0], c[1]), p.GetAttribute("thermal:ceilingJetHalfSize").Get())
+    for mask, d in _jet_fields(prims, owner, hits, series, tc, t_srf):
+        true_map[mask] += d
     g = lambda n, d: (cam_prim.GetAttribute(n).Get() if cam_prim.HasAttribute(n) else d)
     l_obs = rad.observed_radiance(true_map, eps[owner], t_refl)
     app = rad.apparent_temperature(l_obs, g("thermal:camera:emissivity_setting", 0.95), g("thermal:camera:reflected_setting_c", 20.0))
     app = rad.sensor_effects(app, g("thermal:camera:netd_k", 0.05), g("thermal:camera:blur_px", 0.7), seed=seed)
     return true_map, app
+
+
+def _jet_fields(prims, owner, hits, series, tc, t_srf):
+    """[(pixel mask on the ceiling target, temperature change of the jet there)] for every diffuser seen."""
+    index = {str(p.GetPath()): i for i, p in enumerate(prims)}
+    out = []
+    for k, p in enumerate(prims):
+        rel = p.GetRelationship("thermal:ceilingJetTarget")
+        if not rel or not rel.GetTargets():
+            continue
+        j = index.get(str(rel.GetTargets()[0]))
+        if j is None:
+            continue
+        mask = owner == j
+        if not mask.any():
+            continue
+        c = p.GetAttribute("thermal:ceilingJetCenter").Get()
+        pts = hits[mask]
+        d = jet_delta(pts[:, 0], pts[:, 1], t_srf[k], t_srf[j], series.get(p, "thermal:ceilingJetStrength", tc),
+                      series.get(p, "thermal:ceilingJetDecayLength", tc), (c[0], c[1]),
+                      p.GetAttribute("thermal:ceilingJetHalfSize").Get())
+        out.append((mask, d))
+    return out
+
+
+def provenance_frame(stage, series: Series, tc, prims, owner, hits):
+    """Per-pixel index into LEVELS of the provenance of the temperature shown at time step tc (len(LEVELS) = background).
+
+    Starts from each surface's model level and lowers it where a less certain input acts at this step:
+    ceiling pixels where a diffuser jet changes the temperature by at least the stage's provenance threshold
+    (0.1 K by default), and elements whose fluid is stagnant at this step (the relaxation of Eq. 3 is a heuristic)."""
+    thr = float(stage.GetRootLayer().customLayerData.get("thermal:provenanceThresholdK", 0.1))
+    heur = LEVELS.index("heuristic")
+    lv = []
+    for p in prims:
+        a = p.GetAttribute(TEMP + ":provenance")
+        level = LEVELS.index(a.Get()) if a and a.Get() in LEVELS else len(LEVELS)
+        if p.HasAttribute("mep:stagnation") and p.HasAttribute("mep:fluidMassFlow") and level < heur:
+            if series.get(p, "mep:fluidMassFlow", tc) <= 0:
+                level = heur
+        lv.append(level)
+    prov = np.array(lv + [len(LEVELS)])[owner]
+    t_srf = [series.get(p, TEMP, tc) for p in prims]
+    for mask, d in _jet_fields(prims, owner, hits, series, tc, t_srf):
+        sub = prov[mask]
+        sub[(np.abs(d) >= thr) & (sub < heur)] = heur
+        prov[mask] = sub
+    return prov
+
+
+def provenance_shares(prov):
+    names = LEVELS + ["background"]
+    return {names[i]: float(np.mean(prov == i)) for i in range(len(names)) if np.any(prov == i)}

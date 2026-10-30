@@ -14,6 +14,7 @@ from scipy.cluster.vq import kmeans2
 from shapely.geometry import Point
 from shapely.ops import unary_union
 
+from ..energyplus.model import newell_normal
 from ..ontology import Medium, Surface
 from ..scene.geometry import box, plan_polygon
 
@@ -34,6 +35,12 @@ def interior_points(poly, inset, step=0.1):
 def generate(gen) -> dict:
     z = gen.ids["zone"]
     ceilings = [s for s in gen.scene.of(Surface) if s.space == z and s.cls == "Surface" and s.surface_type == "Ceiling"]
+    if not ceilings:              # top-floor zone without plenum: devices hang from the (near-horizontal) roof
+        cos_max = np.cos(np.radians(gen.L["ceiling_from_roof_max_tilt_deg"]))
+        ceilings = [s for s in gen.scene.of(Surface) if s.space == z and s.cls == "Surface" and s.surface_type == "Roof"
+                    and abs(newell_normal(s.polygon)[2]) >= cos_max]
+        if ceilings:
+            log.info("air devices: zone has no ceiling; mounted on its roof surfaces")
     inlets = gen.chain.get("inlet_nodes", []) if gen.chain else []
     if not ceilings or not inlets:
         log.info("air devices: no ceiling or no air inlet; skipped")
@@ -43,7 +50,8 @@ def generate(gen) -> dict:
     z_c = float(np.mean([p[2] for s in ceilings for p in s.polygon]))
     S = gen.S["diffuser"]
     Q = gen.zone_design_flow()
-    n = max(math.ceil(Q / S["max_flow_m3s"]), math.ceil(ceiling_plan.area / S["max_area_m2"]), 1)
+    q_node = gen.node_design_flows() if len(inlets) > 1 else {}       # several terminals: each node its own flow
+    n = max(math.ceil(Q / S["max_flow_m3s"]), math.ceil(ceiling_plan.area / S["max_area_m2"]), len(inlets), 1)
     pts = interior_points(ceiling_plan, S["inset_m"])
     centers = np.array([pts.mean(0)]) if n == 1 else kmeans2(pts, n, seed=0, minit="++")[0]
     if n == 1 and not ceiling_plan.contains(Point(*centers[0])):
@@ -54,11 +62,14 @@ def generate(gen) -> dict:
     for i, (x, y) in enumerate(centers):
         ceil = ceilings[next((k for k, p in enumerate(polys) if p.contains(Point(x, y))), 0)]
         node = inlets[i % len(inlets)]
-        share = 1.0 / (mult * sum(1 for j in range(n) if inlets[j % len(inlets)] == node))
+        count = sum(1 for j in range(n) if inlets[j % len(inlets)] == node)
+        share = 1.0 / (mult * count)
+        q_d = q_node[node] / count if q_node.get(node) else Q / n
+        flow_kg_s = q_d * rho if q_node.get(node) else Q * rho / n
         e = gen.element(f"Supply_Diffuser_{i + 1}", "Diffuser", z, box(x - half, x + half, y - half, y + half, z_c - 0.03, z_c),
                         "diffuser_face", stream=node, medium=Medium.AIR, flow_scale=share,
-                        design_flow_kg_s=Q * rho / n, ceiling_surface=ceil.id, jet_center=(float(x), float(y), z_c), jet_half=half,
-                        size=f"{S['size_m']} m square, {Q / n:.3f} m3/s", layout_note="k-means centre of the inset ceiling")
+                        design_flow_kg_s=flow_kg_s, ceiling_surface=ceil.id, jet_center=(float(x), float(y), z_c), jet_half=half,
+                        size=f"{S['size_m']} m square, {q_d:.3f} m3/s", layout_note="k-means centre of the inset ceiling")
         out["diffusers"].append(e)
     ret_nodes = []
     for _, f in gen.model.objs("ZoneHVAC:EquipmentConnections").items():

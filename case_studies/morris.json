@@ -1,0 +1,752 @@
+{
+  "trajectories": 10,
+  "levels": 4,
+  "metrics": {
+    "M1": "Wall defect − wall, winter 07:00",
+    "M2": "Duct gap − wrapped duct, summer 15:00",
+    "M3": "Reheat valve − pipe jacket, winter 10:00",
+    "M4": "Diffuser face − ceiling, summer 15:00",
+    "M5": "Ceiling 0.3 m beyond the diffuser edge (jet) − ceiling, summer 15:00",
+    "M6": "Pump motor − roof deck, summer 09:00",
+    "M7": "Condenser coil − roof deck, summer 15:00",
+    "M8": "AHU fan section − roof deck, summer 15:00"
+  },
+  "results": {
+    "M1": [
+      {
+        "parameter": "Insulation conductivity (W/m·K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Plenum film coefficient (W/m²K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, insulated pipe (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, bare valve (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Envelope cavity resistance (m²K/W)",
+        "mu_star": 1.0614991116002421,
+        "mu": 1.0614991116002421,
+        "sigma": 0.1140732703090319
+      },
+      {
+        "parameter": "Diffuser face effectiveness η_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet amplitude a_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet decay length L_0 (m)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Duct-wrap facing emissivity",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Motor temperature rise (K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Condenser-coil fraction φ_c",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "AHU casing coupling",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Sol-air solar fraction f_s",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Camera emissivity setting",
+        "mu_star": 0.25186630473277277,
+        "mu": 0.25186630473277277,
+        "sigma": 0.04201734390320373
+      },
+      {
+        "parameter": "Camera reflected-temperature setting (°C)",
+        "mu_star": 0.024576148310075752,
+        "mu": -0.024576148310075752,
+        "sigma": 0.02456550354060746
+      }
+    ],
+    "M2": [
+      {
+        "parameter": "Insulation conductivity (W/m·K)",
+        "mu_star": 0.16079578596206207,
+        "mu": 0.16079578596206207,
+        "sigma": 0.11853834048255488
+      },
+      {
+        "parameter": "Plenum film coefficient (W/m²K)",
+        "mu_star": 0.1218737883716173,
+        "mu": 0.05230008531564252,
+        "sigma": 0.14014885110144118
+      },
+      {
+        "parameter": "Stagnant-water time constant, insulated pipe (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, bare valve (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Envelope cavity resistance (m²K/W)",
+        "mu_star": 0.004308524704670092,
+        "mu": 0.0032768304986337425,
+        "sigma": 0.005427606612499859
+      },
+      {
+        "parameter": "Diffuser face effectiveness η_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet amplitude a_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet decay length L_0 (m)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Duct-wrap facing emissivity",
+        "mu_star": 1.4976882368176954,
+        "mu": 1.4976882368176954,
+        "sigma": 0.15682857067664466
+      },
+      {
+        "parameter": "Motor temperature rise (K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Condenser-coil fraction φ_c",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "AHU casing coupling",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Sol-air solar fraction f_s",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Camera emissivity setting",
+        "mu_star": 0.14249601600430922,
+        "mu": 0.14249601600430922,
+        "sigma": 0.07438547710127846
+      },
+      {
+        "parameter": "Camera reflected-temperature setting (°C)",
+        "mu_star": 0.014377606101606766,
+        "mu": -0.014377606101606766,
+        "sigma": 0.01711108996355817
+      }
+    ],
+    "M3": [
+      {
+        "parameter": "Insulation conductivity (W/m·K)",
+        "mu_star": 1.354045622841371,
+        "mu": -1.354045622841371,
+        "sigma": 0.2642803874739379
+      },
+      {
+        "parameter": "Plenum film coefficient (W/m²K)",
+        "mu_star": 1.4465661829345398,
+        "mu": 1.4465661829345398,
+        "sigma": 0.454646857228897
+      },
+      {
+        "parameter": "Stagnant-water time constant, insulated pipe (min)",
+        "mu_star": 1.5221014769673478,
+        "mu": -1.5221014769673478,
+        "sigma": 0.7608110850735554
+      },
+      {
+        "parameter": "Stagnant-water time constant, bare valve (min)",
+        "mu_star": 11.870126694693033,
+        "mu": 11.870126694693033,
+        "sigma": 1.4919584425541985
+      },
+      {
+        "parameter": "Envelope cavity resistance (m²K/W)",
+        "mu_star": 0.011116213362711314,
+        "mu": -0.011116213362711314,
+        "sigma": 0.0037391834412851613
+      },
+      {
+        "parameter": "Diffuser face effectiveness η_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet amplitude a_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet decay length L_0 (m)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Duct-wrap facing emissivity",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Motor temperature rise (K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Condenser-coil fraction φ_c",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "AHU casing coupling",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Sol-air solar fraction f_s",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Camera emissivity setting",
+        "mu_star": 0.38755620952324643,
+        "mu": -0.33296296479433174,
+        "sigma": 0.3449859646045587
+      },
+      {
+        "parameter": "Camera reflected-temperature setting (°C)",
+        "mu_star": 0.03127100406663352,
+        "mu": 0.024458296474738718,
+        "sigma": 0.03577538113963202
+      }
+    ],
+    "M4": [
+      {
+        "parameter": "Insulation conductivity (W/m·K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Plenum film coefficient (W/m²K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, insulated pipe (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, bare valve (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Envelope cavity resistance (m²K/W)",
+        "mu_star": 0.03743910847885736,
+        "mu": 0.03743910847885736,
+        "sigma": 0.01958364108249552
+      },
+      {
+        "parameter": "Diffuser face effectiveness η_max",
+        "mu_star": 2.9662108524968582,
+        "mu": -2.9662108524968582,
+        "sigma": 0.09297778111243472
+      },
+      {
+        "parameter": "Ceiling-jet amplitude a_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet decay length L_0 (m)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Duct-wrap facing emissivity",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Motor temperature rise (K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Condenser-coil fraction φ_c",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "AHU casing coupling",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Sol-air solar fraction f_s",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Camera emissivity setting",
+        "mu_star": 0.9520211400200018,
+        "mu": 0.9520211400200018,
+        "sigma": 0.13187337354187653
+      },
+      {
+        "parameter": "Camera reflected-temperature setting (°C)",
+        "mu_star": 0.0759341258538159,
+        "mu": -0.0759341258538159,
+        "sigma": 0.0663015790403655
+      }
+    ],
+    "M5": [
+      {
+        "parameter": "Insulation conductivity (W/m·K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Plenum film coefficient (W/m²K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, insulated pipe (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, bare valve (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Envelope cavity resistance (m²K/W)",
+        "mu_star": 0.010302093467820761,
+        "mu": 0.010302093467820761,
+        "sigma": 0.005356998310646326
+      },
+      {
+        "parameter": "Diffuser face effectiveness η_max",
+        "mu_star": 0.9609458893250101,
+        "mu": -0.9609458893250101,
+        "sigma": 0.22903984403048935
+      },
+      {
+        "parameter": "Ceiling-jet amplitude a_max",
+        "mu_star": 2.20477450258808,
+        "mu": -2.20477450258808,
+        "sigma": 0.3537298200828713
+      },
+      {
+        "parameter": "Ceiling-jet decay length L_0 (m)",
+        "mu_star": 0.5077397417990603,
+        "mu": -0.5077397417990603,
+        "sigma": 0.14295951964505993
+      },
+      {
+        "parameter": "Duct-wrap facing emissivity",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Motor temperature rise (K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Condenser-coil fraction φ_c",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "AHU casing coupling",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Sol-air solar fraction f_s",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Camera emissivity setting",
+        "mu_star": 0.2809225026894692,
+        "mu": 0.2809225026894692,
+        "sigma": 0.09656830076832532
+      },
+      {
+        "parameter": "Camera reflected-temperature setting (°C)",
+        "mu_star": 0.022273058971264702,
+        "mu": -0.022273058971264702,
+        "sigma": 0.02025634912590914
+      }
+    ],
+    "M6": [
+      {
+        "parameter": "Insulation conductivity (W/m·K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Plenum film coefficient (W/m²K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, insulated pipe (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, bare valve (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Envelope cavity resistance (m²K/W)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Diffuser face effectiveness η_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet amplitude a_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet decay length L_0 (m)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Duct-wrap facing emissivity",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Motor temperature rise (K)",
+        "mu_star": 9.076058630432867,
+        "mu": 9.076058630432867,
+        "sigma": 0.2703138750023002
+      },
+      {
+        "parameter": "Condenser-coil fraction φ_c",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "AHU casing coupling",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Sol-air solar fraction f_s",
+        "mu_star": 6.604246151882151,
+        "mu": 6.604246151882151,
+        "sigma": 0.19216870029165795
+      },
+      {
+        "parameter": "Camera emissivity setting",
+        "mu_star": 0.6709064155700158,
+        "mu": -0.6709064155700158,
+        "sigma": 0.36227424824378734
+      },
+      {
+        "parameter": "Camera reflected-temperature setting (°C)",
+        "mu_star": 0.03967895602302356,
+        "mu": 0.03967895602302356,
+        "sigma": 0.04279699377009238
+      }
+    ],
+    "M7": [
+      {
+        "parameter": "Insulation conductivity (W/m·K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Plenum film coefficient (W/m²K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, insulated pipe (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, bare valve (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Envelope cavity resistance (m²K/W)",
+        "mu_star": 0.00025092138622788694,
+        "mu": -0.00025092138622788694,
+        "sigma": 0.000218663927840601
+      },
+      {
+        "parameter": "Diffuser face effectiveness η_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet amplitude a_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet decay length L_0 (m)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Duct-wrap facing emissivity",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Motor temperature rise (K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Condenser-coil fraction φ_c",
+        "mu_star": 3.3666666415222553,
+        "mu": 3.3666666415222553,
+        "sigma": 0.08757678544886272
+      },
+      {
+        "parameter": "AHU casing coupling",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Sol-air solar fraction f_s",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Camera emissivity setting",
+        "mu_star": 1.0572606707625742,
+        "mu": 1.0572606707625742,
+        "sigma": 0.09190559549817799
+      },
+      {
+        "parameter": "Camera reflected-temperature setting (°C)",
+        "mu_star": 0.06805236823037823,
+        "mu": -0.06805236823037823,
+        "sigma": 0.062418461526259406
+      }
+    ],
+    "M8": [
+      {
+        "parameter": "Insulation conductivity (W/m·K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Plenum film coefficient (W/m²K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, insulated pipe (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Stagnant-water time constant, bare valve (min)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Envelope cavity resistance (m²K/W)",
+        "mu_star": 0.0011405721895805243,
+        "mu": 0.0011405721895805243,
+        "sigma": 0.0010678894130569058
+      },
+      {
+        "parameter": "Diffuser face effectiveness η_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet amplitude a_max",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Ceiling-jet decay length L_0 (m)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Duct-wrap facing emissivity",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Motor temperature rise (K)",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "Condenser-coil fraction φ_c",
+        "mu_star": 0.0,
+        "mu": 0.0,
+        "sigma": 0.0
+      },
+      {
+        "parameter": "AHU casing coupling",
+        "mu_star": 3.127382484812851,
+        "mu": -3.127382484812851,
+        "sigma": 0.22895796020545658
+      },
+      {
+        "parameter": "Sol-air solar fraction f_s",
+        "mu_star": 8.760391581427893,
+        "mu": 8.760391581427893,
+        "sigma": 0.4722246762459626
+      },
+      {
+        "parameter": "Camera emissivity setting",
+        "mu_star": 0.7544845663789171,
+        "mu": 0.7544845663789171,
+        "sigma": 0.2115417738333534
+      },
+      {
+        "parameter": "Camera reflected-temperature setting (°C)",
+        "mu_star": 0.04668907775470359,
+        "mu": -0.04668907775470359,
+        "sigma": 0.04540681775192387
+      }
+    ]
+  }
+}

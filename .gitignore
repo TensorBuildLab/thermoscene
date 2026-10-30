@@ -7,3 +7,5 @@ case_studies/*/sweep/
 case_studies/*/sensitivity/
 isaac_renders/
 *.egg-info/
+case_studies/*/annual/
+case_studies/*/morris/

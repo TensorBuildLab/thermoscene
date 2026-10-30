@@ -5,18 +5,21 @@ Project memory for Claude Code. Read this before changing anything.
 ## What this is
 
 `thermoscene` turns an ordinary EnergyPlus model into a 3D thermal scene (OpenUSD) of one zone, its envelope and the
-HVAC system serving it, as a virtual training environment for the thermal perception of ground robots and drones.
-It accompanies a journal paper (target: Energy and Buildings / Building and Environment / Building Simulation /
-Automation in Construction):
+HVAC system serving it: labelled, simulation-grounded thermography for building diagnostics, whether the camera is
+handheld, on a drone or on a ground robot. It accompanies a journal paper (target: Energy and Buildings):
 
-*Virtual thermal training environments for robots from building energy models: an ontology-driven pipeline for
-buildings and HVAC systems* — Liang Zhang (University of Arizona), Huanrui Yang (University of Arizona),
-Yiyuan Jia (Big Ladder Software).
+*From energy models to thermal scenes: an ontology-driven pipeline for physically grounded thermography of buildings
+and HVAC systems* — Liang Zhang (University of Arizona), Huanrui Yang (University of Arizona), a student author (TBD),
+Yiyuan Jia (Big Ladder Software). Reframed on 2026-10-30 after a mock review for Energy and Buildings (the review and
+the item-by-item changes are in `../../reviews/2026-10-29_energy-and-buildings_thermoscene/`).
 
 The manuscript is in `paper/`: `manuscript_EnB.docx` (current, Energy and Buildings format, real Word equations,
 EndNote citations) built from `manuscript_EnB.md` + `references.ris` with the `manuscript-template` skill (see
 `paper/README.md`); `manuscript.docx/.md` are the earlier author-year export. Figures are generated here:
-`docs/paper/figures/` (figs 4-8 at 300 dpi); every number in Sections 5.1-5.6 comes from `case_studies/paper_numbers.py`.
+`docs/paper/figures/` (figs 4-8 at 300 dpi, graphical abstract); every number in Sections 5.1-5.7 comes from
+`case_studies/paper_numbers.py`. `paper/supplementary_EnB.*` is assembled from `docs/*.md` by
+`paper/build_supplementary.py`; `paper/submission/` holds the upload files (line-numbered manuscript, highlights,
+graphical abstract, cover letter).
 
 ## Setup
 
@@ -38,12 +41,15 @@ python -m thermoscene web <scene.usda> -o viewer.html      # self-contained real
 python -m pytest -q tests                                  # must pass before committing
 python case_studies/topology_survey.py                     # paper Table 7 -> docs/topology_survey.md
 python case_studies/zone_sweep.py                          # paper Table 6 -> docs/zone_sweep.md
-python case_studies/sensitivity.py                         # paper Table 8 -> docs/sensitivity.md
-python case_studies/paper_numbers.py                       # numbers in Sections 5.1-5.6 -> docs/paper_numbers.md
-python case_studies/paper_figures.py [fig_name ...]        # paper Figs 1-8 -> docs/paper/figures/
+python case_studies/morris.py                              # paper Table 8 -> docs/morris.md (~7 min)
+python case_studies/sensitivity.py                         # one-at-a-time (Supplementary) -> docs/sensitivity.md
+python case_studies/annual.py                              # paper Table 9 -> docs/annual.md (two TMY3 years, ~7 min)
+python case_studies/benchmark.py                           # Section 5.6 -> docs/benchmark.md
+python case_studies/paper_numbers.py                       # numbers in Sections 5.1-5.7 -> docs/paper_numbers.md
+python case_studies/paper_figures.py [fig_name ...]        # paper Figs 1-8 + graphical abstract -> docs/paper/figures/
 ```
 
-Case outputs (`case_studies/*/output`, `sweep`, `sensitivity`, `.sim_cache`) are git-ignored and must be rebuilt
+Case outputs (`case_studies/*/output`, `sweep`, `sensitivity`, `morris`, `annual`, `.sim_cache`) are git-ignored and must be rebuilt
 after a fresh clone (build A, B, C with `--render` before running the figure script or the full tests).
 
 ## Architecture (five stages, one ontology)
@@ -65,8 +71,9 @@ provenance levels; see `docs/ontology.md`.
 ## Rules for changes
 
 - **No model-specific names.** The topology tracer and generators must never look up EnergyPlus objects or nodes by
-  name; derive everything from field semantics, loop/branch membership and ports. Re-run the topology survey after
-  changing `topology.py` (expected: 180/180 conditioned zones traced).
+  name; derive everything from field semantics, loop/branch membership and ports (the plenum is found from declared
+  plenums or unconditioned zones excluded from floor area, never by name). Re-run the topology survey after changing
+  `topology.py` (expected: 180/180 traced, precision 1.000, recall 0.998 = 2497/2503, 174/180 exact).
 - **Every non-simulated quantity gets a provenance level** (`Thing.prov(...)` / `scene.set_series(..., level, note)`).
 - **All parameters live in `thermoscene/defaults.yaml`.** No magic numbers in code.
 - **One radiometry, three renderers.** `render/shading.py` (Python reference, Isaac) and `web/viewer.html` (JS + GLSL)
@@ -81,19 +88,24 @@ provenance levels; see `docs/ontology.md`.
 
 ## Status and open items
 
-- Repository re-verified 2026-10-29 with EnergyPlus 22.2 on Windows 11 (laptop i7-1185G7): counts A 8/12/8,
-  B 14/28/17, C 26/37/10; topology survey 180/180; zone sweep 15/15; sensitivity table identical to paper Table 8
-  (within 0.002 K of the earlier EnergyPlus 25.2 run); 8/8 tests pass. Paper text numbers, timings and figures 4-8 were
-  regenerated from this run; a few case B morning-reheat values moved by up to 1.3 K relative to 25.2.
-
+- Repository re-verified 2026-10-30 with EnergyPlus 22.2 on Windows 11 (laptop i7-1185G7): counts A 8/12/8,
+  B 14/28/17, C 26/37/10; topology survey 180/180 (precision 1.000, recall 0.998, 174/180 exact); zone sweep 15/15;
+  Morris screening of 15 parameters; annual runs of B (Phoenix) and C (Chicago); all tests pass (`test_core.py`,
+  `test_plausibility.py`). Paper text numbers, tables, figures 4-8 and the graphical abstract were regenerated from
+  this run. Timings were measured with other applications loading the CPU (zone sweep 2-7 s per scene).
+- Stagnation time constants (air 45, water 120, valve 30 min) are rounded lumped-capacitance estimates
+  (`benchmark.py`); the valve constant dominates the valve contrast after reheat (Morris mu* 11.9 K).
+- Open review items (see the review folder, `07_changes_made.md`): an EnergyPlus FaultModel case (M3), HVAC energy
+  penalty of the void from paired runs (M1), heuristic models vs. published data (M10), a source for every default
+  (M11), jet renormalisation (M16), more system types for the tracer (M18), outdoor view factors (S3).
+- Authors must still decide: author list, acknowledgements/funding, competing-interest statement (Big Ladder),
+  public release + Zenodo DOI, and re-check the Energy and Buildings Guide for Authors (not downloadable here).
 - Isaac Sim script: Replicator calls written against the 4.5–6.x API, **never executed on a GPU**. The shading path it
   feeds is tested. First job on a GPU machine: run it on case B and compare with `renders/` (the script prints the
   segmentation agreement).
 - Paper: references were checked against Crossref/arXiv/OSTI/publisher records on 2026-10-29 (DOIs added; HEARTH is
   Su et al., ADAPT is Yang et al.). ASHRAE 223P was still a public-review draft then; recheck before submission.
-  Confirm Big Ladder Software's city; settle the author list and corresponding author; CRediT, competing-interest and
-  acknowledgement sections are placeholders. Energy and Buildings also needs a graphical abstract; line numbers can be
-  added at submission (`split_submission.py --line-numbers`). Abstract 248 words, 6 keywords.
+  Confirm Big Ladder Software's city. Abstract 249 words, 6 keywords, about 9,000 words of main text (53 pages).
 - Not yet in `defaults.yaml`: geometric detailing constants in the generators (terminal-box proportions, casing
   margins, fan positions, capacity fallbacks) and the auto-camera search grid and score weights.
 - Scope (stated in the paper): scenes are replay-only. Next steps toward a robot test environment: (1) live thermal
@@ -123,3 +135,8 @@ provenance levels; see `docs/ontology.md`.
   series read).
 - `paper_numbers.py` quotes differences computed from the rounded values it prints, so "X K (a vs b)" adds up.
 - Two builds started at the same moment on Windows once failed to find energyplus.exe; run builds one after another.
+- Do not run timing-sensitive scripts (zone sweep, paper_numbers cost) while anything else runs; timings double.
+- A failed EnergyPlus run must not leave an empty `eplusout.sql` in `.sim_cache` (it poisons later builds);
+  `_cached_simulation` and `Results` refuse empty files.
+- The sun comes from the EPW LOCATION header (Site:Location only without an EPW); for case C they differ by 0.2 deg.
+- In this environment Bash heredocs collapse double backslashes: write Python helper scripts to a file instead.

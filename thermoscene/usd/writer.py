@@ -17,7 +17,7 @@ import numpy as np
 from matplotlib import colormaps
 from pxr import Gf, Sdf, Usd, UsdGeom, UsdLux, UsdPhysics, Vt
 
-from ..ontology import CLASSES, Camera, Element, SimComponent, Space, Surface
+from ..ontology import CLASSES, Camera, Element, NameRegistry, SimComponent, Space, Surface
 from ..thermal.radiometry import BAND_UM
 from ..scene.geometry import grid_split, triangulate
 
@@ -28,6 +28,9 @@ T = Sdf.ValueTypeNames
 def pname(s: str) -> str:
     s = re.sub(r"[^A-Za-z0-9_]", "_", s)
     return s if s and not s[0].isdigit() else "_" + s
+
+
+RESERVED = {"/World": {"PhysicsScene", "DomeLight", "Systems", "Cameras"}}     # prims the writer defines itself
 
 
 def faces_of(thing):
@@ -48,6 +51,10 @@ class Writer:
         self.sidecar: dict[str, np.ndarray] = {}
         self.step = step_minutes
         self.paths: dict[str, str] = {}
+        self.names = NameRegistry(RESERVED)          # unique prim names per parent: a second "X" becomes "X_2"
+
+    def child(self, parent: str, name: str, owner) -> str:
+        return f"{parent}/{self.names.claim(parent, pname(name), owner)}"
 
     # ---------------------------------------------------------------- low level
     def mesh(self, path, faces):
@@ -127,7 +134,7 @@ class Writer:
         sc = self.scene
 
         for sp in sc.of(Space):
-            p = UsdGeom.Xform.Define(st, f"/World/{pname(sp.id)}").GetPrim()
+            p = UsdGeom.Xform.Define(st, self.child("/World", sp.id, sp.id)).GetPrim()
             self.paths[sp.id] = str(p.GetPath())
             self.classes(p, sp.cls)
             if sp.sim_zone:
@@ -142,9 +149,7 @@ class Writer:
         ranges = {sp.id: self.color_range(sp.id) for sp in sc.of(Space)}
         for thing, faces in scene_meshes(sc):
             kind = "Surfaces" if isinstance(thing, Surface) else "Elements"
-            path_ = f"/World/{pname(thing.space)}/{kind}/{pname(thing.name)}"
-            if path_ in self.paths.values():
-                path_ += "_" + pname(thing.id.split("/")[0])
+            path_ = self.child(f"{self.paths[thing.space]}/{kind}", thing.name, thing.id)
             if isinstance(thing, Surface) and thing.id in jet_targets and self.mode == "timesamples":
                 faces = grid_split(thing.polygon, thing.holes, 0.25)
             m = self.mesh(path_, faces); prim = m.GetPrim()
@@ -170,6 +175,8 @@ class Writer:
                 self.put(prim, "thermal:model", T.String, thing.thermal_model)
                 if thing.stream_node:
                     self.put(prim, "mep:streamNode", T.String, thing.stream_node)
+                if thing.attrs.get("stagnation"):
+                    self.put(prim, "mep:stagnation", T.String, thing.attrs["stagnation"])
                 if thing.attrs.get("fault"):
                     self.put(prim, "ts:fault", T.String, thing.attrs["fault"])
                 for q, name in (("fluidTemperature", "mep:fluidTemperature"), ("fluidMassFlow", "mep:fluidMassFlow"),
@@ -192,14 +199,14 @@ class Writer:
         # systems (data prims)
         UsdGeom.Scope.Define(st, "/World/Systems")
         for c in sc.of(SimComponent):
-            p = UsdGeom.Scope.Define(st, f"/World/Systems/{pname(c.sim_type + '_' + c.name)}").GetPrim()
+            p = UsdGeom.Scope.Define(st, self.child("/World/Systems", c.sim_type + "_" + c.name, c.id)).GetPrim()
             self.paths[c.id] = str(p.GetPath())
             self.classes(p, c.cls)
             for k, v in (("ts:simType", c.sim_type), ("ts:simName", c.name), ("ts:role", c.role), ("ts:system", c.system)):
                 self.put(p, k, T.String, v)
             self.put(p, "ts:ports", T.StringArray, [f"{x.direction}|{x.medium.value}|{x.node}|{x.name}" for x in c.ports])
             for d, v in c.sizes.items():
-                self.put(p, f"ts:size:{pname(d)}", T.Float, float(v))
+                self.put(p, f"ts:size:{self.names.claim(str(p.GetPath()) + ':size', pname(d), d)}", T.Float, float(v))
         # relationships
         for thing in list(sc.of(Element)):
             prim = st.GetPrimAtPath(self.paths[thing.id])
@@ -222,7 +229,9 @@ class Writer:
             self._camera(cam)
         meta = {"ts:ontology": "thermoscene/1.0", "thermal:timeCodeLabels": Vt.StringArray(self.labels),
                 "thermal:timestepMinutes": self.step, "thermal:temperatureUnit": "degC",
-                "ts:source": sc.meta.get("source", ""), "ts:case": self.cfg.get("name", ""), "thermal:storage": self.mode}
+                "ts:source": sc.meta.get("source", ""), "ts:case": self.cfg.get("name", ""), "thermal:storage": self.mode,
+                "thermal:provenanceThresholdK": float(self.cfg["thermal"]["provenance_threshold_k"]),
+                "ts:northAxisDeg": float(sc.meta.get("north_axis_deg", 0.0))}   # geometry is in building coordinates
         if self.mode == "sidecar":
             side = path.with_suffix(".series.npz")
             np.savez_compressed(side, **{k.replace("/", "~"): v for k, v in self.sidecar.items()})
@@ -248,7 +257,7 @@ class Writer:
 
     def _camera(self, cam: Camera):
         from ..render.cameras import look_at
-        c = UsdGeom.Camera.Define(self.stage, f"/World/Cameras/{pname(cam.name)}")
+        c = UsdGeom.Camera.Define(self.stage, self.child("/World/Cameras", cam.name, cam.id))
         w, h = cam.resolution; ha = 20.955
         c.CreateHorizontalApertureAttr(ha); c.CreateVerticalApertureAttr(ha * h / w)
         c.CreateFocalLengthAttr(ha / (2 * np.tan(np.radians(cam.hfov_deg) / 2)))

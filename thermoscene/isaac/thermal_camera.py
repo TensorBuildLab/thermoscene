@@ -38,7 +38,8 @@ import numpy as np  # noqa: E402
 import omni.timeline  # noqa: E402
 import omni.usd  # noqa: E402
 
-from thermoscene.render.shading import Series, camera_rays, cameras, labels, thermal_frame, thermal_prims  # noqa: E402
+from thermoscene.render.shading import (Series, camera_rays, cameras, labels, provenance_frame,  # noqa: E402
+                                        thermal_frame, thermal_prims)
 
 ctx = omni.usd.get_context()
 ctx.open_stage(os.path.abspath(args.usd))
@@ -116,6 +117,7 @@ for cam in cameras(stage):
         tag = labs[tc].replace(" ", "_").replace(":", "")
         np.save(out / f"{tag}_true.npy", true_map.astype(np.float32))
         np.save(out / f"{tag}_apparent.npy", app_map.astype(np.float32))
+        np.save(out / f"{tag}_provenance.npy", provenance_frame(stage, series, tc, prims, owner, hits).astype(np.int8))
         save_png(app_map, out / f"{tag}_apparent.png")
         if rgb_a is not None:
             timeline.set_current_time(tc / tcps); render()

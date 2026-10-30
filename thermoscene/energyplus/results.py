@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import sqlite3
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -9,7 +10,10 @@ import pandas as pd
 
 class Results:
     def __init__(self, sql_path, step_minutes: int | None = None) -> None:
-        con = sqlite3.connect(str(sql_path))
+        p = Path(sql_path)
+        if not p.is_file() or p.stat().st_size == 0:          # sqlite3.connect would create an empty database
+            raise FileNotFoundError(f"no EnergyPlus SQLite output at {p}")
+        con = sqlite3.connect(str(p))
         self.con = con
         try:    # EnergyPlus does not index ReportData by variable; without it every series read scans the table
             con.execute("create index if not exists ts_report_data_dict on ReportData(ReportDataDictionaryIndex)")

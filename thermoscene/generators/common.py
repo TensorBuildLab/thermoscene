@@ -31,7 +31,13 @@ class Gen:
         a = q / v
         m = self.S.get("min_rect_duct_m", 0.15)
         h = max(m, min(max_h, np.sqrt(a / 2)))
-        return round(max(m, a / h), 2), round(h, 2)
+        w = max(m, a / h)
+        w_max = self.S["max_rect_duct_aspect"] * h
+        if w > w_max:
+            log.warning("rectangular duct for %.2f m3/s at %.1f m/s needs %.2f x %.2f m; capped at aspect ratio %g: "
+                        "%.2f x %.2f m (%.1f m/s)", q, v, w, h, self.S["max_rect_duct_aspect"], w_max, h, q / (w_max * h))
+            w = w_max
+        return round(w, 2), round(h, 2)
 
     def pipe(self, q, v):
         d = np.sqrt(4 * q / (np.pi * v))
@@ -52,9 +58,30 @@ class Gen:
         except KeyError:
             return 0.0
 
+    def node_design_flows(self) -> dict:
+        """Design supply air volume flow (m3/s, one zone instance) per zone inlet node: autosized flow of the terminal
+        unit or zone equipment that discharges into the node, else the node's peak simulated flow (None if unknown)."""
+        mult, out = self.zone.multiplier, {}
+        for n in self.chain.get("inlet_nodes", []):
+            v = None
+            for c in self.comps:
+                if c.role in ("terminal", "zone_equipment") and any(p.direction == "out" and p.node == n for p in c.ports):
+                    v = self.size(c, "Maximum Air Flow Rate") or self.size(c, "Maximum Supply Air Flow Rate")
+                    if v:
+                        break
+            if not v:
+                v = self.node_max_flow(n) / self.S["air_density"] or None
+            out[n] = v / mult if v else None
+        return out
+
     def zone_design_flow(self) -> float:
-        """Design supply air volume flow for ONE zone instance (m3/s)."""
+        """Design supply air volume flow for ONE zone instance (m3/s); the sum over the inlet nodes of a zone served
+        by several terminals (e.g. VAV + DOAS)."""
         mult = self.zone.multiplier
+        if len(self.chain.get("inlet_nodes", [])) > 1:
+            q = self.node_design_flows()
+            if all(q.values()):
+                return sum(q.values())
         for c in self.comps:
             if c.role in ("terminal", "zone_equipment"):
                 v = self.size(c, "Maximum Air Flow Rate") or self.size(c, "Maximum Supply Air Flow Rate")
@@ -86,6 +113,7 @@ class Gen:
 
     def element(self, id_, cls, space, quads, model, *, stream=None, params=None, material=None, medium=Medium.NONE,
                 represents=(), connects=(), size="", layout_note="", stagnation=None, **attrs) -> Element:
+        id_ = self.scene.names.claim("id:" + space, id_)                # unique: a second "X" becomes "X_2"
         e = Element(id=f"{space}/{id_}", cls=cls, name=id_, space=space, quads=quads, thermal_model=model,
                     thermal_params=params or {}, material=self.material_for(cls, space, material), medium=medium,
                     stream_node=stream, represents=list(represents), connected_to=list(connects))
@@ -94,7 +122,7 @@ class Gen:
             e.attrs["stagnation"] = stagnation
         e.prov("geometry", Provenance.ASSUMED_LAYOUT, layout_note or "rule-based layout")
         e.prov("size", Provenance.ENGINEERING_RULE, size)
-        e.prov("material", Provenance.ASSUMED_LAYOUT, f"material rule: {e.material}")
+        e.prov("material", Provenance.HEURISTIC, f"assumed material (emissivity, absorptance): {e.material}")
         return self.scene.add(e)
 
     def find(self, cls=None, role=None, sim_prefix=None):

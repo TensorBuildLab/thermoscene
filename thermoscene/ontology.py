@@ -37,6 +37,7 @@ USER              given explicitly in the case configuration
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -211,12 +212,42 @@ class Fault(Thing):
 
 
 # ---------------------------------------------------------------------------------------------
+# Names
+# ---------------------------------------------------------------------------------------------
+def sanitize(name: str) -> str:
+    """ASCII identifier characters only (ids, USD prim names)."""
+    return re.sub(r"[^A-Za-z0-9_]", "_", name)
+
+
+class NameRegistry:
+    """Unique names per scope. The first owner of a name keeps it; later owners of the same (sanitised) name get
+    `_2`, `_3`, ... Asking again for the same owner returns its name; without an owner every call is a new owner."""
+
+    def __init__(self, reserved: dict[str, set[str]] | None = None) -> None:
+        self.used: dict[str, set[str]] = {k: set(v) for k, v in (reserved or {}).items()}
+        self.memo: dict[tuple[str, Any], str] = {}
+
+    def claim(self, scope: str, base: str, owner: Any = None) -> str:
+        if owner is not None and (scope, owner) in self.memo:
+            return self.memo[(scope, owner)]
+        used = self.used.setdefault(scope, set())
+        name, i = base, 2
+        while name in used:
+            name, i = f"{base}_{i}", i + 1
+        used.add(name)
+        if owner is not None:
+            self.memo[(scope, owner)] = name
+        return name
+
+
+# ---------------------------------------------------------------------------------------------
 # Scene graph
 # ---------------------------------------------------------------------------------------------
 class SceneGraph:
     """In-memory instance graph. Time series live in `series` keyed by (owner id, quantity)."""
 
     def __init__(self) -> None:
+        self.names = NameRegistry()                     # unique Space, Surface and Element ids
         self.things: dict[str, Thing] = {}
         self.feeds: list[tuple[str, str]] = []          # SimComponent -> SimComponent
         self.series: dict[tuple[str, str], Any] = {}    # (thing id, quantity) -> numpy array

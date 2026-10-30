@@ -35,14 +35,17 @@ def rays_from(eye, target, hfov_deg, res):
 
 
 def resolve_frames(specs, labels):
-    """Frame specs: exact label | 'ENV HH:MM' (last day of ENV) | 'ENV MM-DD HH:MM'."""
+    """Frame specs: exact label 'ENV MM-DD HH:MM' | 'ENV HH:MM' (last day of ENV). ENV is the run-period name; it may
+    contain spaces and is matched case-insensitively (EnergyPlus reports environment names in upper case)."""
     out = []
+    norm = lambda x: " ".join(str(x).split()).upper()
+    by_norm = {norm(lab): lab for lab in labels}
     for s in specs or []:
-        if s in labels:
-            out.append(s); continue
-        m = re.match(r"^(\S+)\s+(\d\d:\d\d)$", s.strip())
+        if norm(s) in by_norm:
+            out.append(by_norm[norm(s)]); continue
+        m = re.match(r"^(.+?)\s+(\d\d:\d\d)$", norm(s))
         if m:
-            hits = [l for l in labels if l.startswith(m.group(1) + " ") and l.endswith(" " + m.group(2))]
+            hits = [lab for lab in labels if re.match(rf"^{re.escape(m.group(1))} \d\d-\d\d {m.group(2)}$", norm(lab))]
             if hits:
                 out.append(hits[-1]); continue
         raise KeyError(f"frame '{s}' not found (examples: {labels[:2]})")

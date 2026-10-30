@@ -7,7 +7,8 @@ from pathlib import Path
 import numpy as np
 from pxr import Usd, UsdGeom
 
-from .shading import Series, camera_environment, camera_rays, cameras, labels, thermal_frame, thermal_prims
+from .shading import (LEVELS, Series, camera_environment, camera_rays, cameras, labels, provenance_frame, provenance_shares,
+                      thermal_frame, thermal_prims)
 
 log = logging.getLogger(__name__)
 
@@ -60,28 +61,14 @@ def raycast(origin, dirs, meshes, normals=False):
     return (best, best_t, nrm) if normals else (best, best_t)
 
 
-LEVELS = ["simulated", "physics", "engineering_rule", "heuristic", "assumed_layout", "user"]
-
-
-def provenance_map(prims, owner, hits=None, jet_extent=2.1):
-    """Per-pixel index into LEVELS of the provenance of the surface temperature seen (len(LEVELS) = background).
-    Ceiling pixels inside a diffuser's jet footprint (exp(-r/L) > 5 % at the longest jet) are 'heuristic'."""
+def provenance_map(prims, owner):
+    """Per-pixel index into LEVELS of the model level of the surface seen (len(LEVELS) = background), without the
+    per-frame effects (ceiling jets, stagnant fluid) that shading.provenance_frame adds."""
     lv = []
     for p in prims:
         a = p.GetAttribute("thermal:surfaceTemperature:provenance")
         lv.append(LEVELS.index(a.Get()) if a and a.Get() in LEVELS else len(LEVELS))
-    prov = np.array(lv + [len(LEVELS)])[owner]
-    if hits is not None:
-        index = {str(p.GetPath()): i for i, p in enumerate(prims)}
-        for p in prims:
-            rel = p.GetRelationship("thermal:ceilingJetTarget")
-            if not rel or not rel.GetTargets() or str(rel.GetTargets()[0]) not in index:
-                continue
-            mask = owner == index[str(rel.GetTargets()[0])]
-            c = p.GetAttribute("thermal:ceilingJetCenter").Get(); half = p.GetAttribute("thermal:ceilingJetHalfSize").Get()
-            r = np.maximum(np.maximum(np.abs(hits[..., 0] - c[0]), np.abs(hits[..., 1] - c[1])) - half, 0)
-            prov[mask & (r < jet_extent)] = LEVELS.index("heuristic")
-    return prov
+    return np.array(lv + [len(LEVELS)])[owner]
 
 
 def usd_faces(prim):
@@ -109,21 +96,25 @@ def render_usd(usd_path, outdir, camera_names=None, frames=None, preview=True):
         hits = o + d * np.where(np.isfinite(t), t, 0).reshape(h, w, 1)
         out = Path(outdir) / name; out.mkdir(parents=True, exist_ok=True)
         np.save(out / "segmentation.npy", owner)
-        prov = provenance_map(prims, owner, hits)
+        prov = provenance_map(prims, owner)
         np.save(out / "provenance_map.npy", prov)
-        levels = ["simulated", "physics", "engineering_rule", "heuristic", "assumed_layout", "user", "background"]
-        share = {lv: float(np.mean(prov == i)) for i, lv in enumerate(levels) if np.any(prov == i)}
-        (out / "provenance_share.json").write_text(encoding="utf-8", data=__import__("json").dumps(share, indent=2))
         (out / "segmentation_labels.txt").write_text(encoding="utf-8", data="".join(f"{i}\t{p.GetPath()}\n" for i, p in enumerate(prims)))
         fl = frames or list(cam.GetAttribute("thermal:previewFrames").Get() or [])
-        res = {}
+        res, shares = {}, {}
         for lab in fl:
             tc = labs.index(lab)
             true_map, app = thermal_frame(stage, series, tc, prims, owner, hits, cam, seed=tc)
             tag = lab.replace(" ", "_").replace(":", "")
             np.save(out / f"{tag}_true.npy", true_map.astype(np.float32))
             np.save(out / f"{tag}_apparent.npy", app.astype(np.float32))
+            pf = provenance_frame(stage, series, tc, prims, owner, hits)
+            np.save(out / f"{tag}_provenance.npy", pf.astype(np.int8))
+            shares[lab] = provenance_shares(pf)
             res[lab] = (tc, app)
+        names = sorted({k for s in shares.values() for k in s}, key=(LEVELS + ["background"]).index)
+        mean = {k: float(np.mean([s.get(k, 0.0) for s in shares.values()])) for k in names} if shares else {}
+        (out / "provenance_share.json").write_text(encoding="utf-8", data=__import__("json").dumps(
+            {"mean": mean, "frames": shares, "model_levels": provenance_shares(prov)}, indent=2))
         results[name] = (owner, res)
         if preview and res:
             _figure(stage, series, cam, prims, owner, res, Path(outdir) / f"preview_{name}.png")

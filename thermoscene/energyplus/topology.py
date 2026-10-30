@@ -139,7 +139,9 @@ class HVACGraph:
             mark(self._branch_list(f.get("demand_side_branch_list_name")), "plant_demand", name, True)
         for name, f in self.m.objs("CondenserLoop").items():
             mark(self._branch_list(f.get("condenser_side_branch_list_name")), "condenser_supply", name, True)
-            mark(self._branch_list(f.get("demand_side_branch_list_name")), "condenser_demand", name, True)
+            # epJSON names this field condenser_demand_side_branch_list_name (PlantLoop: demand_side_branch_list_name)
+            mark(self._branch_list(f.get("condenser_demand_side_branch_list_name") or f.get("demand_side_branch_list_name")),
+                 "condenser_demand", name, True)
         for name, f in self.m.objs("AirLoopHVAC").items():
             mark(self._branch_list(f.get("branch_list_name")), "air_supply", name, False)
         for _, f in self.m.objs("ZoneHVAC:AirDistributionUnit").items():
@@ -185,13 +187,28 @@ class HVACGraph:
                         self.G.add_edge("C:" + key, "N:" + p.node)
                 self.comps[key] = comp
 
+    def _children(self, parent: SimComponent) -> set[str]:
+        """Component keys a container declares through <x>_object_type / <x>_name field pairs (its coils, fans, mixer)."""
+        _, f = self.m.obj(parent.sim_type, parent.name)
+        out = set()
+        for k, v in (f or {}).items():
+            n = (f or {}).get(k[:-len("_object_type")] + "_name") if k.endswith("_object_type") else None
+            if isinstance(v, str) and isinstance(n, str):
+                out.add(self.key(v, n))
+        return out
+
     def _inherit_from_containers(self) -> None:
-        """Children of a container (CoilSystem, UnitarySystem, fan coil, PTAC) share its nodes; they inherit its
-        system memberships so that e.g. a DX coil inside a CoilSystem counts as air-loop supply equipment."""
+        """Children of a container (CoilSystem, UnitarySystem, fan coil, PTAC) inherit its system memberships, so that
+        e.g. a DX coil inside a CoilSystem or a unitary system counts as air-loop supply equipment. A child is a
+        component the container declares as its own or one that shares a node with it (a blow-through or draw-through
+        middle component shares no node with the container, only the declaration links it)."""
         for parent in [c for c in self.comps.values() if c.cls in self.CONTAINERS and c.attrs["memberships"]]:
             pn = {p.node for p in parent.ports}
+            declared = self._children(parent)
             for child in self.comps.values():
-                if child is parent or child.cls in self.CONTAINERS or not ({p.node for p in child.ports} & pn):
+                if child is parent or child.cls in self.CONTAINERS:
+                    continue
+                if child.id not in declared and not ({p.node for p in child.ports} & pn):
                     continue
                 for m in parent.attrs["memberships"]:
                     if m not in child.attrs["memberships"]:

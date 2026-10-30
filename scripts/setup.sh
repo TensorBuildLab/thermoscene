@@ -14,6 +14,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -q --upgrade pip
 pip install -q -r requirements.txt
+pip install -q -e .                 # the thermoscene package itself (python -m thermoscene from any folder)
 
 echo "== EnergyPlus"
 if [ -z "${THERMOSCENE_ENERGYPLUS:-}" ]; then

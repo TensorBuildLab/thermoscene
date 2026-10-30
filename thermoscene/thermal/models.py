@@ -84,7 +84,8 @@ def fluid(e: Element, ctx: Ctx):
     flow = ctx.r.series("System Node Mass Flow Rate", e.attrs.get("flow_node", e.stream_node)) * e.attrs.get("flow_scale", 1.0)
     kind = e.attrs.get("stagnation")
     if kind:
-        T = stagnate(T, np.nan_to_num(flow), ctx.ambient_air(e), ctx.th["stagnation_tau_steps"][kind], ctx.period_start)
+        tau_steps = ctx.th["stagnation_tau_min"][kind] / ctx.r.step_minutes
+        T = stagnate(T, np.nan_to_num(flow), ctx.ambient_air(e), tau_steps, ctx.period_start)
     return T, flow
 
 
@@ -114,7 +115,8 @@ def _(e, Tf, c):
 
 @model("bare_pipe")
 def _(e, Tf, c):
-    return Tf + (c.ambient(e) - Tf) * c.th["bare_pipe_coupling"], Provenance.PHYSICS, "bare metal, water-side film dominates"
+    return Tf + (c.ambient(e) - Tf) * c.th["bare_pipe_coupling"], Provenance.HEURISTIC, \
+        "bare metal, fixed film-resistance ratio (water side dominates)"
 
 
 @model("ambient")

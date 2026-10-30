@@ -20,9 +20,13 @@ class IDFText:
             if fields and fields[0]:
                 self.objects.append(fields)
 
+    # EnergyPlus requires UTF-8 names. Reading UTF-8 with surrogateescape keeps any other byte of the user's file
+    # unchanged on write, while text appended here (fault objects named after model objects) is written as UTF-8.
+    ENCODING = dict(encoding="utf-8", errors="surrogateescape")
+
     @classmethod
     def read(cls, path) -> "IDFText":
-        with open(path, encoding="latin-1") as f:
+        with open(path, **cls.ENCODING) as f:
             return cls(f.read())
 
     def classes(self) -> set[str]:
@@ -55,11 +59,12 @@ class IDFText:
         return "\n".join(out)
 
     def write(self, path) -> None:
-        with open(path, "w", encoding="latin-1") as f:     # IDF files are Latin-1
+        with open(path, "w", **self.ENCODING) as f:
             f.write(self.text())
 
 
-def run_period(name: str, start: str, end: str, start_dow: str = "UseWeatherFile") -> str:
+def run_period(name: str, start: str, end: str, start_dow: str = "") -> str:
+    """RunPeriod object; an empty start weekday lets EnergyPlus use its default (Sunday when no year is given)."""
     m0, d0 = (int(x) for x in re.split(r"[-/]", start))
     m1, d1 = (int(x) for x in re.split(r"[-/]", end))
     return f"RunPeriod, {name}, {m0}, {d0}, , {m1}, {d1}, , {start_dow}, No, No, No, No, No, No;"

@@ -26,10 +26,26 @@ def b64(a) -> str:
     return base64.b64encode(np.ascontiguousarray(a).tobytes()).decode()
 
 
+def time_index(n: int, max_steps: int | None = None) -> np.ndarray:
+    """Time codes shown in the viewer: all of them, or `max_steps` (default MAX_STEPS) evenly spaced ones for long runs."""
+    m = MAX_STEPS if max_steps is None else max_steps
+    return np.arange(n) if n <= m else np.linspace(0, n - 1, m).astype(int)
+
+
+def viewer_frame(idx: np.ndarray, tc: int) -> int:
+    """Position on the viewer's (possibly subsampled) time axis of the stage time code `tc`."""
+    return int(np.argmin(np.abs(np.asarray(idx) - tc)))
+
+
+def viewer_step_minutes(step: int, n: int, idx: np.ndarray):
+    """Mean minutes between two viewer steps (the stage step unless the run was subsampled)."""
+    return step if len(idx) == n or len(idx) < 2 else round(step * (n - 1) / (len(idx) - 1), 2)
+
+
 def export(usd_path, out_html, title=None) -> Path:
     stage = Usd.Stage.Open(str(usd_path))
     ser, labs = Series(stage), labels(stage)
-    idx = np.arange(len(labs)) if len(labs) <= MAX_STEPS else np.linspace(0, len(labs) - 1, MAX_STEPS).astype(int)
+    idx = time_index(len(labs))
     prims = thermal_prims(stage)
     world = stage.GetPrimAtPath("/World")
     spaces = [p for p in world.GetChildren() if p.HasAttribute("semantic:class")
@@ -46,6 +62,10 @@ def export(usd_path, out_html, title=None) -> Path:
     pos = np.asarray(pos, np.float32); owner = np.asarray(owner, np.float32)
 
     temps = np.array([sv(p, "thermal:surfaceTemperature") for p in prims], np.float32)
+    # 1 where an element's fluid is stagnant at that step (its temperature then rests on the heuristic relaxation)
+    stag = np.array([[1 if p.HasAttribute("mep:stagnation") and p.HasAttribute("mep:fluidMassFlow") and v <= 0 else 0
+                      for v in (sv(p, "mep:fluidMassFlow") if p.HasAttribute("mep:fluidMassFlow") else [1.0] * len(idx))]
+                     for p in prims], np.uint8)
     info = []
     for p in prims:
         path = str(p.GetPath())
@@ -81,19 +101,20 @@ def export(usd_path, out_html, title=None) -> Path:
         env = c.GetRelationship("thermal:environment").GetTargets()
         cams.append(dict(name=c.GetName(), eye=M[3, :3].tolist(), target=(M[3, :3] - 3.0 * M[2, :3]).tolist(),
                          hfov=float(hfov), space=space_index.get(str(env[0]) if env else "", 0),
-                         frames=[labs.index(f) for f in (c.GetAttribute("thermal:previewFrames").Get() or [])]))
+                         frames=[viewer_frame(idx, labs.index(f)) for f in (c.GetAttribute("thermal:previewFrames").Get() or [])]))
     g = lambda n, d: (cameras(stage)[0].GetAttribute(n).Get() if cameras(stage) and cameras(stage)[0].HasAttribute(n) else d)
     meta = stage.GetRootLayer().customLayerData
     data = dict(
         title=title or meta.get("ts:case", Path(usd_path).stem), source=meta.get("ts:source", ""),
-        labels=[labs[int(t)] for t in idx], step_minutes=int(meta.get("thermal:timestepMinutes", 15)) * int(len(labs) / len(idx)),
+        labels=[labs[int(t)] for t in idx], step_minutes=viewer_step_minutes(int(meta.get("thermal:timestepMinutes", 15)), len(labs), idx),
         prims=info, spaces=sp, jets=jets, cameras=cams, levels=LEVELS + ["background"],
         camera=dict(eps=float(g("thermal:camera:emissivity_setting", 0.95)), refl=float(g("thermal:camera:reflected_setting_c", 20.0)),
                     netd=float(g("thermal:camera:netd_k", 0.05))),
         band=list(stage.GetPrimAtPath(str(cameras(stage)[0].GetPath())).GetAttribute("thermal:band_um").Get()) if cameras(stage) else [8, 14],
         inferno=(np.array([colormaps["inferno"](i / 255)[:3] for i in range(256)]) * 255).round().astype(int).ravel().tolist(),
         n_prims=len(prims), n_steps=len(idx),
-        positions=b64(pos), owner=b64(owner), temps=b64(temps))
+        prov_threshold=float(meta.get("thermal:provenanceThresholdK", 0.1)),
+        positions=b64(pos), owner=b64(owner), temps=b64(temps), stag=b64(stag))
     html = TEMPLATE.read_text(encoding="utf-8").replace("/*__THERMOSCENE_DATA__*/null", json.dumps(data, separators=(",", ":")))
     out = Path(out_html); out.write_text(encoding="utf-8", data=html)
     return out

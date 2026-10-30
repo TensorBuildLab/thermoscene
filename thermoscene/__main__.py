@@ -1,6 +1,7 @@
 """Command line:  python -m thermoscene {build,render,web,inspect} ..."""
 import argparse
 import logging
+import sys
 
 from . import pipeline
 
@@ -17,6 +18,11 @@ def main():
     i = sub.add_parser("inspect", help="list zones of an EnergyPlus model and trace the HVAC serving them")
     i.add_argument("idf"); i.add_argument("--zone"); i.add_argument("--energyplus")
     a = ap.parse_args()
+    for s in (sys.stdout, sys.stderr):          # zone and object names may not fit the console code page (Windows)
+        try:
+            s.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
     if a.cmd == "build":
         pipeline.build(a.case, render=a.render)

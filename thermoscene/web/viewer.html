@@ -165,7 +165,10 @@ if (!window.THREE || !DATA) { $("err").style.display = "flex"; $("err").textCont
 // ------------------------------------------------------------------ data
 const f32 = (b) => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return new Float32Array(u.buffer); };
 const P = DATA.prims, NP = P.length, NS = DATA.n_steps, SP = DATA.spaces, NSP = SP.length, J = DATA.jets.slice(0, 16);
+const u8 = (b) => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
 const pos = f32(DATA.positions), owner = f32(DATA.owner), temps = f32(DATA.temps);
+const stag = DATA.stag ? u8(DATA.stag) : new Uint8Array(NP * NS), PROV_THR = DATA.prov_threshold || 0.1;
+const stagAt = (p, t) => stag[p * NS + Math.min(Math.round(t), NS - 1)] > 0;
 const LEVEL_NAMES = ["Simulated by EnergyPlus", "Physics model", "Engineering rule", "Heuristic model", "Assumed layout", "User given", "Background"];
 const LEVEL_COLORS = ["#2f6db3", "#3a9a62", "#7c5ac2", "#d9792c", "#9aa4ab", "#6b767c", "#4a5256"];
 const CLASS_COLORS = {Wall: "#d6d1c4", Floor: "#b3ac98", Ceiling: "#e9e6de", Roof: "#9a978f", Window: "#9ec9df", Door: "#c49a6c",
@@ -205,8 +208,9 @@ function surfaceTemp(p, x, y, t) {
   for (const g of J) if (g.target === p) {
     const dx = x - g.center[0], dy = y - g.center[1], r = Math.max(Math.max(Math.abs(dx), Math.abs(dy)) - g.half, 0);
     const lobes = 0.6 + 0.4 * Math.pow(Math.cos(2 * Math.atan2(dy, dx)), 2);
-    T += (tempAt(g.diffuser, t) - base) * series(g.strength, t) * Math.exp(-r / Math.max(series(g.length, t), 1e-3)) * lobes;
-    if (r < 2.1) jet = true;
+    const dj = (tempAt(g.diffuser, t) - base) * series(g.strength, t) * Math.exp(-r / Math.max(series(g.length, t), 1e-3)) * lobes;
+    T += dj;
+    if (Math.abs(dj) >= PROV_THR) jet = true;          // same rule as thermoscene.render.shading.provenance_frame
   }
   return { T, jet };
 }
@@ -234,7 +238,8 @@ geom.computeBoundingBox();
 const tex = (data, w, hgt, type) => { const t = new THREE.DataTexture(data, w, hgt, THREE.RGBAFormat, type || THREE.FloatType);
   t.minFilter = t.magFilter = THREE.NearestFilter; t.needsUpdate = true; return t; };
 const tempData = new Float32Array(NS * NP * 4);
-for (let p = 0; p < NP; p++) for (let i = 0; i < NS; i++) tempData[4 * (p * NS + i)] = temps[p * NS + i];
+for (let p = 0; p < NP; p++) for (let i = 0; i < NS; i++) {
+  tempData[4 * (p * NS + i)] = temps[p * NS + i]; tempData[4 * (p * NS + i) + 1] = stag[p * NS + i]; }
 const info = new Float32Array(NP * 4), colors = new Float32Array(NP * 4);
 P.forEach((q, k) => { info.set([q.eps, q.space, q.prov, 0], 4 * k);
   const col = new THREE.Color(CLASS_COLORS[q.cls] || "#bbbbbb"); colors.set([col.r, col.g, col.b, 1], 4 * k); });
@@ -247,6 +252,7 @@ const U = {
   uSpace: { value: spaceTex }, uLut: { value: tex(lut, LUTN, 1) }, uInv: { value: tex(inv, LUTN, 1) }, uCmap: { value: cmTex },
   uNP: { value: NP }, uNS: { value: NS }, uNSp: { value: NSP }, uT: { value: 0 }, uMode: { value: 0 },
   uCamEps: { value: S.eps }, uCamRefl: { value: S.rc }, uNetd: { value: DATA.camera.netd }, uSeed: { value: 0 },
+  uProvThr: { value: PROV_THR },
   uMin: { value: 15 }, uMax: { value: 35 }, uT0: { value: T0 }, uT1: { value: T1 }, uL0: { value: L0 }, uL1: { value: L1 }, uLutN: { value: LUTN },
   uJetN: { value: J.length }, uJetTarget: { value: new Array(16).fill(-1) }, uJetDiff: { value: new Array(16).fill(-1) },
   uJetC: { value: Array.from({ length: 16 }, () => new THREE.Vector2()) }, uJetHalf: { value: new Array(16).fill(0) },
@@ -264,7 +270,7 @@ const material = new THREE.ShaderMaterial({
   fragmentShader: `
     precision highp float;
     uniform sampler2D uTemps, uInfo, uColor, uSpace, uLut, uInv, uCmap;
-    uniform float uNP, uNS, uNSp, uT, uMode, uCamEps, uCamRefl, uNetd, uSeed, uMin, uMax, uT0, uT1, uL0, uL1, uLutN, uJetN;
+    uniform float uNP, uNS, uNSp, uT, uMode, uCamEps, uCamRefl, uNetd, uSeed, uMin, uMax, uT0, uT1, uL0, uL1, uLutN, uJetN, uProvThr;
     uniform float uJetTarget[16], uJetDiff[16], uJetHalf[16], uJetA[16], uJetL[16];
     uniform vec2 uJetC[16];
     uniform vec3 uProv[7];
@@ -273,6 +279,8 @@ const material = new THREE.ShaderMaterial({
       return mix(texture2D(s, vec2((i + 0.5) / n, 0.5)).r, texture2D(s, vec2((i + 1.5) / n, 0.5)).r, f); }
     float temp(float p) { float i = floor(uT); float j = min(i + 1.0, uNS - 1.0); float f = uT - i; float v = (p + 0.5) / uNP;
       return mix(texture2D(uTemps, vec2((i + 0.5) / uNS, v)).r, texture2D(uTemps, vec2((j + 0.5) / uNS, v)).r, f); }
+    float stagnant(float p) { float i = min(floor(uT + 0.5), uNS - 1.0);
+      return texture2D(uTemps, vec2((i + 0.5) / uNS, (p + 0.5) / uNP)).g; }
     float Lb(float T) { return row(uLut, (T - uT0) / (uT1 - uT0) * (uLutN - 1.0), uLutN); }
     float LbInv(float L) { return row(uInv, (L - uL0) / (uL1 - uL0) * (uLutN - 1.0), uLutN); }
     vec3 cmap(float x) { return texture2D(uCmap, vec2(clamp(x, 0.0, 1.0) * 0.996 + 0.002, 0.5)).rgb; }
@@ -289,8 +297,9 @@ const material = new THREE.ShaderMaterial({
           vec2 d = vWorld.xy - uJetC[i];
           float r = max(max(abs(d.x), abs(d.y)) - uJetHalf[i], 0.0);
           float c2 = cos(2.0 * atan(d.y, d.x));
-          Ts += (temp(uJetDiff[i]) - base) * uJetA[i] * exp(-r / max(uJetL[i], 0.001)) * (0.6 + 0.4 * c2 * c2);
-          if (r < 2.1) jet = 1.0;
+          float dj = (temp(uJetDiff[i]) - base) * uJetA[i] * exp(-r / max(uJetL[i], 0.001)) * (0.6 + 0.4 * c2 * c2);
+          Ts += dj;
+          if (abs(dj) >= uProvThr) jet = 1.0;
         }
       }
       float shade = 0.58 + 0.42 * abs(dot(normalize(vN), normalize(vec3(0.35, -0.5, 0.8))));
@@ -305,7 +314,8 @@ const material = new THREE.ShaderMaterial({
       } else if (uMode < 1.5) {
         col = cmap((Ts - uMin) / (uMax - uMin));
       } else if (uMode < 2.5) {
-        float lv = jet > 0.5 ? 3.0 : inf.b;
+        float lv = inf.b;
+        if ((jet > 0.5 || stagnant(p) > 0.5) && lv < 3.0) lv = 3.0;      // per-frame rule of provenance_frame
         col = uProv[0];
         if (lv > 0.5) col = uProv[1]; if (lv > 1.5) col = uProv[2]; if (lv > 2.5) col = uProv[3];
         if (lv > 3.5) col = uProv[4]; if (lv > 4.5) col = uProv[5]; if (lv > 5.5) col = uProv[6];
@@ -423,9 +433,9 @@ renderer.domElement.addEventListener("pointermove", (e) => {
   const r = renderer.domElement.getBoundingClientRect();
   const h = pick(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
   if (!h || e.buttons) { tip.style.display = "none"; return; }
-  const v = valueAt(h), lv = v.jet ? 3 : v.q.prov;
+  const v = valueAt(h), stg = stagAt(h.p, S.t), lv = (v.jet || stg) && v.q.prov < 3 ? 3 : v.q.prov;
   tip.innerHTML = `<b>${v.q.name.replace(/_/g, " ")}</b><br><span class="k">${v.q.cls}${v.q.size ? ", " + v.q.size : ""}</span><br>` +
-    `Actual ${v.T.toFixed(1)} °C &nbsp; Camera ${v.cam.toFixed(1)} °C<br><span class="k">Emissivity ${v.q.eps.toFixed(2)}. ${LEVEL_NAMES[lv]}${v.jet ? " (ceiling jet)" : ""}.</span>`;
+    `Actual ${v.T.toFixed(1)} °C &nbsp; Camera ${v.cam.toFixed(1)} °C<br><span class="k">Emissivity ${v.q.eps.toFixed(2)}. ${LEVEL_NAMES[lv]}${v.jet ? " (ceiling jet)" : stg && v.q.prov < 3 ? " (stagnant fluid)" : ""}.</span>`;
   tip.style.display = "block";
   const x = Math.min(e.clientX - r.left + 14, r.width - tip.offsetWidth - 8), y = Math.min(e.clientY - r.top + 14, r.height - tip.offsetHeight - 8);
   tip.style.left = x + "px"; tip.style.top = y + "px";

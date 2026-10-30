@@ -135,9 +135,21 @@ def generate(gen, dist) -> dict:
     return out
 
 
+def _kind(src) -> str:
+    if src.cls == "Chiller":
+        cond_air = any(p.medium == Medium.AIR for p in src.ports if "condenser" in p.name)
+        return "Chiller:air" if cond_air else "Chiller:water"
+    return src.cls
+
+
+def _where(gen, src) -> str:
+    kind = _kind(src)
+    return gen.cfg.get("equipment_location", {}).get(kind, ROOF_SOURCES.get(kind, "plant_room"))
+
+
 def _plant(gen, out, spec, P):
     S, L, T = gen.S, gen.L, gen.T
-    R, W, z0 = spec["z"], out["W"], out["z0"]
+    R, W = spec["z"], out["W"]
     across_ch = -(W / 2 + L["roof_clearance_m"])
     placed = {}
     for c, e, x, ln in out["sections"]:
@@ -149,19 +161,17 @@ def _plant(gen, out, spec, P):
         tins = T["insulation"]["pipe_roof_m"]; r = od / 2 + tins
         coil_mid = x + ln / 2
         z_s, z_r = R + 0.6, R + 0.9
-        for src in gen.graph.plant_sources(c):
-            kind = src.cls
-            if src.cls == "Chiller":
-                cond_air = any(p.medium == Medium.AIR for p in src.ports if "condenser" in p.name)
-                kind = "Chiller:air" if cond_air else "Chiller:water"
-            where = gen.cfg.get("equipment_location", {}).get(kind, ROOF_SOURCES.get(kind, "plant_room"))
+        sources = gen.graph.plant_sources(c)              # parallel chillers/boilers: one plant, several sources
+        coil_valve = riser_done = False
+        for src in sources:
+            kind, where = _kind(src), _where(gen, src)
             s_out = next((p for p in src.ports if p.direction == "out" and p.medium == Medium.WATER), None)
             s_in = next((p for p in src.ports if p.direction == "in" and p.medium == Medium.WATER), None)
             if where == "roof" and src.id not in placed:
                 cap = (gen.size(src, "Capacity") or 50000.0) / 1000
                 Lc = S["chiller_length_m"]["base"] + S["chiller_length_m"]["per_kw"] * cap
                 Wc, Hc = S["chiller_width_m"], S["chiller_height_m"]
-                ac = across_ch - Wc / 2
+                ac = across_ch - Wc / 2 - len(placed) * (Wc + L["roof_clearance_m"])     # next unit further out
                 c0 = coil_mid - Lc / 2
                 zb, zt = R + 0.15, R + 0.15 + Hc
                 nm = "".join(ch if ch.isalnum() else "_" for ch in src.name)[:30]
@@ -194,6 +204,9 @@ def _plant(gen, out, spec, P):
                 ret = gen.element(f"{src.name[:20]}_{c.name[:20]}_Return_Pipe".replace(" ", "_"), "Pipe", "Outdoors", ret_q,
                                   "insulated_pipe", stream=s_in.node, params=dict(od=od, thickness=tins), medium=Medium.WATER,
                                   stagnation="water", represents=[src.id, c.id], size=f"{od * 1000:.0f} mm OD + {tins * 1000:.0f} mm")
+                if coil_valve:                              # one control valve and pump per coil, not per source
+                    continue
+                coil_valve = True
                 gen.element(f"{c.name[:24]}_Control_Valve".replace(" ", "_"), "Valve", "Outdoors",
                             cyl(P(coil_mid + 0.2, y_coil - 0.35, z_r), P(coil_mid + 0.2, y_coil - 0.6, z_r), od / 2 + 0.02, caps=True),
                             "bare_pipe", stream=w_out.node, medium=Medium.WATER, stagnation="valve", condensation_check=True,
@@ -205,11 +218,13 @@ def _plant(gen, out, spec, P):
                                 cyl(P(coil_mid - 0.2, yp, z_s + r), P(coil_mid - 0.2, yp, z_s + r + 0.45), 0.12, caps=True),
                                 "motor", represents=[pump.id], power=["Pump Electricity Rate", pump.name],
                                 size="inline pump motor", connects=[sup.id])
-            else:
+            elif not riser_done:                            # one riser pair per coil serves all plant-room sources
+                riser_done = True
+                room = [s for s in sources if s is src or _where(gen, s) != "roof"]
                 riser = (W / 2 + 0.6)
                 for tag, port, zz, dx in (("Supply", w_in, z_s, -0.2), ("Return", w_out, z_r, 0.2)):
                     gen.element(f"{c.name[:24]}_{tag}_From_Riser".replace(" ", "_"), "Pipe", "Outdoors",
                                 path([P(dx, riser, R), P(dx, riser, zz), P(coil_mid + dx, riser, zz), P(coil_mid + dx, W / 2, zz)], r),
                                 "insulated_pipe", stream=port.node, params=dict(od=od, thickness=tins), medium=Medium.WATER,
-                                stagnation="water", represents=[c.id, src.id],
+                                stagnation="water", represents=[c.id] + [s.id for s in room],
                                 size=f"{od * 1000:.0f} mm from {where} ({src.sim_type})")

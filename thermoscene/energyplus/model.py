@@ -3,6 +3,8 @@
 Handles GlobalGeometryRules (relative/world coordinates, clockwise/counter-clockwise entry),
 zone origins and rotation, BuildingSurface:Detailed and Wall/RoofCeiling/Floor:Detailed,
 FenestrationSurface:Detailed and the simple Window/Door/GlazedDoor objects.
+Coordinates are building coordinates: the Building north axis is NOT applied (EnergyPlus rotates relative-coordinate
+models by it for solar calculations only); the stage records it as `ts:northAxisDeg`.
 """
 from __future__ import annotations
 
@@ -19,6 +21,7 @@ SURFACE_CLASSES = {"BuildingSurface:Detailed": None, "Wall:Detailed": "Wall",
 UNSUPPORTED_SURFACES = ("Wall:Exterior", "Wall:Adiabatic", "Wall:Underground", "Wall:Interzone", "Roof",
                         "Ceiling:Adiabatic", "Ceiling:Interzone", "Floor:GroundContact", "Floor:Adiabatic", "Floor:Interzone")
 SIMPLE_SUBSURFACES = {"Window": "Window", "Door": "Door", "GlazedDoor": "GlassDoor"}
+UNSUPPORTED_SUBSURFACES = ("Window:Interzone", "Door:Interzone", "GlazedDoor:Interzone")
 
 
 def newell_normal(pts) -> np.ndarray:
@@ -50,6 +53,10 @@ class EPModel:
         self.clockwise = r.get("vertex_entry_direction", "Counterclockwise").lower() == "clockwise"
         self.warnings: list[str] = []
 
+    def warn(self, msg: str) -> None:
+        if msg not in self.warnings:
+            self.warnings.append(msg)
+
     # ---------------------------------------------------------------- generic access
     def objs(self, cls: str) -> dict:
         return self.d.get(cls, {})
@@ -70,6 +77,14 @@ class EPModel:
     def zone_multiplier(self, zone: str) -> int:
         _, z = self.obj("Zone", zone)
         return int(z.get("multiplier", 1)) if z else 1
+
+    def north_axis(self) -> float:
+        """Building north axis (deg clockwise from true north); not applied to the geometry."""
+        b = next(iter(self.objs("Building").values()), {})
+        try:
+            return float(b.get("north_axis", 0.0) or 0.0)
+        except (TypeError, ValueError):
+            return 0.0
 
     def _to_world(self, pts, zone: str):
         p = np.asarray(pts, float)
@@ -118,7 +133,7 @@ class EPModel:
                                 verts=self._to_world(verts, zn)))
         for cls in UNSUPPORTED_SURFACES:
             if self.objs(cls):
-                self.warnings.append(f"{cls} objects are not read (convert to BuildingSurface:Detailed)")
+                self.warn(f"{cls} objects are not read (convert to BuildingSurface:Detailed)")
         return out
 
     def surface(self, name: str) -> dict | None:
@@ -129,7 +144,8 @@ class EPModel:
         for name, f in self.objs("FenestrationSurface:Detailed").items():
             if f.get("building_surface_name", "").upper() != host["name"].upper():
                 continue
-            n = int(f.get("number_of_vertices", 4) or 4)
+            # 'Autocalculate' or blank (omitted in epJSON): count the vertices actually given
+            n = sum(f"vertex_{i}_x_coordinate" in f for i in range(1, 5))
             verts = [(f[f"vertex_{i}_x_coordinate"], f[f"vertex_{i}_y_coordinate"], f[f"vertex_{i}_z_coordinate"])
                      for i in range(1, n + 1)]
             out.append(dict(name=name, type=f.get("surface_type", "Window"), construction=f.get("construction_name", ""),
@@ -140,7 +156,7 @@ class EPModel:
                     continue
                 o, u, v, nrm = plane_frame(host["verts"])
                 if abs(nrm[2]) > 0.95:
-                    self.warnings.append(f"{cls} {name}: simple sub-surfaces on horizontal hosts are not supported")
+                    self.warn(f"{cls} {name}: simple sub-surfaces on horizontal hosts are not supported")
                     continue
                 hv = np.asarray(host["verts"]); uu, vv = (hv - o) @ u, (hv - o) @ v
                 ll = o + uu.min() * u + vv.min() * v
@@ -149,7 +165,14 @@ class EPModel:
                 pts = [ll + (x0) * u + (z0 + H) * v, ll + x0 * u + z0 * v, ll + (x0 + L) * u + z0 * v, ll + (x0 + L) * u + (z0 + H) * v]
                 out.append(dict(name=name, type=st, construction=f.get("construction_name", ""), verts=np.array(pts),
                                 multiplier=int(f.get("multiplier", 1) or 1)))
+        for cls in UNSUPPORTED_SUBSURFACES:
+            if self.objs(cls):
+                self.warn(f"{cls} objects are not read (convert to FenestrationSurface:Detailed)")
         return out
+
+    def is_air_boundary(self, construction: str) -> bool:
+        """Construction:AirBoundary surfaces are not heat-transfer surfaces (EnergyPlus reports no temperatures)."""
+        return bool(construction) and self.obj("Construction:AirBoundary", construction)[0] is not None
 
     # ---------------------------------------------------------------- constructions / materials
     def layers(self, construction: str) -> list[str]:

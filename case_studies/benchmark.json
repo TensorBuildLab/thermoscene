@@ -1,0 +1,150 @@
+{
+  "elements": {
+    "insulated_pipe: hot-water pipe, 21 mm + 25 mm, ε 0.90": [
+      [
+        30.0,
+        24.62406459308881,
+        24.674442500140238
+      ],
+      [
+        45.0,
+        26.184226075810834,
+        26.172728217280167
+      ],
+      [
+        65.0,
+        28.264441386106867,
+        28.01546944956695
+      ],
+      [
+        80.0,
+        29.82460286882889,
+        29.32997281378116
+      ]
+    ],
+    "insulated_flat: 200 mm duct, 38 mm foil-faced wrap, ε 0.30": [
+      [
+        12.0,
+        22.666666666666668,
+        21.838787337201644
+      ],
+      [
+        16.0,
+        23.11111111111111,
+        22.49415167051409
+      ],
+      [
+        30.0,
+        24.666666666666668,
+        25.159341588848683
+      ],
+      [
+        35.0,
+        25.22222222222222,
+        25.989352311469496
+      ]
+    ],
+    "bare_duct: 200 mm galvanised duct, ε 0.25": [
+      [
+        12.0,
+        15.428571428571429,
+        14.327200729398148
+      ],
+      [
+        16.0,
+        18.285714285714285,
+        17.458226224231826
+      ],
+      [
+        30.0,
+        28.285714285714285,
+        28.942179774300932
+      ],
+      [
+        35.0,
+        31.857142857142858,
+        32.86648746811677
+      ]
+    ],
+    "bare_pipe: DN15 valve body, ε 0.60 (reference: laminar / turbulent water side)": [
+      [
+        30.0,
+        29.82,
+        29.58800273940414,
+        29.988092385234495
+      ],
+      [
+        45.0,
+        44.37,
+        43.27237192973941,
+        44.94907367131861
+      ],
+      [
+        65.0,
+        63.77,
+        61.207632915507226,
+        64.88640407747206
+      ],
+      [
+        80.0,
+        78.32,
+        74.491727710264,
+        79.83337430855684
+      ]
+    ]
+  },
+  "worst_abs_difference_K": {
+    "insulated_pipe: hot-water pipe, 21 mm + 25 mm, ε 0.90": 0.49463005504772894,
+    "insulated_flat: 200 mm duct, 38 mm foil-faced wrap, ε 0.30": 0.8278793294650235,
+    "bare_duct: 200 mm galvanised duct, ε 0.25": 1.1013706991732803,
+    "bare_pipe: DN15 valve body, ε 0.60 (reference: laminar / turbulent water side)": 3.8282722897359918
+  },
+  "stagnation": [
+    {
+      "element": "wrapped 200 mm supply duct (air)",
+      "kind": "air",
+      "initial_fluid_C": 14.0,
+      "heat_capacity_J_per_mK": 1715.2,
+      "ua_W_per_mK": 0.6,
+      "tau_lumped_min": 47.7,
+      "tau_default_min": 45.0
+    },
+    {
+      "element": "insulated DN15 hot-water pipe (water)",
+      "kind": "water",
+      "initial_fluid_C": 60.0,
+      "heat_capacity_J_per_mK": 1435.8,
+      "ua_W_per_mK": 0.187,
+      "tau_lumped_min": 127.7,
+      "tau_default_min": 120.0
+    },
+    {
+      "element": "bare DN15 pipe, proxy for the valve body (water)",
+      "kind": "valve",
+      "initial_fluid_C": 60.0,
+      "heat_capacity_J_per_mK": 1399.1,
+      "ua_W_per_mK": 0.756,
+      "tau_lumped_min": 30.8,
+      "tau_default_min": 30.0
+    }
+  ],
+  "defect_2d": {
+    "boundary": "steady, inside 20.0 °C (R_si 0.13), outside 0.0 °C (R_se 0.04)",
+    "one_d": {
+      "wall": 18.86,
+      "void": 14.27,
+      "contrast": -4.59
+    },
+    "two_d": {
+      "void_centre": 14.27,
+      "far_wall": 18.86,
+      "contrast": -4.59
+    },
+    "centre_contrast_ratio_2d_to_1d": 1.0,
+    "edge_90_to_10_percent_m": [
+      0.383,
+      0.448
+    ],
+    "note": "x measured from the void centre; the void edge is at 0.40 m"
+  }
+}

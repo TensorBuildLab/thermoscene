@@ -10,6 +10,7 @@ python -m venv .venv
 & .\.venv\Scripts\Activate.ps1
 python -m pip install -q --upgrade pip
 python -m pip install -q -r requirements.txt
+python -m pip install -q -e .      # the thermoscene package itself (python -m thermoscene from any folder)
 
 Write-Host "== EnergyPlus"
 if (-not $env:THERMOSCENE_ENERGYPLUS) {

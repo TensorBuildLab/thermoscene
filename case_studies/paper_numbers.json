@@ -20,7 +20,7 @@
       23.9,
       23.9,
       0.0,
-      23.8
+      23.6
     ],
     "diffuser WINTER 01-15 07:30: face / ceiling / difference / supply air (zone inlet node)": [
       23.1,
@@ -45,7 +45,7 @@
       "WINTER 01-15 08:00",
       26.7
     ],
-    "reheat valve WINTER 01-15 10:00 (reheat off, trapped water)": 37.7,
+    "reheat valve WINTER 01-15 10:00 (reheat off, trapped water)": 31.6,
     "duct gap - wrapped duct, winter day maximum (reheat): difference / time": [
       1.5,
       "WINTER 01-15 07:15"
@@ -94,41 +94,189 @@
       "packaged condenser, 165 kW"
     ]
   },
+  "energy": {
+    "B envelope void": {
+      "void area (m2) / insulated wall area (m2)": [
+        0.64,
+        11.76
+      ],
+      "WINTER 01-15: void / insulated wall (Wh/m2 per day); ratio": [
+        -254.6,
+        -59.0,
+        4.3
+      ],
+      "WINTER 01-15: whole wall without / with void (Wh per day); change (%)": [
+        -732,
+        -857,
+        -17.1
+      ],
+      "SUMMER 07-16: void / insulated wall (Wh/m2 per day); ratio": [
+        640.0,
+        134.5,
+        4.8
+      ],
+      "SUMMER 07-16: whole wall without / with void (Wh per day); change (%)": [
+        1668,
+        1991,
+        19.4
+      ]
+    },
+    "C envelope void": {
+      "void area (m2) / insulated wall area (m2)": [
+        0.8,
+        70.83
+      ],
+      "WINTER 01-15: void / insulated wall (Wh/m2 per day); ratio": [
+        -676.4,
+        -197.7,
+        3.4
+      ],
+      "WINTER 01-15: whole wall without / with void (Wh per day); change (%)": [
+        -14161,
+        -14544,
+        -2.7
+      ],
+      "SUMMER 07-16: void / insulated wall (Wh/m2 per day); ratio": [
+        354.3,
+        82.7,
+        4.3
+      ],
+      "SUMMER 07-16: whole wall without / with void (Wh per day); change (%)": [
+        5922,
+        6140,
+        3.7
+      ]
+    },
+    "B duct insulation gap": {
+      "unwrapped area (m2)": 0.113,
+      "WINTER 01-15: extra heat gain (Wh per day) / office sensible cooling (Wh per day); share (%)": [
+        65.8,
+        4266,
+        1.54
+      ],
+      "SUMMER 15:00: extra heat gain (W) / office sensible cooling (W); share (%)": [
+        5.8,
+        1039,
+        0.56
+      ],
+      "SUMMER 07-16: extra heat gain (Wh per day) / office sensible cooling (Wh per day); share (%)": [
+        133.6,
+        13888,
+        0.96
+      ]
+    }
+  },
   "provenance_share_percent": {
     "B CeilingCamera": {
-      "simulated": 24.5,
-      "heuristic": 75.5
+      "simulated": [
+        56.3,
+        24.5,
+        94.7
+      ],
+      "heuristic": [
+        43.7,
+        5.3,
+        75.5
+      ]
     },
     "B PlenumCamera": {
-      "simulated": 80.9,
-      "physics": 19.1
+      "simulated": [
+        80.9,
+        80.9,
+        80.9
+      ],
+      "physics": [
+        12.6,
+        0,
+        19.0
+      ],
+      "heuristic": [
+        6.5,
+        0.1,
+        19.1
+      ]
     },
     "B RooftopCamera": {
-      "physics": 0.0,
-      "heuristic": 70.7,
-      "background": 29.3
+      "physics": [
+        0.0,
+        0,
+        0.0
+      ],
+      "heuristic": [
+        70.7,
+        70.7,
+        70.7
+      ],
+      "background": [
+        29.3,
+        29.3,
+        29.3
+      ]
     },
     "B WallCamera": {
-      "simulated": 99.4,
-      "heuristic": 0.6
+      "simulated": [
+        99.9,
+        99.4,
+        100.0
+      ],
+      "heuristic": [
+        0.1,
+        0,
+        0.6
+      ]
     },
     "C DiffuserCamera": {
-      "simulated": 4.8,
-      "heuristic": 95.2
+      "simulated": [
+        24.8,
+        12.4,
+        37.9
+      ],
+      "heuristic": [
+        75.2,
+        62.1,
+        87.6
+      ]
     },
     "C PlenumCamera": {
-      "simulated": 97.8,
-      "physics": 2.2,
-      "heuristic": 0.0
+      "simulated": [
+        97.8,
+        97.8,
+        97.8
+      ],
+      "physics": [
+        2.2,
+        2.2,
+        2.2
+      ]
     },
     "C RooftopCamera": {
-      "simulated": 56.7,
-      "heuristic": 14.3,
-      "background": 29.1
+      "simulated": [
+        56.7,
+        56.7,
+        56.7
+      ],
+      "heuristic": [
+        14.3,
+        14.3,
+        14.3
+      ],
+      "background": [
+        29.1,
+        29.1,
+        29.1
+      ]
     },
     "C WindowCamera": {
-      "simulated": 73.9,
-      "heuristic": 26.1
+      "simulated": [
+        89.7,
+        82.6,
+        94.9
+      ],
+      "heuristic": [
+        10.3,
+        5.1,
+        17.4
+      ]
     }
   },
   "counts": {
@@ -143,7 +291,7 @@
       "energyplus": {
         "warnings": 2,
         "severe": 0,
-        "cached": false
+        "cached": true
       }
     },
     "B_hvac_system": {
@@ -151,14 +299,14 @@
       "elements": 28,
       "components": 17,
       "surface_temperature_provenance": {
-        "heuristic": 14,
-        "physics": 14,
+        "heuristic": 17,
+        "physics": 11,
         "simulated": 14
       },
       "energyplus": {
         "warnings": 2,
         "severe": 0,
-        "cached": false
+        "cached": true
       }
     },
     "C_doe_medium_office": {
@@ -173,66 +321,66 @@
       "energyplus": {
         "warnings": 13,
         "severe": 0,
-        "cached": false
+        "cached": true
       }
     }
   },
   "cost": {
     "render B_hvac_system": {
       "WallCamera": {
-        "raycast_s": 1.02,
-        "per_frame_s": 0.016,
+        "raycast_s": 1.33,
+        "per_frame_s": 0.023,
         "resolution": "320x240"
       },
       "CeilingCamera": {
-        "raycast_s": 3.45,
-        "per_frame_s": 0.022,
+        "raycast_s": 5.54,
+        "per_frame_s": 0.042,
         "resolution": "320x240"
       },
       "PlenumCamera": {
-        "raycast_s": 1.69,
-        "per_frame_s": 0.008,
+        "raycast_s": 2.78,
+        "per_frame_s": 0.025,
         "resolution": "320x240"
       },
       "RooftopCamera": {
-        "raycast_s": 0.56,
-        "per_frame_s": 0.012,
+        "raycast_s": 1.22,
+        "per_frame_s": 0.02,
         "resolution": "320x240"
       }
     },
     "build B_hvac_system, as last built (s)": {
-      "seconds": 7.93,
-      "energyplus_cached": false
+      "seconds": 10.94,
+      "energyplus_cached": true
     },
-    "build B_hvac_system, cached EnergyPlus run (s)": 6.5,
+    "build B_hvac_system, cached EnergyPlus run (s)": 10.8,
     "render C_doe_medium_office": {
       "WindowCamera": {
-        "raycast_s": 0.86,
-        "per_frame_s": 0.035,
+        "raycast_s": 1.59,
+        "per_frame_s": 0.069,
         "resolution": "320x240"
       },
       "DiffuserCamera": {
-        "raycast_s": 0.78,
-        "per_frame_s": 0.081,
+        "raycast_s": 1.31,
+        "per_frame_s": 0.14,
         "resolution": "320x240"
       },
       "PlenumCamera": {
-        "raycast_s": 0.97,
-        "per_frame_s": 0.019,
+        "raycast_s": 1.62,
+        "per_frame_s": 0.026,
         "resolution": "320x240"
       },
       "RooftopCamera": {
-        "raycast_s": 0.97,
-        "per_frame_s": 0.008,
+        "raycast_s": 1.37,
+        "per_frame_s": 0.019,
         "resolution": "320x240"
       }
     },
     "build C_doe_medium_office, as last built (s)": {
-      "seconds": 14.8,
-      "energyplus_cached": false
+      "seconds": 20.48,
+      "energyplus_cached": true
     },
-    "build C_doe_medium_office, cached EnergyPlus run (s)": 11.7,
-    "B stage size, time samples (MB)": 6.72,
+    "build C_doe_medium_office, cached EnergyPlus run (s)": 21.0,
+    "B stage size, time samples (MB)": 6.73,
     "C stage size, sidecar: usda + npz (MB)": 0.48,
     "C stage size, time samples (MB)": 48.4
   }

@@ -52,7 +52,9 @@ def generate(gen, devices, faults) -> dict:
     t_damper = terminal.port("damper", direction="out") or t_in
     reheat = next((c for c in gen.comps if c.cls in ("HeatingCoil", "HotWaterCoil")
                    and any(p.direction == "out" and p.node in inlets for p in c.ports)), None)
-    zone_node = inlets[0]
+    # the zone inlet this terminal discharges into (a zone can have several inlets, e.g. VAV box + DOAS terminal)
+    zone_node = next((p.node for p in terminal.ports if p.direction == "out" and p.medium == Medium.AIR and p.node in inlets),
+                     inlets[0])
     mult = gen.zone.multiplier
     pl = gen.scene.get(gen.ids["plenum"])
     pid = pl.id
@@ -120,13 +122,15 @@ def generate(gen, devices, faults) -> dict:
             gap_quads = cyl((top[0], top[1], g0), (top[0], top[1], g1), Dd / 2)
         else:
             drop_quads += cyl((top[0], top[1], zd), bot, Dd / 2)
-        dis = gen.element(f"Discharge_Duct_{i + 1}", "Duct", pid, drop_quads, "insulated_flat", stream=zone_node,
+        node = dfu.stream_node or zone_node            # the duct carries the air of the inlet its diffuser is fed from
+        dis = gen.element(f"Discharge_Duct_{i + 1}", "Duct", pid, drop_quads, "insulated_flat", stream=node,
                           params=dict(thickness=T["insulation"]["duct_wrap_m"]), medium=Medium.AIR, stagnation="air",
                           flow_scale=1.0 / mult, size=f"{Dd * 1000:.0f} mm round", connects=[dfu.id],
                           layout_note="orthogonal route box -> diffuser")
-        last.connected_to.append(dis.id)
+        if node == zone_node:                          # other inlets' terminals are not generated
+            last.connected_to.append(dis.id)
         if gap_quads:
-            gen.element("Duct_Insulation_Gap", "InsulationDefect", pid, gap_quads, "bare_duct", stream=zone_node,
+            gen.element("Duct_Insulation_Gap", "InsulationDefect", pid, gap_quads, "bare_duct", stream=node,
                         medium=Medium.AIR, stagnation="air", flow_scale=1.0 / mult, connects=[dfu.id],
                         size=f"{gap.get('length_m', 0.18)} m unwrapped", fault="duct_insulation_gap",
                         layout_note="injected fault: missing duct wrap")

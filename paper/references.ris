@@ -488,3 +488,474 @@ PY  - 2026
 DO  - 10.48550/arXiv.2608.19804
 ER  - 
 
+
+TY  - JOUR
+ID  - tejedor2017quantitative
+AU  - Tejedor, Blanca
+AU  - Casals, Miquel
+AU  - Gangolells, Marta
+AU  - Roca, Xavier
+TI  - Quantitative internal infrared thermography for determining in-situ thermal behaviour of façades
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2017
+VL  - 151
+SP  - 187
+EP  - 197
+DO  - 10.1016/j.enbuild.2017.06.040
+ER  - 
+
+TY  - JOUR
+ID  - ogrady2017quantification
+AU  - O'Grady, Małgorzata
+AU  - Lechowska, Agnieszka A.
+AU  - Harte, Annette M.
+TI  - Quantification of heat losses through building envelope thermal bridges influenced by wind velocity using the outdoor infrared thermography technique
+T2  - Applied Energy
+J2  - Appl. Energy
+PY  - 2017
+VL  - 208
+SP  - 1038
+EP  - 1052
+DO  - 10.1016/j.apenergy.2017.09.047
+ER  - 
+
+TY  - JOUR
+ID  - nardi2018quantification
+AU  - Nardi, Iole
+AU  - Lucchi, Elena
+AU  - de Rubeis, Tullio
+AU  - Ambrosini, Dario
+TI  - Quantification of heat energy losses through the building envelope: a state-of-the-art analysis with critical and comprehensive review on infrared thermography
+T2  - Building and Environment
+J2  - Build. Environ.
+PY  - 2018
+VL  - 146
+SP  - 190
+EP  - 205
+DO  - 10.1016/j.buildenv.2018.09.050
+ER  - 
+
+TY  - JOUR
+ID  - rakha2018review
+AU  - Rakha, Tarek
+AU  - Gorodetsky, Alice
+TI  - Review of Unmanned Aerial System (UAS) applications in the built environment: towards automated building inspection procedures using drones
+T2  - Automation in Construction
+J2  - Autom. Constr.
+PY  - 2018
+VL  - 93
+SP  - 252
+EP  - 264
+DO  - 10.1016/j.autcon.2018.05.002
+ER  - 
+
+TY  - JOUR
+ID  - bayomi2021building
+AU  - Bayomi, Norhan
+AU  - Nagpal, Shreshth
+AU  - Rakha, Tarek
+AU  - Fernandez, John E.
+TI  - Building envelope modeling calibration using aerial thermography
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2021
+VL  - 233
+SP  - 110648
+DO  - 10.1016/j.enbuild.2020.110648
+ER  - 
+
+TY  - JOUR
+ID  - park2021thermal
+AU  - Park, Gwanyong
+AU  - Lee, Minhyung
+AU  - Jang, Hyangin
+AU  - Kim, Changmin
+TI  - Thermal anomaly detection in walls via CNN-based segmentation
+T2  - Automation in Construction
+J2  - Autom. Constr.
+PY  - 2021
+VL  - 125
+SP  - 103627
+DO  - 10.1016/j.autcon.2021.103627
+ER  - 
+
+TY  - JOUR
+ID  - mayer2023deep
+AU  - Mayer, Zoe
+AU  - Kahn, James
+AU  - Hou, Yu
+AU  - Götz, Markus
+AU  - Volk, Rebekka
+AU  - Schultmann, Frank
+TI  - Deep learning approaches to building rooftop thermal bridge detection from aerial images
+T2  - Automation in Construction
+J2  - Autom. Constr.
+PY  - 2023
+VL  - 146
+SP  - 104690
+DO  - 10.1016/j.autcon.2022.104690
+ER  - 
+
+TY  - JOUR
+ID  - mayer2023thermal
+AU  - Mayer, Zoe
+AU  - Kahn, James
+AU  - Götz, Markus
+AU  - Hou, Yu
+AU  - Beiersdörfer, Tobias
+AU  - Blumenröhr, Nicolas
+AU  - Volk, Rebekka
+AU  - Streit, Achim
+AU  - Schultmann, Frank
+TI  - Thermal bridges on building rooftops
+T2  - Scientific Data
+J2  - Sci. Data
+PY  - 2023
+VL  - 10
+IS  - 1
+SP  - 268
+DO  - 10.1038/s41597-023-02140-z
+ER  - 
+
+TY  - JOUR
+ID  - guan2022automatic
+AU  - Guan, Hang
+AU  - Xiao, Tong
+AU  - Luo, Wei
+AU  - Gu, Jiefan
+AU  - He, Ruikai
+AU  - Xu, Peng
+TI  - Automatic fault diagnosis algorithm for hot water pipes based on infrared thermal images
+T2  - Building and Environment
+J2  - Build. Environ.
+PY  - 2022
+VL  - 218
+SP  - 109111
+DO  - 10.1016/j.buildenv.2022.109111
+ER  - 
+
+TY  - JOUR
+ID  - zhang2017modeling
+AU  - Zhang, Rongpeng
+AU  - Hong, Tianzhen
+TI  - Modeling of HVAC operational faults in building performance simulation
+T2  - Applied Energy
+J2  - Appl. Energy
+PY  - 2017
+VL  - 202
+SP  - 178
+EP  - 188
+DO  - 10.1016/j.apenergy.2017.05.153
+ER  - 
+
+TY  - JOUR
+ID  - granderson2023labeled
+AU  - Granderson, Jessica
+AU  - Lin, Guanjing
+AU  - Chen, Yimin
+AU  - Casillas, Armando
+AU  - Wen, Jin
+AU  - Chen, Zhelun
+AU  - Im, Piljae
+AU  - Huang, Sen
+AU  - Ling, Jiazhen
+TI  - A labeled dataset for building HVAC systems operating in faulted and fault-free states
+T2  - Scientific Data
+J2  - Sci. Data
+PY  - 2023
+VL  - 10
+IS  - 1
+SP  - 342
+DO  - 10.1038/s41597-023-02197-w
+ER  - 
+
+TY  - JOUR
+ID  - kim2018review
+AU  - Kim, Woohyun
+AU  - Katipamula, Srinivas
+TI  - A review of fault detection and diagnostics methods for building systems
+T2  - Science and Technology for the Built Environment
+J2  - Sci. Technol. Built Environ.
+PY  - 2018
+VL  - 24
+IS  - 1
+SP  - 3
+EP  - 21
+DO  - 10.1080/23744731.2017.1318008
+ER  - 
+
+TY  - JOUR
+ID  - arowoiya2024digital
+AU  - Arowoiya, Victor Adetunji
+AU  - Moehler, Robert Christian
+AU  - Fang, Yihai
+TI  - Digital twin technology for thermal comfort and energy efficiency in buildings: a state-of-the-art and future directions
+T2  - Energy and Built Environment
+J2  - Energy Built Environ.
+PY  - 2024
+VL  - 5
+IS  - 5
+SP  - 641
+EP  - 656
+DO  - 10.1016/j.enbenv.2023.05.004
+ER  - 
+
+TY  - JOUR
+ID  - hosamo2022digital
+AU  - Hosamo, Haidar Hosamo
+AU  - Svennevig, Paul Ragnar
+AU  - Svidt, Kjeld
+AU  - Han, Daguang
+AU  - Nielsen, Henrik Kofoed
+TI  - A digital twin predictive maintenance framework of air handling units based on automatic fault detection and diagnostics
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2022
+VL  - 261
+SP  - 111988
+DO  - 10.1016/j.enbuild.2022.111988
+ER  - 
+
+TY  - JOUR
+ID  - bjornskov2023ontology
+AU  - Bjørnskov, Jakob
+AU  - Jradi, Muhyiddine
+TI  - An ontology-based innovative energy modeling framework for scalable and adaptable building digital twins
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2023
+VL  - 292
+SP  - 113146
+DO  - 10.1016/j.enbuild.2023.113146
+ER  - 
+
+TY  - JOUR
+ID  - andriamamonjy2018automated
+AU  - Andriamamonjy, Ando
+AU  - Saelens, Dirk
+AU  - Klein, Ralf
+TI  - An automated IFC-based workflow for building energy performance simulation with Modelica
+T2  - Automation in Construction
+J2  - Autom. Constr.
+PY  - 2018
+VL  - 91
+SP  - 166
+EP  - 181
+DO  - 10.1016/j.autcon.2018.03.019
+ER  - 
+
+TY  - JOUR
+ID  - benfer2024semantic
+AU  - Benfer, Rebekka
+AU  - Müller, Jochen
+TI  - Semantic digital twin creation of building systems through time series based metadata inference – a review
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2024
+VL  - 321
+SP  - 114637
+DO  - 10.1016/j.enbuild.2024.114637
+ER  - 
+
+TY  - CONF
+ID  - fierro2020shepherding
+AU  - Fierro, Gabe
+AU  - Prakash, Anand Krishnan
+AU  - Mosiman, Cory
+AU  - Pritoni, Marco
+AU  - Raftery, Paul
+AU  - Wetter, Michael
+AU  - Culler, David E.
+TI  - Shepherding metadata through the building lifecycle
+T2  - Proceedings of the 7th ACM International Conference on Systems for Energy-Efficient Buildings, Cities, and Transportation (BuildSys '20)
+PB  - ACM
+CY  - Virtual Event, Japan
+PY  - 2020
+SP  - 70
+EP  - 79
+DO  - 10.1145/3408308.3427627
+ER  - 
+
+TY  - JOUR
+ID  - hou2021novel
+AU  - Hou, Yu
+AU  - Volk, Rebekka
+AU  - Soibelman, Lucio
+TI  - A novel building temperature simulation approach driven by expanding semantic segmentation training datasets with synthetic aerial thermal images
+T2  - Energies
+J2  - Energies
+PY  - 2021
+VL  - 14
+IS  - 2
+SP  - 353
+DO  - 10.3390/en14020353
+ER  - 
+
+TY  - JOUR
+ID  - bulatov2020from
+AU  - Bulatov, Dimitri
+AU  - Burkard, Eva
+AU  - Ilehag, Rebecca
+AU  - Kottler, Benedikt
+AU  - Helmholz, Petra
+TI  - From multi-sensor aerial data to thermal and infrared simulation of semantic 3D models: towards identification of urban heat islands
+T2  - Infrared Physics & Technology
+J2  - Infrared Phys. Technol.
+PY  - 2020
+VL  - 105
+SP  - 103233
+DO  - 10.1016/j.infrared.2020.103233
+ER  - 
+
+
+TY  - JOUR
+ID  - wang2024knowledge
+AU  - Wang, Meng
+AU  - Lilis, Georgios N.
+AU  - Mavrokapnidis, Dimitris
+AU  - Katsigarakis, Kyriakos
+AU  - Korolija, Ivan
+AU  - Rovas, Dimitrios
+TI  - A knowledge graph-based framework to automate the generation of building energy models using geometric relation checking and HVAC topology establishment
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2024
+VL  - 325
+SP  - 115035
+DO  - 10.1016/j.enbuild.2024.115035
+ER  - 
+
+TY  - JOUR
+ID  - goodenough2017dirsig5
+AU  - Goodenough, Adam A.
+AU  - Brown, Scott D.
+TI  - DIRSIG5: Next-Generation Remote Sensing Data and Image Simulation Framework
+T2  - IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing
+J2  - IEEE J. Sel. Top. Appl. Earth Obs. Remote Sens.
+PY  - 2017
+VL  - 10
+IS  - 11
+SP  - 4818
+EP  - 4833
+DO  - 10.1109/JSTARS.2017.2758964
+ER  - 
+
+TY  - JOUR
+ID  - martin2022infrared
+AU  - Martin, Miguel
+AU  - Chong, Adrian
+AU  - Biljecki, Filip
+AU  - Miller, Clayton
+TI  - Infrared thermography in the built environment: A multi-scale review
+T2  - Renewable and Sustainable Energy Reviews
+J2  - Renew. Sustain. Energy Rev.
+PY  - 2022
+VL  - 165
+SP  - 112540
+DO  - 10.1016/j.rser.2022.112540
+ER  - 
+
+TY  - JOUR
+ID  - kirimtat2018review
+AU  - Kirimtat, Ayca
+AU  - Krejcar, Ondrej
+TI  - A review of infrared thermography for the investigation of building envelopes: Advances and prospects
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2018
+VL  - 176
+SP  - 390
+EP  - 406
+DO  - 10.1016/j.enbuild.2018.07.052
+ER  - 
+
+TY  - JOUR
+ID  - tian2013review
+AU  - Tian, Wei
+TI  - A review of sensitivity analysis methods in building energy analysis
+T2  - Renewable and Sustainable Energy Reviews
+J2  - Renew. Sustain. Energy Rev.
+PY  - 2013
+VL  - 20
+SP  - 411
+EP  - 419
+DO  - 10.1016/j.rser.2012.12.014
+ER  - 
+
+TY  - JOUR
+ID  - menberg2016sensitivity
+AU  - Menberg, Kathrin
+AU  - Heo, Yeonsook
+AU  - Choudhary, Ruchi
+TI  - Sensitivity analysis methods for building energy models: Comparing computational costs and extractable information
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2016
+VL  - 133
+SP  - 433
+EP  - 445
+DO  - 10.1016/j.enbuild.2016.10.005
+ER  - 
+
+TY  - JOUR
+ID  - morris1991factorial
+AU  - Morris, Max D.
+TI  - Factorial Sampling Plans for Preliminary Computational Experiments
+T2  - Technometrics
+J2  - Technometrics
+PY  - 1991
+VL  - 33
+IS  - 2
+SP  - 161
+EP  - 174
+DO  - 10.1080/00401706.1991.10484804
+ER  - 
+
+TY  - JOUR
+ID  - churchill1975horizontal
+AU  - Churchill, Stuart W.
+AU  - Chu, Humbert H.S.
+TI  - Correlating equations for laminar and turbulent free convection from a horizontal cylinder
+T2  - International Journal of Heat and Mass Transfer
+J2  - Int. J. Heat Mass Transf.
+PY  - 1975
+VL  - 18
+IS  - 9
+SP  - 1049
+EP  - 1053
+DO  - 10.1016/0017-9310(75)90222-7
+ER  - 
+
+TY  - JOUR
+ID  - churchill1975vertical
+AU  - Churchill, Stuart W.
+AU  - Chu, Humbert H.S.
+TI  - Correlating equations for laminar and turbulent free convection from a vertical plate
+T2  - International Journal of Heat and Mass Transfer
+J2  - Int. J. Heat Mass Transf.
+PY  - 1975
+VL  - 18
+IS  - 11
+SP  - 1323
+EP  - 1329
+DO  - 10.1016/0017-9310(75)90243-4
+ER  - 
+
+TY  - ELEC
+ID  - energyplus2022bnd
+AU  - U.S. Department of Energy
+TI  - EnergyPlus 22.2 Output Details and Examples: eplusout.bnd (branch node details)
+PY  - 2022
+UR  - https://bigladdersoftware.com/epx/docs/22-2/output-details-and-examples/eplusout-bnd.html
+Y2  - 30 October 2026
+ER  - 
+
+TY  - ELEC
+ID  - gazebo2026thermal
+AU  - Open Robotics
+TI  - Gazebo Sensors: thermal camera
+UR  - https://gazebosim.org/api/sensors/6/thermalcameraigngazebo.html
+Y2  - 30 October 2026
+ER  - 
+
