@@ -13,8 +13,10 @@ Automation in Construction):
 buildings and HVAC systems* — Liang Zhang (University of Arizona), Huanrui Yang (University of Arizona),
 Yiyuan Jia (Big Ladder Software).
 
-The manuscript is in `paper/` (`manuscript.docx`, `manuscript.md`, exported from the draft document). Its figures are
-generated here: `docs/paper/figures/`; every number in its Sections 5.1-5.6 comes from `case_studies/paper_numbers.py`.
+The manuscript is in `paper/`: `manuscript_EnB.docx` (current, Energy and Buildings format, real Word equations,
+EndNote citations) built from `manuscript_EnB.md` + `references.ris` with the `manuscript-template` skill (see
+`paper/README.md`); `manuscript.docx/.md` are the earlier author-year export. Figures are generated here:
+`docs/paper/figures/` (figs 4-8 at 300 dpi); every number in Sections 5.1-5.6 comes from `case_studies/paper_numbers.py`.
 
 ## Setup
 
@@ -90,7 +92,8 @@ provenance levels; see `docs/ontology.md`.
 - Paper: references were checked against Crossref/arXiv/OSTI/publisher records on 2026-10-29 (DOIs added; HEARTH is
   Su et al., ADAPT is Yang et al.). ASHRAE 223P was still a public-review draft then; recheck before submission.
   Confirm Big Ladder Software's city; settle the author list and corresponding author; CRediT, competing-interest and
-  acknowledgement sections are placeholders. Equations are LaTeX text in the Word file, not Word equations.
+  acknowledgement sections are placeholders. Energy and Buildings also needs a graphical abstract; line numbers can be
+  added at submission (`split_submission.py --line-numbers`). Abstract 248 words, 6 keywords.
 - Not yet in `defaults.yaml`: geometric detailing constants in the generators (terminal-box proportions, casing
   margins, fan positions, capacity fallbacks) and the auto-camera search grid and score weights.
 - Scope (stated in the paper): scenes are replay-only. Next steps toward a robot test environment: (1) live thermal

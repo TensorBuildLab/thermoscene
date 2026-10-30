@@ -1,0 +1,490 @@
+TY  - STAND
+ID  - ashrae2026standard223p
+AU  - ASHRAE
+TI  - BSR/ASHRAE Standard 223P, Semantic data model for analytics and automation applications in buildings
+T2  - Second ISC public review draft (public review 24 April–8 June 2026)
+PB  - ASHRAE
+CY  - Peachtree Corners, GA
+PY  - 2026
+UR  - https://www.ashrae.org/technical-resources/standards-and-guidelines/public-review-drafts
+ER  - 
+
+TY  - CONF
+ID  - balaji2016brick
+AU  - Balaji, Bharathan
+AU  - Bhattacharya, Arka
+AU  - Fierro, Gabriel
+AU  - Gao, Jingkun
+AU  - Gluck, Joshua
+AU  - Hong, Dezhi
+AU  - Johansen, Aslak
+AU  - Koh, Jason
+AU  - Ploennigs, Joern
+AU  - Agarwal, Yuvraj
+AU  - Berges, Mario
+AU  - Culler, David
+AU  - Gupta, Rajesh
+AU  - Kjærgaard, Mikkel Baun
+AU  - Srivastava, Mani
+AU  - Whitehouse, Kamin
+TI  - Brick: towards a unified metadata schema for buildings
+T2  - Proceedings of the 3rd ACM International Conference on Systems for Energy-Efficient Built Environments (BuildSys '16)
+PB  - ACM
+CY  - Palo Alto, CA, USA
+PY  - 2016
+SP  - 41
+EP  - 50
+DO  - 10.1145/2993422.2993577
+ER  - 
+
+TY  - DATA
+ID  - baubriaud2023mepseg
+AU  - Baubriaud, Mathis
+TI  - MEP-seg dataset: synthetic images generated from Building Information Modeling (BIM)
+PB  - LIRIS, CNRS
+PY  - 2023
+C2  - 1
+UR  - https://datasets.liris.cnrs.fr/mep-seg-dataset-synthetic-images-generated-building-information-modeling-bim-v1
+ER  - 
+
+TY  - JOUR
+ID  - blum2021boptest
+AU  - Blum, David
+AU  - Arroyo, Javier
+AU  - Huang, Sen
+AU  - Drgoňa, Ján
+AU  - Jorissen, Filip
+AU  - Walnum, Harald Taxt
+AU  - Chen, Yan
+AU  - Benne, Kyle
+AU  - Vrabie, Draguna
+AU  - Wetter, Michael
+AU  - Helsen, Lieve
+TI  - Building optimization testing framework (BOPTEST) for simulation-based benchmarking of control strategies in buildings
+T2  - Journal of Building Performance Simulation
+J2  - J. Build. Perform. Simul.
+PY  - 2021
+VL  - 14
+IS  - 5
+SP  - 586
+EP  - 610
+DO  - 10.1080/19401493.2021.1986574
+ER  - 
+
+TY  - JOUR
+ID  - crawley2001energyplus
+AU  - Crawley, Drury B.
+AU  - Lawrie, Linda K.
+AU  - Winkelmann, Frederick C.
+AU  - Buhl, W. F.
+AU  - Huang, Y. Joe
+AU  - Pedersen, Curtis O.
+AU  - Strand, Richard K.
+AU  - Liesen, Richard J.
+AU  - Fisher, Daniel E.
+AU  - Witte, Michael J.
+AU  - Glazer, Jason
+TI  - EnergyPlus: creating a new-generation building energy simulation program
+T2  - Energy and Buildings
+J2  - Energy Build.
+PY  - 2001
+VL  - 33
+IS  - 4
+SP  - 319
+EP  - 331
+DO  - 10.1016/S0378-7788(00)00114-6
+ER  - 
+
+TY  - JOUR
+ID  - deitke2022procthor
+AU  - Deitke, Matt
+AU  - VanderBilt, Eli
+AU  - Herrasti, Alvaro
+AU  - Weihs, Luca
+AU  - Ehsani, Kiana
+AU  - Salvador, Jordi
+AU  - Han, Winson
+AU  - Kolve, Eric
+AU  - Kembhavi, Aniruddha
+AU  - Mottaghi, Roozbeh
+TI  - ProcTHOR: large-scale embodied AI using procedural generation
+T2  - Advances in Neural Information Processing Systems
+J2  - Adv. Neural Inf. Process. Syst.
+PY  - 2022
+VL  - 35
+SP  - 5982
+EP  - 5994
+DO  - 10.52202/068431-0433
+ER  - 
+
+TY  - RPRT
+ID  - deru2011reference
+AU  - Deru, Michael
+AU  - Field, Kristin
+AU  - Studer, Daniel
+AU  - Benne, Kyle
+AU  - Griffith, Brent
+AU  - Torcellini, Paul
+AU  - Liu, Bing
+AU  - Halverson, Mark
+AU  - Winiarski, Dave
+AU  - Rosenberg, Michael
+AU  - Yazdanian, Mehry
+AU  - Huang, Joe
+AU  - Crawley, Drury
+TI  - U.S. Department of Energy commercial reference building models of the national building stock
+T2  - Technical Report NREL/TP-5500-46861
+PB  - National Renewable Energy Laboratory
+CY  - Golden, CO
+PY  - 2011
+DO  - 10.2172/1009264
+ER  - 
+
+TY  - JOUR
+ID  - fox2014thermography
+AU  - Fox, Matthew
+AU  - Coley, David
+AU  - Goodhew, Steve
+AU  - de Wilde, Pieter
+TI  - Thermography methodologies for detecting energy related building defects
+T2  - Renewable and Sustainable Energy Reviews
+J2  - Renew. Sustain. Energy Rev.
+PY  - 2014
+VL  - 40
+SP  - 296
+EP  - 310
+DO  - 10.1016/j.rser.2014.07.188
+ER  - 
+
+TY  - JOUR
+ID  - goldfeder2024smart
+AU  - Goldfeder, Judah
+AU  - Dean, Victoria
+AU  - Jiang, Zixin
+AU  - Wang, Xuezheng
+AU  - Dong, Bing
+AU  - Lipson, Hod
+AU  - Sipple, John
+TI  - The Smart Buildings Control Suite: a diverse open source benchmark to evaluate and scale HVAC control policies for sustainability
+T2  - arXiv preprint arXiv:2410.03756
+PY  - 2024
+DO  - 10.48550/arXiv.2410.03756
+ER  - 
+
+TY  - JOUR
+ID  - halder2023robots
+AU  - Halder, Srijeet
+AU  - Afsari, Kereshmeh
+TI  - Robots in inspection and monitoring of buildings and infrastructure: a systematic review
+T2  - Applied Sciences
+J2  - Appl. Sci.
+PY  - 2023
+VL  - 13
+IS  - 4
+SP  - 2304
+DO  - 10.3390/app13042304
+ER  - 
+
+TY  - CONF
+ID  - jimenezraboso2021sinergym
+AU  - Jiménez-Raboso, Javier
+AU  - Campoy-Nieves, Alejandro
+AU  - Manjavacas-Lucas, Antonio
+AU  - Gómez-Romero, Juan
+AU  - Molina-Solana, Miguel
+TI  - Sinergym: a building simulation and control framework for training reinforcement learning agents
+T2  - Proceedings of the 8th ACM International Conference on Systems for Energy-Efficient Buildings, Cities, and Transportation (BuildSys '21)
+PB  - ACM
+CY  - Coimbra, Portugal
+PY  - 2021
+SP  - 319
+EP  - 323
+DO  - 10.1145/3486611.3488729
+ER  - 
+
+TY  - JOUR
+ID  - kamel2019bim
+AU  - Kamel, Ehsan
+AU  - Memari, Ali M.
+TI  - Review of BIM's application in energy simulation: tools, issues, and solutions
+T2  - Automation in Construction
+J2  - Autom. Constr.
+PY  - 2019
+VL  - 97
+SP  - 164
+EP  - 180
+DO  - 10.1016/j.autcon.2018.11.008
+ER  - 
+
+TY  - JOUR
+ID  - kolve2017ai2thor
+AU  - Kolve, Eric
+AU  - Mottaghi, Roozbeh
+AU  - Han, Winson
+AU  - VanderBilt, Eli
+AU  - Weihs, Luca
+AU  - Herrasti, Alvaro
+AU  - Deitke, Matt
+AU  - Ehsani, Kiana
+AU  - Gordon, Daniel
+AU  - Zhu, Yuke
+AU  - Kembhavi, Aniruddha
+AU  - Gupta, Abhinav
+AU  - Farhadi, Ali
+TI  - AI2-THOR: an interactive 3D environment for visual AI
+T2  - arXiv preprint arXiv:1712.05474
+PY  - 2017
+DO  - 10.48550/arXiv.1712.05474
+ER  - 
+
+TY  - JOUR
+ID  - kylili2014infrared
+AU  - Kylili, Angeliki
+AU  - Fokaides, Paris A.
+AU  - Christou, Petros
+AU  - Kalogirou, Soteris A.
+TI  - Infrared thermography (IRT) applications for building diagnostics: a review
+T2  - Applied Energy
+J2  - Appl. Energy
+PY  - 2014
+VL  - 134
+SP  - 531
+EP  - 549
+DO  - 10.1016/j.apenergy.2014.08.005
+ER  - 
+
+TY  - JOUR
+ID  - lucchi2018applications
+AU  - Lucchi, Elena
+TI  - Applications of the infrared thermography in the energy audit of buildings: a review
+T2  - Renewable and Sustainable Energy Reviews
+J2  - Renew. Sustain. Energy Rev.
+PY  - 2018
+VL  - 82
+SP  - 3077
+EP  - 3090
+DO  - 10.1016/j.rser.2017.10.031
+ER  - 
+
+TY  - JOUR
+ID  - mittal2023orbit
+AU  - Mittal, Mayank
+AU  - Yu, Calvin
+AU  - Yu, Qinxi
+AU  - Liu, Jingzhou
+AU  - Rudin, Nikita
+AU  - Hoeller, David
+AU  - Yuan, Jia Lin
+AU  - Singh, Ritvik
+AU  - Guo, Yunrong
+AU  - Mazhar, Hammad
+AU  - Mandlekar, Ajay
+AU  - Babich, Buck
+AU  - State, Gavriel
+AU  - Hutter, Marco
+AU  - Garg, Animesh
+TI  - Orbit: a unified simulation framework for interactive robot learning environments
+T2  - IEEE Robotics and Automation Letters
+J2  - IEEE Robot. Autom. Lett.
+PY  - 2023
+VL  - 8
+IS  - 6
+SP  - 3740
+EP  - 3747
+DO  - 10.1109/LRA.2023.3270034
+ER  - 
+
+TY  - DATA
+ID  - new2021modelamerica
+AU  - New, Joshua
+AU  - Adams, Mark
+AU  - Berres, Andy
+AU  - Bass, Brett
+AU  - Clinton, Nicholas
+TI  - Model America – data and models of every U.S. building
+PB  - Oak Ridge National Laboratory
+CY  - Oak Ridge, TN
+PY  - 2021
+DO  - 10.13139/ORNLNCCS/1774134
+ER  - 
+
+TY  - JOUR
+ID  - nvidia2025cosmos
+AU  - NVIDIA
+TI  - Cosmos world foundation model platform for physical AI
+T2  - arXiv preprint arXiv:2501.03575
+PY  - 2025
+DO  - 10.48550/arXiv.2501.03575
+ER  - 
+
+TY  - JOUR
+ID  - prabowo2024building
+AU  - Prabowo, Arian
+AU  - Lin, Xiachong
+AU  - Razzak, Imran
+AU  - Xue, Hao
+AU  - Yap, Emily W.
+AU  - Amos, Matthew
+AU  - Salim, Flora D.
+TI  - Building timeseries dataset: empowering large-scale building analytics
+T2  - Advances in Neural Information Processing Systems
+J2  - Adv. Neural Inf. Process. Syst.
+PY  - 2024
+VL  - 37
+SP  - 133180
+EP  - 133206
+DO  - 10.52202/079017-4232
+ER  - 
+
+TY  - CONF
+ID  - raistrick2024infinigen
+AU  - Raistrick, Alexander
+AU  - Mei, Lingjie
+AU  - Kayan, Karhan
+AU  - Yan, David
+AU  - Zuo, Yiming
+AU  - Han, Beining
+AU  - Wen, Hongyu
+AU  - Parakh, Meenal
+AU  - Alexandropoulos, Stamatis
+AU  - Lipson, Lahav
+AU  - Ma, Zeyu
+AU  - Deng, Jia
+TI  - Infinigen Indoors: photorealistic indoor scenes using procedural generation
+T2  - Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)
+PB  - IEEE
+CY  - Seattle, WA, USA
+PY  - 2024
+SP  - 21783
+EP  - 21794
+DO  - 10.1109/CVPR52733.2024.02058
+ER  - 
+
+TY  - JOUR
+ID  - ramakrishnan2021hm3d
+AU  - Ramakrishnan, Santhosh Kumar
+AU  - Gokaslan, Aaron
+AU  - Wijmans, Erik
+AU  - Maksymets, Oleksandr
+AU  - Clegg, Alexander
+AU  - Turner, John
+AU  - Undersander, Eric
+AU  - Galuba, Wojciech
+AU  - Westbury, Andrew
+AU  - Chang, Angel
+AU  - Savva, Manolis
+AU  - Zhao, Yili
+AU  - Batra, Dhruv
+TI  - Habitat-Matterport 3D Dataset (HM3D): 1000 large-scale 3D environments for embodied AI
+T2  - Proceedings of the Neural Information Processing Systems Track on Datasets and Benchmarks
+PY  - 2021
+VL  - 1
+UR  - https://datasets-benchmarks-proceedings.neurips.cc/paper/2021/hash/34173cb38f07f89ddbebc2ac9128303f-Abstract-round2.html
+ER  - 
+
+TY  - CONF
+ID  - savva2019habitat
+AU  - Savva, Manolis
+AU  - Kadian, Abhishek
+AU  - Maksymets, Oleksandr
+AU  - Zhao, Yili
+AU  - Wijmans, Erik
+AU  - Jain, Bhavana
+AU  - Straub, Julian
+AU  - Liu, Jia
+AU  - Koltun, Vladlen
+AU  - Malik, Jitendra
+AU  - Parikh, Devi
+AU  - Batra, Dhruv
+TI  - Habitat: a platform for embodied AI research
+T2  - Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)
+PB  - IEEE
+CY  - Seoul, South Korea
+PY  - 2019
+SP  - 9338
+EP  - 9346
+DO  - 10.1109/ICCV.2019.00943
+ER  - 
+
+TY  - CONF
+ID  - srivastava2022behavior
+AU  - Srivastava, Sanjana
+AU  - Li, Chengshu
+AU  - Lingelbach, Michael
+AU  - Martín-Martín, Roberto
+AU  - Xia, Fei
+AU  - Vainio, Kent Elliott
+AU  - Lian, Zheng
+AU  - Gokmen, Cem
+AU  - Buch, Shyamal
+AU  - Liu, Karen
+AU  - Savarese, Silvio
+AU  - Gweon, Hyowon
+AU  - Wu, Jiajun
+AU  - Fei-Fei, Li
+TI  - BEHAVIOR: benchmark for everyday household activities in virtual, interactive, and ecological environments
+T2  - Proceedings of the 5th Conference on Robot Learning, PMLR 164
+PB  - PMLR
+CY  - London, UK
+PY  - 2022
+SP  - 477
+EP  - 490
+UR  - https://proceedings.mlr.press/v164/srivastava22a.html
+ER  - 
+
+TY  - JOUR
+ID  - su2026hearth
+AU  - Su, Yuning
+AU  - Li, Borui
+AU  - Shi, Yonghao
+AU  - Liu, Bofei
+AU  - Yang, Xing-Dong
+TI  - HEARTH: an object-centric RGB-thermal-3D dataset for temperature-aware robot manipulation
+T2  - arXiv preprint arXiv:2609.23418
+PY  - 2026
+DO  - 10.48550/arXiv.2609.23418
+ER  - 
+
+TY  - CONF
+ID  - tobin2017domain
+AU  - Tobin, Josh
+AU  - Fong, Rachel
+AU  - Ray, Alex
+AU  - Schneider, Jonas
+AU  - Zaremba, Wojciech
+AU  - Abbeel, Pieter
+TI  - Domain randomization for transferring deep neural networks from simulation to the real world
+T2  - 2017 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)
+PB  - IEEE
+CY  - Vancouver, BC, Canada
+PY  - 2017
+SP  - 23
+EP  - 30
+DO  - 10.1109/IROS.2017.8202133
+ER  - 
+
+TY  - BOOK
+ID  - vollmer2018infrared
+AU  - Vollmer, Michael
+AU  - Möllmann, Klaus-Peter
+TI  - Infrared thermal imaging: fundamentals, research and applications
+ET  - 2nd
+PB  - Wiley-VCH
+CY  - Weinheim
+PY  - 2018
+SN  - 978-3-527-41351-5
+DO  - 10.1002/9783527693306
+ER  - 
+
+TY  - JOUR
+ID  - yang2026adapt
+AU  - Yang, Xu
+AU  - Sun, Kailai
+AU  - Zhong, Dianyu
+AU  - Zhao, Qianchuan
+TI  - ADAPT: physics-aware diffusion-based world models for adaptive predictive transferable HVAC control
+T2  - arXiv preprint arXiv:2608.19804
+PY  - 2026
+DO  - 10.48550/arXiv.2608.19804
+ER  - 
+

@@ -5,8 +5,24 @@ buildings and HVAC systems* (draft for Energy and Buildings / Building and Envir
 
 | File | Content |
 |---|---|
-| `manuscript.docx` | Word version with all eight figures embedded |
-| `manuscript.md` | the same text as Markdown (figures as placeholders, equations as LaTeX blocks) |
+| **`manuscript_EnB.docx`** | **current version**, formatted for Energy and Buildings: Times New Roman 12 pt, double spacing, numbered headings, real Word equations numbered at the margin, three-line tables, Fig./Table captions with live cross-references, numbered references as EndNote fields |
+| `manuscript_EnB.md` | its source (template Markdown: `[@key]` citations, `$$ … $$ {#eq:…}` equations, `@fig:`/`@tbl:`/`@sec:` cross-references) |
+| `references.ris` | the 27 references with complete author lists and DOIs (cited keys come from here) |
+| `manuscript.docx`, `manuscript.md` | the earlier export of the same revised text in author-year style (equations as LaTeX text) |
+
+Rebuild the formatted file after editing `manuscript_EnB.md` (the `manuscript-template` Claude skill):
+
+```bash
+python ~/.claude/skills/manuscript-template/scripts/md2docx.py paper/manuscript_EnB.md -o paper/manuscript_EnB.docx
+python ~/.claude/skills/manuscript-template/scripts/check_format.py paper/manuscript_EnB.docx
+```
+
+Once the `.docx` is edited in Word, it becomes the source; do not regenerate it from the Markdown. In Word, choose the
+journal's output style in EndNote and run EndNote > Update Citations and Bibliography (the citations carry their own
+records, so EndNote > Export Traveling Library adds them to your library).
+
+Before submitting to Energy and Buildings: prepare the graphical abstract (required), check whether line numbers are
+requested, and note the manuscript runs to about 42 double-spaced pages including 8 figures and 8 tables.
 
 Where the content comes from:
 

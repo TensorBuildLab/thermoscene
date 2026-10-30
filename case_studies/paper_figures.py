@@ -308,7 +308,7 @@ def fig_geometry():
     eC, tC = roof_view(C, 1.0)
     geometry_render(C, eC, tC, 50, (640, 440), ("Perimeter_top_ZN_1/", "TopFloor_Plenum/"), axs[1, 1],
                     "(d) Case C: packaged rooftop unit on the model's roof")
-    fig.tight_layout(); fig.savefig(OUT / "fig4_geometry.png", dpi=200); plt.close(fig)
+    fig.tight_layout(); fig.savefig(OUT / "fig4_geometry.png", dpi=300); plt.close(fig)
 
 
 # ----------------------------------------------------------------------------------- thermal results
@@ -336,7 +336,7 @@ def fig_thermal(case, rows, name):
             axs[r, c].axis("off")
     handles = [plt.Rectangle((0, 0), 1, 1, color=PROV_COLORS[k]) for k in ("simulated", "physics", "heuristic", "background")]
     fig.legend(handles, ["simulated", "physics", "heuristic", "background"], loc="lower center", ncol=4, fontsize=7, frameon=False)
-    fig.tight_layout(rect=(0, 0.03, 1, 1)); fig.savefig(OUT / name, dpi=200); plt.close(fig)
+    fig.tight_layout(rect=(0, 0.03, 1, 1)); fig.savefig(OUT / name, dpi=300); plt.close(fig)
 
 
 def fig_timeseries():
@@ -385,7 +385,7 @@ def fig_timeseries():
     a.set_title("(d) Roof, summer day"); a.set_xlabel("hour"); a.legend(fontsize=6.2, frameon=False, ncol=2, loc="upper left")
     for a in axs.ravel():
         a.set_xlim(0, 24); a.set_xticks(range(0, 25, 6)); a.grid(alpha=0.25)
-    fig.tight_layout(); fig.savefig(OUT / "fig6_timeseries_caseB.png", dpi=200); plt.close(fig)
+    fig.tight_layout(); fig.savefig(OUT / "fig6_timeseries_caseB.png", dpi=300); plt.close(fig)
 
 
 def fig_provenance_shares():
@@ -408,7 +408,7 @@ def fig_provenance_shares():
     ax.legend(ncol=5, fontsize=7, frameon=False, loc="lower center", bbox_to_anchor=(0.5, 1.0))
     for sp in ("top", "right"):
         ax.spines[sp].set_visible(False)
-    fig.tight_layout(); fig.savefig(OUT / "fig8_pixel_provenance.png", dpi=200); plt.close(fig)
+    fig.tight_layout(); fig.savefig(OUT / "fig8_pixel_provenance.png", dpi=300); plt.close(fig)
 
 
 def fig_thermal_cases():
