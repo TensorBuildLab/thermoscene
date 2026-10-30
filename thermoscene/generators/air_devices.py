@@ -9,6 +9,7 @@ import logging
 import math
 
 import numpy as np
+import shapely
 from scipy.cluster.vq import kmeans2
 from shapely.geometry import Point
 from shapely.ops import unary_union
@@ -24,8 +25,10 @@ def interior_points(poly, inset, step=0.1):
     if p.is_empty or p.area < 0.05:
         p = poly.buffer(-min(inset, 0.2))
     xmin, ymin, xmax, ymax = p.bounds
-    pts = [(x, y) for x in np.arange(xmin, xmax + 1e-9, step) for y in np.arange(ymin, ymax + 1e-9, step) if p.contains(Point(x, y))]
-    return np.array(pts) if pts else np.array([p.representative_point().coords[0]])
+    gx, gy = np.meshgrid(np.arange(xmin, xmax + 1e-9, step), np.arange(ymin, ymax + 1e-9, step), indexing="ij")
+    gx, gy = gx.ravel(), gy.ravel()
+    inside = shapely.contains_xy(p, gx, gy)                  # vectorised point-in-polygon, same order as a nested loop
+    return np.c_[gx[inside], gy[inside]] if inside.any() else np.array([p.representative_point().coords[0]])
 
 
 def generate(gen) -> dict:
@@ -64,10 +67,10 @@ def generate(gen) -> dict:
     if ret_nodes:
         m = max(1, n // 2)
         chosen = []
+        d = np.min(np.linalg.norm(pts[:, None, :] - centers[None], axis=2), axis=1)   # distance to the nearest device
         for k in range(m):
-            ref = np.vstack([centers] + ([np.array(chosen)] if chosen else []))
-            d = np.min(np.linalg.norm(pts[:, None, :] - ref[None], axis=2), axis=1)
             chosen.append(pts[np.argmax(d)])
+            d = np.minimum(d, np.linalg.norm(pts - chosen[-1], axis=1))
         g = gen.S["return_grille"]["size_m"] / 2
         for k, (x, y) in enumerate(chosen):
             ceil = ceilings[next((i for i, p in enumerate(polys) if p.contains(Point(x, y))), 0)]

@@ -15,7 +15,8 @@ from .geometry import frame, to2d
 DEFECT_PREFIX = "TS_DEFECT_"
 
 
-def envelope_defect(model, fault: dict) -> tuple[list[str], str]:
+def envelope_defect(model, fault: dict, defaults: dict | None = None) -> tuple[list[str], str]:
+    fault = {"mode": "cavity", **(defaults or {}), **fault}           # cavity_resistance: defaults.yaml
     host = model.surface(fault["surface"])
     if host is None:
         raise KeyError(f"fault: surface {fault['surface']} not found")
@@ -33,19 +34,24 @@ def envelope_defect(model, fault: dict) -> tuple[list[str], str]:
     if k is None:
         raise ValueError(f"fault: construction {host['construction']} has no insulation layer to remove")
     cav = f"{name}_Cavity"
-    new_layers = layers[:k] + ([cav] if fault.get("mode", "cavity") == "cavity" else []) + layers[k + 1:]
-    objs = [f"Material:AirGap, {cav}, {fault.get('cavity_resistance', 0.17)};",
-            f"Construction, {name}_Construction, {', '.join(new_layers)};",
+    objs = []
+    if fault["mode"] == "cavity":                  # otherwise the insulation layer is simply removed
+        r_cav = float(fault["cavity_resistance"])
+        # EnergyPlus accepts Material:AirGap only between two layers; an exposed cavity is written as a no-mass layer
+        objs.append(f"Material:AirGap, {cav}, {r_cav};" if 0 < k < len(layers) - 1
+                    else f"Material:NoMass, {cav}, Rough, {r_cav}, 0.9, 0.7, 0.7;")
+    new_layers = layers[:k] + ([cav] if fault["mode"] == "cavity" else []) + layers[k + 1:]
+    objs += [f"Construction, {name}_Construction, {', '.join(new_layers)};",
             f"FenestrationSurface:Detailed, {name}, Door, {name}_Construction, {host['name']}, , autocalculate, , 1, 4, "
             + ", ".join(f"{x:.4f}, {y:.4f}, {z:.4f}" for x, y, z in pts) + ";"]
     return objs, name
 
 
-def injection_objects(model, faults: list[dict]) -> tuple[list[str], set[str]]:
+def injection_objects(model, faults: list[dict], defaults: dict | None = None) -> tuple[list[str], set[str]]:
     objs, defect_names = [], set()
     for f in faults or []:
         if f["type"] == "envelope_defect":
-            o, nm = envelope_defect(model, f)
+            o, nm = envelope_defect(model, f, (defaults or {}).get("envelope_defect"))
             objs += o; defect_names.add(nm.upper())
         elif f["type"] == "energyplus_object":
             objs.append(f["idf"])

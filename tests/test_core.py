@@ -41,6 +41,33 @@ def test_radiometry_roundtrip_and_low_emissivity_misreading():
     assert 26 < metal < 29           # a 35 C galvanised duct reads ~27 C on a default-settings camera
 
 
+def test_radiometry_covers_cold_sky_and_hot_equipment():
+    """The lookup table must not clamp clear-sky temperatures of cold climates or hot rooftop equipment."""
+    for t in (-80.0, -45.0, 0.0, 95.0, 200.0):
+        assert abs(rad.apparent_temperature(rad.observed_radiance(t, 1.0, 20.0), 1.0, 20.0) - t) < 0.01, t
+
+
+def test_envelope_defect_cavity_is_never_an_exposed_air_gap():
+    """EnergyPlus rejects Material:AirGap as the outermost or innermost layer of a construction."""
+    from thermoscene.energyplus.model import EPModel
+    from thermoscene.scene.faults import envelope_defect
+    mats = {"Brick": {"thickness": 0.1, "conductivity": 0.9}, "Ins": {"thickness": 0.1, "conductivity": 0.04},
+            "Board": {"thickness": 0.013, "conductivity": 0.16}}
+    verts = [dict(vertex_x_coordinate=x, vertex_y_coordinate=0.0, vertex_z_coordinate=z) for x, z in ((0, 3), (0, 0), (5, 0), (5, 3))]
+
+    def wall(layers):
+        return EPModel({"GlobalGeometryRules": {"g": {"vertex_entry_direction": "Counterclockwise", "coordinate_system": "Relative"}},
+                        "Zone": {"Z": {}}, "Material": mats,
+                        "Construction": {"C": {"outside_layer": layers[0], **{f"layer_{i + 2}": x for i, x in enumerate(layers[1:])}}},
+                        "BuildingSurface:Detailed": {"W": {"surface_type": "Wall", "construction_name": "C", "zone_name": "Z",
+                                                           "outside_boundary_condition": "Outdoors", "vertices": verts}}})
+    for layers, cls in ((["Brick", "Ins", "Board"], "Material:AirGap"), (["Ins", "Board"], "Material:NoMass"),
+                        (["Brick", "Ins"], "Material:NoMass")):
+        objs, _ = envelope_defect(wall(layers), {"surface": "W", "rect": [1, 2, 0.5, 1.5]}, {"cavity_resistance": 0.17})
+        assert objs[0].startswith(cls), (layers, objs[0])
+        assert "_Cavity" in objs[1] and objs[2].startswith("FenestrationSurface:Detailed")
+
+
 def _built(case):
     return (ROOT / "case_studies" / case / "output" / f"{case}.usda").exists()
 

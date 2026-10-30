@@ -18,6 +18,7 @@ from matplotlib import colormaps
 from pxr import Gf, Sdf, Usd, UsdGeom, UsdLux, UsdPhysics, Vt
 
 from ..ontology import CLASSES, Camera, Element, SimComponent, Space, Surface
+from ..thermal.radiometry import BAND_UM
 from ..scene.geometry import grid_split, triangulate
 
 CMAP = colormaps["inferno"]
@@ -255,7 +256,7 @@ class Writer:
         c.AddTransformOp().Set(look_at(cam.eye, cam.target))
         p = c.GetPrim()
         self.put(p, "thermal:resolution", T.Int2, Gf.Vec2i(int(w), int(h)))
-        self.put(p, "thermal:band_um", T.Float2, Gf.Vec2f(*self.cfg["thermal"]["band_um"]))
+        self.put(p, "thermal:band_um", T.Float2, Gf.Vec2f(*BAND_UM))
         self.put(p, "thermal:previewFrames", T.StringArray, cam.frames)
         for k in ("emissivity_setting", "reflected_setting_c", "netd_k", "blur_px"):
             self.put(p, f"thermal:camera:{k}", T.Float, float(self.cfg["camera"][k]))

@@ -19,6 +19,8 @@ scene:
     anchor: auto              # shaft position under the AHU discharge: auto (above zone service corner) | [x, y]
 
 faults: []                    # see docs/configuration.md
+fault_defaults:               # used for every fault of that type unless the fault sets the key itself
+  envelope_defect: {mode: cavity, cavity_resistance: 0.17}    # m2K/W, replaces the highest-resistance layer (ASSUMED)
 
 storage:
   time_series: timesamples    # timesamples (in USD) | sidecar (NPZ next to the USD; for long runs)
@@ -34,6 +36,7 @@ sizing:
   diffuser: {size_m: 0.6, max_flow_m3s: 0.15, max_area_m2: 25.0, inset_m: 0.6}
   return_grille: {size_m: 0.6}
   main_duct_flow_fraction: 0.3          # share of the air-loop design flow carried by the floor main at this zone
+  return_duct: {flow_fraction: 0.85, max_height_m: 0.5}   # rooftop return duct: share of supply flow, height cap
   coil_face_velocity: 2.5               # m/s, sets AHU cross-section
   min_casing_m: {width: 1.2, height: 0.9}   # smallest catalogue rooftop unit / AHU cross-section
   min_rect_duct_m: 0.15                 # smallest rectangular duct side
@@ -76,7 +79,7 @@ material_rules:
 
 # ---------------------------------------------------------------- thermal models
 thermal:
-  band_um: [8.0, 14.0]
+  band_um: [8.0, 14.0]          # camera band (global: read by thermal/radiometry.py, written to every camera)
   film_coefficients: {inside_air: 20.0, plenum: 8.0, outdoor: 17.0, radiative: 5.0}   # W/m2K   (PHYSICS)
   insulation: {conductivity: 0.040, duct_wrap_m: 0.038, box_lining_m: 0.025, pipe_plenum_m: 0.025, pipe_roof_m: 0.038}
   stagnation_tau_steps: {air: 2, water: 6, valve: 3}                                    # (HEURISTIC)
@@ -87,6 +90,9 @@ thermal:
   condenser_coil_fraction: 0.6                                                          # of discharge rise (HEURISTIC)
   condenser_air_flow_m3s_per_kw: 0.114                                                  # if not autosized (ENGINEERING_RULE)
   motor_rise: 15.0                                                                      # K   (HEURISTIC)
+  bare_pipe_coupling: 0.03          # bare valves/pipes: share of (surroundings - water) at the surface (film ratio)
+  louver_sol_air_fraction: 0.3      # louver blades: outdoor air + this share of the sol-air excess (HEURISTIC)
+  condenser_air: {density: 1.2, cp: 1005.0}   # kg/m3, J/kgK for the condenser discharge-air rise (PHYSICS)
   sol_air: {vertical_solar_fraction: 0.6, vertical_sky_fraction: 0.5}                   # (HEURISTIC)
 
 camera:

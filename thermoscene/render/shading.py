@@ -31,7 +31,8 @@ class Series:
         meta = stage.GetRootLayer().customLayerData
         self.npz = None
         if meta.get("thermal:storage") == "sidecar":
-            self.npz = np.load(Path(stage.GetRootLayer().realPath).parent / meta["thermal:sidecar"])
+            with np.load(Path(stage.GetRootLayer().realPath).parent / meta["thermal:sidecar"]) as z:   # decompress once
+                self.npz = {k: z[k] for k in z.files}
 
     def get(self, prim, name, tc):
         a = prim.GetAttribute(name)

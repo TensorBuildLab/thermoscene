@@ -12,7 +12,7 @@ from pathlib import Path
 from . import config as config_mod
 from .energyplus.model import EPModel
 from .energyplus.results import Results
-from .energyplus.runner import energyplus_dir, prepare, simulate, to_epjson
+from .energyplus.runner import energyplus_dir, engine_version, prepare, simulate, to_epjson
 from .energyplus.topology import HVACGraph
 from .generators import air_devices, distribution, equipment
 from .generators.common import Gen
@@ -81,7 +81,7 @@ def build(case_path, render: bool = False, overrides: dict | None = None) -> Pat
 
     # 1. faults that must be simulated are injected into the user's model
     pre = load_model(cfg["model"]["idf"], exe, out / "_work" / "pre")
-    extra, defects = faults_mod.injection_objects(pre, cfg.get("faults", []))
+    extra, defects = faults_mod.injection_objects(pre, cfg.get("faults", []), cfg.get("fault_defaults"))
     prepared = out / "prepared.idf"
     prepare(cfg["model"]["idf"], prepared, cfg["energyplus"].get("run_periods"), extra, cfg["energyplus"].get("timesteps_per_hour"))
     # 2. simulate (cached) and read
@@ -94,7 +94,7 @@ def build(case_path, render: bool = False, overrides: dict | None = None) -> Pat
     graph = HVACGraph(model)
     # 3. spaces, surfaces, topology
     scene = SceneGraph()
-    scene.meta["source"] = f"EnergyPlus {Path(exe).parent.name}; model {Path(cfg['model']['idf']).name}; weather {Path(cfg['model']['epw']).name}"
+    scene.meta["source"] = f"{engine_version(exe)}; model {Path(cfg['model']['idf']).name}; weather {Path(cfg['model']['epw']).name}"
     ids = spaces.build(scene, model, cfg)
     zone_name = scene.get(ids["zone"]).sim_zone
     chain = graph.serving(zone_name) if zone_name.upper() in graph.zone_inlets else {"components": [], "inlet_nodes": [], "loops": []}
@@ -141,7 +141,8 @@ def _summary(scene, cfg, ids, chain, sim, results):
             prov[f"{type(t).__name__}.{q}:{lvl.value}"] += 1
     return dict(
         case=cfg["name"], zone=ids["zone"], plenum=ids["plenum"], timesteps=results.n, step_minutes=results.step_minutes,
-        energyplus=dict(warnings=sim["warnings"], severe=sim["severe"]),
+        source=scene.meta.get("source", ""),
+        energyplus=dict(warnings=sim["warnings"], severe=sim["severe"], cached=sim["cached"]),
         serving_chain=[dict(cls=c.cls, type=c.sim_type, name=c.name, role=c.role, system=c.system, distance=d)
                        for c, d in chain["components"]],
         counts=dict(surfaces=len(scene.of(Surface)), elements=len(scene.of(Element)), components=len(scene.of(SimComponent))),

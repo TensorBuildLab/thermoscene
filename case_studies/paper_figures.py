@@ -359,14 +359,19 @@ def fig_timeseries():
            c="#3182ce", lw=1, ls="--", label="supply air (node)")
     a2.fill_between(h, [ser.get(st.GetPrimAtPath("/World/Plenum/Elements/Discharge_Duct_1"), "mep:fluidMassFlow", t) * 1000 for t in win],
                     color="gray", alpha=0.18, step="mid"); a2.set_ylabel("room supply flow (g/s)", fontsize=7)
-    a.set_title("(b) Terminal and diffuser, winter day"); a.legend(fontsize=6.5, frameon=False, loc="upper right")
+    a.set_zorder(a2.get_zorder() + 1); a.patch.set_visible(False)       # curves above the flow shading
+    for ax_ in (a, a2):                                                   # empty strip at the bottom for the legend
+        lo, hi = ax_.get_ylim(); ax_.set_ylim(lo - 0.2 * (hi - lo), hi)
+    a2.set_yticks([t for t in a2.get_yticks() if 0 <= t <= a2.get_ylim()[1]])   # no negative flow ticks
+    a.set_title("(b) Terminal and diffuser, winter day"); a.legend(fontsize=6.2, frameon=False, loc="lower center", ncol=3)
     a = axs[1, 0]
     a.plot(h, g("/World/Plenum/Elements/HW_Control_Valve", T, win), c="#c53030", lw=1.6, label="reheat valve (bare)")
     a.plot(h, g("/World/Plenum/Elements/HW_Supply_Pipe", T, win), c="#dd6b20", lw=1.6, label="HW pipe jacket")
     a.plot(h, g("/World/Plenum/Elements/HW_Supply_Pipe", "mep:fluidTemperature", win), c="#dd6b20", ls=":", lw=1, label="water inside")
     a.plot(h, g("/World/Plenum/Elements/Duct_Insulation_Gap", T, win), c="#2b6cb0", lw=1.6, label="duct, insulation gap")
     a.plot(h, g("/World/Plenum/Elements/Discharge_Duct_1", T, win), c="#63b3ed", lw=1.2, label="duct, wrapped")
-    a.set_title("(c) Plenum, winter day"); a.set_ylabel("°C"); a.set_xlabel("hour"); a.legend(fontsize=6.2, frameon=False, ncol=2)
+    a.set_title("(c) Plenum, winter day"); a.set_ylabel("°C"); a.set_xlabel("hour")
+    a.legend(fontsize=6.2, frameon=False, ncol=1, loc="center right")
     a = axs[1, 1]
     roof = [p for p in Usd.PrimRange(st.GetPrimAtPath("/World/Outdoors")) if p.HasAttribute(T)]
     pick = lambda cls: next(p for p in roof if p.GetAttribute("semantic:class").Get() == cls)
@@ -376,7 +381,8 @@ def fig_timeseries():
     chw = next(p for p in roof if p.GetAttribute("semantic:class").Get() == "Pipe")
     a.plot(h, [ser.get(chw, T, t) for t in summ], c="#3182ce", lw=1.2, label="CHW pipe jacket")
     a.plot(h, g("/World/Outdoors", "thermal:airTemperature", summ), c="k", ls="--", lw=1, label="outdoor air")
-    a.set_title("(d) Roof, summer day"); a.set_xlabel("hour"); a.legend(fontsize=6.2, frameon=False, ncol=2)
+    lo, hi = a.get_ylim(); a.set_ylim(lo, hi + 0.42 * (hi - lo))         # headroom for the legend
+    a.set_title("(d) Roof, summer day"); a.set_xlabel("hour"); a.legend(fontsize=6.2, frameon=False, ncol=2, loc="upper left")
     for a in axs.ravel():
         a.set_xlim(0, 24); a.set_xticks(range(0, 25, 6)); a.grid(alpha=0.25)
     fig.tight_layout(); fig.savefig(OUT / "fig6_timeseries_caseB.png", dpi=200); plt.close(fig)

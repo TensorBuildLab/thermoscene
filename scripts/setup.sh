@@ -17,13 +17,13 @@ pip install -q -r requirements.txt
 
 echo "== EnergyPlus"
 if [ -z "${THERMOSCENE_ENERGYPLUS:-}" ]; then
-  for c in "$(command -v energyplus || true)" /Applications/EnergyPlus-25-2-0/energyplus /usr/local/EnergyPlus-25-2-0/energyplus \
-           "$HOME"/EnergyPlus-25*/energyplus; do
+  for c in "$(command -v energyplus || true)" /Applications/EnergyPlus-2*/energyplus /usr/local/EnergyPlus-2*/energyplus \
+           "$HOME"/EnergyPlus-2*/energyplus; do
     if [ -n "$c" ] && [ -x "$c" ]; then export THERMOSCENE_ENERGYPLUS="$c"; break; fi
   done
 fi
 if [ -z "${THERMOSCENE_ENERGYPLUS:-}" ]; then
-  echo "EnergyPlus not found. Install EnergyPlus 25.2 (https://github.com/NatLabRockies/EnergyPlus/releases),"
+  echo "EnergyPlus not found. Install EnergyPlus (tested: 22.2; https://github.com/NatLabRockies/EnergyPlus/releases),"
   echo "then: export THERMOSCENE_ENERGYPLUS=/path/to/energyplus  and rerun this script."
   exit 1
 fi
@@ -42,6 +42,7 @@ if [ "$EVAL" = 1 ]; then
   python case_studies/topology_survey.py
   python case_studies/zone_sweep.py
   python case_studies/sensitivity.py
+  python case_studies/paper_numbers.py
   python case_studies/paper_figures.py
 fi
 

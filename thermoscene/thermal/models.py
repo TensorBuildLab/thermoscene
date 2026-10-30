@@ -114,7 +114,7 @@ def _(e, Tf, c):
 
 @model("bare_pipe")
 def _(e, Tf, c):
-    return Tf + (c.ambient(e) - Tf) * 0.03, Provenance.PHYSICS, "bare metal, water-side film dominates"
+    return Tf + (c.ambient(e) - Tf) * c.th["bare_pipe_coupling"], Provenance.PHYSICS, "bare metal, water-side film dominates"
 
 
 @model("ambient")
@@ -141,7 +141,8 @@ def _(e, Tf, c):
 
 @model("louver")
 def _(e, Tf, c):
-    return c.env["T_out"] + 0.3 * (c.ambient(e) - c.env["T_out"]), Provenance.HEURISTIC, "blades in the outdoor-air stream"
+    return c.env["T_out"] + c.th["louver_sol_air_fraction"] * (c.ambient(e) - c.env["T_out"]), Provenance.HEURISTIC, \
+        "blades in the outdoor-air stream"
 
 
 @model("compressor")
@@ -152,7 +153,8 @@ def _(e, Tf, c):
 
 def _discharge_rise(e, c):
     q = np.clip(c.signal(e.attrs.get("heat_rejection")), 0, None)
-    return q / (1.2 * e.attrs["condenser_airflow_m3s"] * 1005.0), q > 0
+    air = c.th["condenser_air"]
+    return q / (air["density"] * e.attrs["condenser_airflow_m3s"] * air["cp"]), q > 0
 
 
 @model("condenser_coil")

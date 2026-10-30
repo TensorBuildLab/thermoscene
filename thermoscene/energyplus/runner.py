@@ -1,7 +1,9 @@
 """Prepare and run a user's EnergyPlus model, then convert the (expanded) model to epJSON."""
 from __future__ import annotations
 
+import functools
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -36,6 +38,19 @@ def find_energyplus(hint: str | None = None) -> str:
 
 def energyplus_dir(exe: str) -> Path:
     return Path(exe).resolve().parent
+
+
+@functools.lru_cache(maxsize=None)
+def engine_version(exe: str) -> str:
+    """'EnergyPlus 22.2.0' from `energyplus --version`; the install folder name if that fails."""
+    try:
+        out = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=60).stdout
+        m = re.search(r"Version\s+([0-9][0-9.]*)", out)
+        if m:
+            return f"EnergyPlus {m.group(1).rstrip('.')}"
+    except (OSError, subprocess.SubprocessError):
+        pass
+    return f"EnergyPlus ({Path(exe).parent.name})"
 
 
 def prepare(src_idf, dst_idf, run_periods=None, extra_objects=(), timesteps_per_hour=None) -> IDFText:

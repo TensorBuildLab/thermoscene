@@ -164,8 +164,8 @@ def generate(gen, devices, faults) -> dict:
         sup.connected_to.append(valve.id); valve.connected_to.append(hdr.id)
 
     # ---------------- return opening (return plenum only)
-    from ..scene.spaces import plenum_zones
-    if pl.sim_zone and pl.sim_zone.upper() in plenum_zones(gen.model):
+    return_plenums = {f["zone_name"].upper() for f in gen.model.objs("AirLoopHVAC:ReturnPlenum").values()}
+    if pl.sim_zone and pl.sim_zone.upper() in return_plenums:
         ra = Le - 0.5 if along < Le / 2 else 0.5
         gen.element("Return_Opening", "Duct", pid, oriented_box(P(ra, 0.2, zd), w, 0.5, min(0.4, depth - 0.2), 0.4),
                     "ambient", stream=f"space:{pid}", material="galv_bare", size="0.5 m return stub to the shaft")

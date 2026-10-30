@@ -21,7 +21,11 @@ class Gen:
     # ---------------------------------------------------------------- sizing rules (ENGINEERING_RULE)
     def round_duct(self, q, v):
         d = np.sqrt(4 * q / (np.pi * v))
-        return next((x for x in self.S["round_ducts_m"] if x >= d), self.S["round_ducts_m"][-1])
+        sizes = self.S["round_ducts_m"]
+        if d > sizes[-1]:
+            log.warning("round duct for %.2f m3/s at %.1f m/s needs %.0f mm; using the largest size, %.0f mm (%.1f m/s)",
+                        q, v, d * 1000, sizes[-1] * 1000, 4 * q / (np.pi * sizes[-1] ** 2))
+        return next((x for x in sizes if x >= d), sizes[-1])
 
     def rect_duct(self, q, v, max_h):
         a = q / v

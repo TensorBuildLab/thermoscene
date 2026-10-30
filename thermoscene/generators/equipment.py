@@ -123,7 +123,8 @@ def generate(gen, dist) -> dict:
                         connects=[mx[1].id], size="outdoor-air intake")
             ret = mixer.port("return_air_stream", direction="in")
             if ret:
-                rw, rh = gen.rect_duct(0.85 * q, S["duct_velocity"]["rooftop"], 0.5)
+                rd = S["return_duct"]
+                rw, rh = gen.rect_duct(rd["flow_fraction"] * q, S["duct_velocity"]["rooftop"], rd["max_height_m"])
                 across = W / 2 + 0.05 + rw / 2
                 gen.element("Roof_Return_Duct", "Duct", "Outdoors",
                             oriented_box(P((mx[2] + mx[3] / 2) / 2, across, R + 0.25 + rh / 2), a, rw, rh, mx[2] + mx[3] / 2),

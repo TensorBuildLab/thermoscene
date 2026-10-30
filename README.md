@@ -30,8 +30,11 @@ Documentation: [ontology](docs/ontology.md) · [configuration](docs/configuratio
 bash scripts/setup.sh                    # venv, dependencies, EnergyPlus check, case studies, tests
 # or by hand:
 pip install -r requirements.txt          # or: pip install -e .
-export THERMOSCENE_ENERGYPLUS=/path/to/EnergyPlus-25.2/energyplus   # EnergyPlus >= 9.6 (tested: 25.2)
+export THERMOSCENE_ENERGYPLUS=/path/to/EnergyPlus/energyplus   # EnergyPlus >= 9.6 (tested: 22.2)
 ```
+
+The hand-made case models (A, B) declare `Version, 22.2;`. With another EnergyPlus version, change that line (the
+objects they use are the same in 22.2 and 25.2) or convert them with EnergyPlus's `IDFVersionUpdater`.
 
 ## Quick start
 
@@ -51,7 +54,9 @@ any WebGL2 browser: move the camera freely (orbit, pan, zoom, or jump to the sce
 simulated period, and switch between the simulated camera reading, the true surface temperature, the provenance of each
 value and the generated geometry. A spot meter at the centre and a hover readout show actual and camera temperatures;
 emissivity and reflected-temperature settings of the camera can be changed live. The per-pixel radiometry runs in a GPU
-shader and matches the Python reference renderer to 1e-4 K.
+shader and agrees with the Python reference renderer to within 1e-3 K (1e-4 K between 10 and 70 °C). Because the free
+camera belongs to no single space, each surface reflects the mean radiant temperature of its own space, and optical blur
+is omitted.
 
 ## Use your own model
 
@@ -93,11 +98,14 @@ Everything else falls back to `defaults.yaml`. Your model file is never modified
 * **Topology generality** ([docs/topology_survey.md](docs/topology_survey.md)): 12 EnergyPlus example models, 8 HVAC
   system types, **180 of 180 conditioned zones traced** without configuration.
 * **Whole-building robustness** ([docs/zone_sweep.md](docs/zone_sweep.md)): scenes for **all 15 conditioned zones** of the
-  unmodified DOE reference medium office, 1.2–9 s each with one shared simulation.
+  unmodified DOE reference medium office, 1.4–3.5 s each on a laptop CPU with one shared simulation.
 * **Sensitivity** ([docs/sensitivity.md](docs/sensitivity.md)): one-at-a-time variation of 7 non-simulated parameters;
   each acts only on the elements it governs.
 * **Renderer agreement and sanity** (`tests/`): the Isaac Sim shading path reproduces the reference renderer to < 1e-4 K
-  for every camera of every case; no missing or implausible temperatures.
+  for every camera of every case (last preview frame); no missing or implausible temperatures.
+* **Numbers quoted in the paper's text** ([docs/paper_numbers.md](docs/paper_numbers.md)): every temperature, size,
+  provenance share, run time and file size in Sections 5.1–5.6, computed from the built cases by
+  `case_studies/paper_numbers.py`.
 
 ## Limitations
 
@@ -113,7 +121,7 @@ the shading path they feed is tested.
 ```
 thermoscene/               package
   ontology.py              concepts, relations, provenance, Brick/223P mapping, scene graph, RDF export
-  defaults.yaml            every rule, assumption and parameter
+  defaults.yaml            sizing and layout rules, materials, thermal-model and camera parameters
   energyplus/              idf_text, runner, model (geometry), results (SQLite), topology (generic tracer)
   scene/                   spaces, geometry, faults
   generators/              air_devices, distribution (plenum), equipment (roof / plant)
@@ -123,9 +131,9 @@ thermoscene/               package
   isaac/thermal_camera.py  Isaac Sim thermal cameras
   web/                     export.py + viewer.html: self-contained real-time thermal viewer
 case_studies/              A, B, C (model + case.yaml), weather, topology_survey.py, zone_sweep.py,
-                           sensitivity.py, paper_figures.py, zone_sweep.json, sensitivity.json
+                           sensitivity.py, paper_numbers.py, paper_figures.py, *.json results
 docs/                      ontology, configuration, reproducing, survey / sweep / sensitivity tables,
-                           paper figures, viewers
+                           paper numbers, paper figures, viewers
 scripts/                   setup.sh / setup.ps1: one-command local setup
 paper/                     manuscript (export from the draft document)
 tests/                     test_core.py

@@ -11,6 +11,11 @@ class Results:
     def __init__(self, sql_path, step_minutes: int | None = None) -> None:
         con = sqlite3.connect(str(sql_path))
         self.con = con
+        try:    # EnergyPlus does not index ReportData by variable; without it every series read scans the table
+            con.execute("create index if not exists ts_report_data_dict on ReportData(ReportDataDictionaryIndex)")
+            con.commit()
+        except sqlite3.Error:
+            pass
         ep = pd.read_sql("select EnvironmentPeriodIndex, EnvironmentName, EnvironmentType from EnvironmentPeriods", con)
         envs = dict(zip(ep.EnvironmentPeriodIndex, ep.EnvironmentName))
         weather_envs = set(ep[ep.EnvironmentType == 3].EnvironmentPeriodIndex) or set(ep.EnvironmentPeriodIndex)

@@ -8,10 +8,16 @@ The camera then converts L_obs to an *apparent* temperature using ITS OWN
 emissivity / reflected-temperature settings, as a real camera does. When the
 camera's settings differ from reality (e.g. glass, metal), it misreads.
 """
+import re
+from pathlib import Path
+
 import numpy as np
 
 H_PLANCK, C_LIGHT, K_B = 6.62607015e-34, 2.99792458e8, 1.380649e-23
-BAND_UM = (8.0, 14.0)
+# Camera band, global for all renderers: thermal.band_um in defaults.yaml (read without PyYAML, so this module also
+# loads in Isaac Sim's Python).
+_band = re.search(r"^\s*band_um:\s*\[([^\]]+)\]", (Path(__file__).resolve().parents[1] / "defaults.yaml").read_text(encoding="utf-8"), re.M)
+BAND_UM = tuple(float(x) for x in _band.group(1).split(","))
 
 
 def _band_radiance(t_kelvin, n=400):
@@ -21,8 +27,9 @@ def _band_radiance(t_kelvin, n=400):
     return np.trapezoid(b, lam, axis=1) if hasattr(np, "trapezoid") else np.trapz(b, lam, axis=1)
 
 
-# Lookup table from -40 C to 150 C for fast forward/inverse conversion
-_T_LUT_C = np.linspace(-40.0, 150.0, 3801)
+# Lookup table for fast forward/inverse conversion: -90 to 220 C (the web viewer's range) in 0.05 K steps.
+# Outside it np.interp clamps, so the range must cover clear-sky temperatures in cold climates.
+_T_LUT_C = np.linspace(-90.0, 220.0, 6201)
 _L_LUT = _band_radiance(_T_LUT_C + 273.15)
 
 

@@ -18,7 +18,8 @@ energyplus:
 
 Without `run_periods` the model's own run periods are used. Output requests and `Output:SQLite` are always added.
 Runs are cached in `energyplus.cache_dir` (default `<case dir>/.sim_cache`) under a hash of the prepared model, the
-weather file and the engine, so scenes of several zones of one building share one simulation.
+weather file and the path of the EnergyPlus executable, so scenes of several zones of one building share one simulation.
+The EnergyPlus version is recorded in the stage (`ts:source`) and in `summary.json`.
 
 ## scene
 
@@ -32,8 +33,9 @@ weather file and the engine, so scenes of several zones of one building share on
 | `interzone_offset_m` | m | coincident interzone faces are pulled apart (avoids z-fighting) |
 
 `equipment_location` (top level) overrides where plant sources go, e.g.
-`equipment_location: {"Chiller:water": roof, Boiler: roof}`. Defaults: air-cooled chillers and cooling towers on the
-roof, water-cooled chillers and boilers in a plant room (piped from a riser, not modelled).
+`equipment_location: {"Chiller:water": roof, Boiler: roof}`. Defaults: air-cooled chillers on the roof, water-cooled
+chillers and boilers in a plant room (piped from a riser, not modelled). Only the sources of the AHU's water coils are
+placed; cooling towers and the sources of reheat coils are traced but not generated.
 
 ## faults
 
@@ -42,6 +44,9 @@ faults:
   # simulated by EnergyPlus: an opaque sub-surface (Door) whose construction is the host construction with its
   # highest-resistance layer replaced by a cavity. rect = [u0, u1, v0, v1] in metres from the host's lower-left
   # corner seen from outside (u along the surface, v up).
+  # mode (cavity | remove) and cavity_resistance (m2K/W) default to fault_defaults.envelope_defect in defaults.yaml.
+  # A cavity that would be the outermost or innermost layer is written as Material:NoMass (EnergyPlus rejects an
+  # exposed Material:AirGap).
   - {type: envelope_defect, surface: South_Wall, rect: [4.0, 4.8, 0.3, 1.1], name: Insulation_Void,
      mode: cavity, cavity_resistance: 0.17}
   # generated element fault: an unwrapped segment of the first diffuser drop
