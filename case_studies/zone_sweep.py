@@ -25,7 +25,7 @@ def main():
         t0 = time.time()
         try:
             usd = pipeline.build(CASE, overrides={"scene": {"zone": z}, "faults": [], "cameras": [], "output_dir": str(out)})
-            s = json.loads((out / "summary.json").read_text())
+            s = json.loads((out / "summary.json").read_text(encoding="utf-8"))
             cls = [e["cls"] for e in s["elements"]]
             prov = {}
             for k, v in s["provenance_counts"].items():
@@ -40,7 +40,7 @@ def main():
         except Exception as e:  # noqa: BLE001
             rows.append(dict(zone=z, ok=False, error=f"{type(e).__name__}: {e}"))
         print(rows[-1])
-    (ROOT / "case_studies" / "zone_sweep.json").write_text(json.dumps(rows, indent=2))
+    (ROOT / "case_studies" / "zone_sweep.json").write_text(encoding="utf-8", data=json.dumps(rows, indent=2))
     lines = ["| Zone | Plenum | EnergyPlus surfaces | Traced components | Diffusers / grilles | Plenum elements | Rooftop elements | "
              "Surface temperatures sim / phys / heur | Build time (s) |", "|---|---|---|---|---|---|---|---|---|"]
     for r in rows:
@@ -51,7 +51,7 @@ def main():
                      f"{r['plenum_elements']} | {r['rooftop_elements']} | {p.get('simulated', 0)} / {p.get('physics', 0)} / "
                      f"{p.get('heuristic', 0)} | {r['seconds']} |")
     ok = sum(r["ok"] for r in rows)
-    (ROOT / "docs" / "zone_sweep.md").write_text(
+    (ROOT / "docs" / "zone_sweep.md").write_text(encoding="utf-8", data=
         f"# Zone sweep: DOE reference medium office\n\nOne scene per conditioned zone of the unmodified model "
         f"(`RefBldgMediumOfficeNew2004_Chicago.idf`), one shared EnergyPlus run. **{ok} / {len(rows)} zones built.** "
         f"Rooftop equipment is generated only where the scene contains roof surfaces (top floor).\n\n" + "\n".join(lines) + "\n")

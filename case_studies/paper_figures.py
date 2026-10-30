@@ -22,7 +22,7 @@ from thermoscene.render.shading import Series, labels, thermal_prims  # noqa: E4
 
 OUT = ROOT / "docs" / "paper" / "figures"
 CS = ROOT / "case_studies"
-plt.rcParams.update({"font.family": ["Liberation Sans", "DejaVu Sans"], "font.size": 9, "axes.titlesize": 9, "figure.dpi": 150})
+plt.rcParams.update({"font.family": ["Liberation Sans", "Arial", "DejaVu Sans"], "font.size": 9, "axes.titlesize": 9, "figure.dpi": 150})
 PROV_COLORS = {"simulated": "#2b6cb0", "physics": "#38a169", "engineering_rule": "#805ad5", "heuristic": "#dd6b20",
                "assumed_layout": "#a0aec0", "user": "#718096", "background": "#f2f2f2"}
 
@@ -386,7 +386,7 @@ def fig_provenance_shares():
     rows = []
     for case, tag in (("B_hvac_system", "B"), ("C_doe_medium_office", "C")):
         for f in sorted((CS / case / "output/renders").glob("*/provenance_share.json")):
-            rows.append((f"{tag}: {f.parent.name.replace('Camera', '')}", json.loads(f.read_text())))
+            rows.append((f"{tag}: {f.parent.name.replace('Camera', '')}", json.loads(f.read_text(encoding="utf-8"))))
     fig, ax = plt.subplots(figsize=(7.2, 2.6))
     left = np.zeros(len(rows))
     for k in ("simulated", "physics", "engineering_rule", "heuristic", "assumed_layout", "background"):

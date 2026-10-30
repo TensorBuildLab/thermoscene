@@ -72,7 +72,7 @@ def simulate(idf_path, epw, outdir, exe: str, expand: bool | None = None) -> dic
         expand = any(c.startswith("HVACTEMPLATE:") for c in IDFText.read(idf_path).classes())
     cmd = [exe, "-w", str(epw), "-d", str(outdir)] + (["-x"] if expand else []) + [str(idf_path)]
     proc = subprocess.run(cmd, capture_output=True, text=True)
-    err = (outdir / "eplusout.err").read_text(errors="ignore") if (outdir / "eplusout.err").exists() else ""
+    err = (outdir / "eplusout.err").read_text(encoding="utf-8", errors="ignore") if (outdir / "eplusout.err").exists() else ""
     if proc.returncode != 0 or "** Fatal **" in err:
         tail = "\n".join(l for l in err.splitlines() if "Severe" in l or "Fatal" in l or "~~~" in l)[-3000:]
         raise RuntimeError(f"EnergyPlus failed ({proc.returncode}):\n{tail or proc.stdout[-2000:]}")

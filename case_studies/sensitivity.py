@@ -83,7 +83,7 @@ def main():
                 res[tag] = metrics(usd, 0.95)
         rows.append(dict(parameter=label, low=lo, high=hi, default=default, results=res))
         print(label, {m: (round(res["low"][m], 2), round(res["high"][m], 2)) for m in base})
-    (ROOT / "case_studies" / "sensitivity.json").write_text(json.dumps(dict(base=base, rows=rows), indent=2))
+    (ROOT / "case_studies" / "sensitivity.json").write_text(encoding="utf-8", data=json.dumps(dict(base=base, rows=rows), indent=2))
     lines = ["| Parameter (low – high) | " + " | ".join(m for m, *_ in METRICS) + " |", "|---|" + "---|" * len(METRICS)]
     lines.append("| **Default** | " + " | ".join(f"**{base[m]:+.1f}**" for m, *_ in METRICS) + " |")
     for r in rows:
@@ -92,7 +92,7 @@ def main():
             lo, hi = r["results"]["low"][m], r["results"]["high"][m]
             cells.append("—" if abs(lo - base[m]) < 0.05 and abs(hi - base[m]) < 0.05 else f"{lo:+.1f} … {hi:+.1f}")
         lines.append(f"| {r['parameter']} ({r['low']} – {r['high']}) | " + " | ".join(cells) + " |")
-    (ROOT / "docs" / "sensitivity.md").write_text(
+    (ROOT / "docs" / "sensitivity.md").write_text(encoding="utf-8", data=
         "# Sensitivity of apparent thermal contrasts (case B)\n\nApparent temperature contrast (K) seen by a camera with "
         "emissivity setting 0.95 and reflected-temperature setting 20 °C; one parameter varied at a time. "
         "— = change below 0.05 K.\n\n" + "\n".join(lines) + "\n")

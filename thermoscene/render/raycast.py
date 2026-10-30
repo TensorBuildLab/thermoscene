@@ -113,8 +113,8 @@ def render_usd(usd_path, outdir, camera_names=None, frames=None, preview=True):
         np.save(out / "provenance_map.npy", prov)
         levels = ["simulated", "physics", "engineering_rule", "heuristic", "assumed_layout", "user", "background"]
         share = {lv: float(np.mean(prov == i)) for i, lv in enumerate(levels) if np.any(prov == i)}
-        (out / "provenance_share.json").write_text(__import__("json").dumps(share, indent=2))
-        (out / "segmentation_labels.txt").write_text("".join(f"{i}\t{p.GetPath()}\n" for i, p in enumerate(prims)))
+        (out / "provenance_share.json").write_text(encoding="utf-8", data=__import__("json").dumps(share, indent=2))
+        (out / "segmentation_labels.txt").write_text(encoding="utf-8", data="".join(f"{i}\t{p.GetPath()}\n" for i, p in enumerate(prims)))
         fl = frames or list(cam.GetAttribute("thermal:previewFrames").Get() or [])
         res = {}
         for lab in fl:

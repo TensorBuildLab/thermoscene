@@ -2,6 +2,7 @@
 #   powershell -ExecutionPolicy Bypass -File scripts\setup.ps1 [-Evaluations] [-ClaudeCode]
 param([switch]$Evaluations, [switch]$ClaudeCode)
 $ErrorActionPreference = "Stop"
+$env:PYTHONUTF8 = "1"          # UTF-8 text I/O regardless of the Windows code page
 Set-Location (Join-Path $PSScriptRoot "..")
 
 Write-Host "== Python environment"
@@ -34,4 +35,7 @@ if ($Evaluations) {
 }
 if (-not (Test-Path .git)) { git init -q; git add .; git commit -qm "thermoscene: initial import" }
 if ($ClaudeCode) { irm https://claude.ai/install.ps1 | iex }
-Write-Host "`nDone. Next: git remote add origin <your repo URL>; git push -u origin main; then run 'claude' here."
+Write-Host "`nDone. Next:"
+Write-Host "  .\.venv\Scripts\Activate.ps1; `$env:THERMOSCENE_ENERGYPLUS='$env:THERMOSCENE_ENERGYPLUS'"
+Write-Host "  git remote add origin <your GitHub repo URL>; git push -u origin main     # optional"
+Write-Host "  claude                                                                     # start Claude Code here"

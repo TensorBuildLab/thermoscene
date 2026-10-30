@@ -55,7 +55,7 @@ class IDFText:
         return "\n".join(out)
 
     def write(self, path) -> None:
-        with open(path, "w") as f:
+        with open(path, "w", encoding="latin-1") as f:     # IDF files are Latin-1
             f.write(self.text())
 
 

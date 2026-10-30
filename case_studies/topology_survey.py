@@ -52,7 +52,7 @@ def main():
                         f"{sum(lengths) / max(len(lengths), 1):.1f} | {found} |")
             print(rows[-1])
     out = ROOT / "docs" / "topology_survey.md"
-    out.write_text("# Topology survey\n\nThe generic tracer (`thermoscene.energyplus.topology`) applied, without any model-specific "
+    out.write_text(encoding="utf-8", data="# Topology survey\n\nThe generic tracer (`thermoscene.energyplus.topology`) applied, without any model-specific "
                    f"configuration, to EnergyPlus example models. **{traced} of {total} conditioned zones traced.** *Traced zones*: "
                    "conditioned zones for which a non-empty serving chain was recovered. Numbers in parentheses: how many traced "
                    "zones contain that class.\n\n" + "\n".join(rows) + "\n")

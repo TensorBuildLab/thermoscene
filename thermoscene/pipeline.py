@@ -57,7 +57,7 @@ def _cached_simulation(prepared, epw, out, exe, cache_root):
     if (cdir / "eplusout.sql").exists():
         log.info("EnergyPlus: re-using cached run %s", key)
         exp = cdir / "eplusout.expidf"
-        err = (cdir / "eplusout.err").read_text(errors="ignore")
+        err = (cdir / "eplusout.err").read_text(encoding="utf-8", errors="ignore")
         return dict(sql=cdir / "eplusout.sql", err=cdir / "eplusout.err", model_idf=exp if exp.exists() else prepared,
                     warnings=err.count("** Warning **"), severe=err.count("** Severe  **"), cached=True)
     sim = simulate(prepared, epw, cdir, exe)
@@ -124,10 +124,10 @@ def build(case_path, render: bool = False, overrides: dict | None = None) -> Pat
     if usd.exists():
         usd.unlink()
     Writer(scene, cfg, results.labels, results.step_minutes).write(usd)
-    (out / "scene.ttl").write_text(scene.to_turtle())
+    (out / "scene.ttl").write_text(encoding="utf-8", data=scene.to_turtle())
     summary = _summary(scene, cfg, ids, chain, sim, results)
     summary["build_seconds"] = round(time.time() - t0, 2)
-    (out / "summary.json").write_text(json.dumps(summary, indent=2))
+    (out / "summary.json").write_text(encoding="utf-8", data=json.dumps(summary, indent=2))
     log.info("wrote %s (%.0f s)", usd, time.time() - t0)
     if render:
         render_usd(usd, out / "renders")

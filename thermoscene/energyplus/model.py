@@ -42,7 +42,7 @@ def plane_frame(pts):
 class EPModel:
     def __init__(self, epjson) -> None:
         if not isinstance(epjson, dict):
-            with open(epjson) as f:
+            with open(epjson, encoding="utf-8") as f:
                 epjson = json.load(f)
         self.d = epjson
         r = next(iter(self.objs("GlobalGeometryRules").values()), {})

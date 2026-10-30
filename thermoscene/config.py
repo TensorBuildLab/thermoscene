@@ -20,9 +20,9 @@ def deep_merge(base: dict, over: dict) -> dict:
 
 def load(case_path) -> dict:
     case_path = Path(case_path).resolve()
-    with open(DEFAULTS) as f:
+    with open(DEFAULTS, encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
-    with open(case_path) as f:
+    with open(case_path, encoding="utf-8") as f:
         cfg = deep_merge(cfg, yaml.safe_load(f))
     exe = find_energyplus(cfg["energyplus"].get("executable"))
     cfg["energyplus"]["executable"] = exe

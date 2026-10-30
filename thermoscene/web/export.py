@@ -94,6 +94,6 @@ def export(usd_path, out_html, title=None) -> Path:
         inferno=(np.array([colormaps["inferno"](i / 255)[:3] for i in range(256)]) * 255).round().astype(int).ravel().tolist(),
         n_prims=len(prims), n_steps=len(idx),
         positions=b64(pos), owner=b64(owner), temps=b64(temps))
-    html = TEMPLATE.read_text().replace("/*__THERMOSCENE_DATA__*/null", json.dumps(data, separators=(",", ":")))
-    out = Path(out_html); out.write_text(html)
+    html = TEMPLATE.read_text(encoding="utf-8").replace("/*__THERMOSCENE_DATA__*/null", json.dumps(data, separators=(",", ":")))
+    out = Path(out_html); out.write_text(encoding="utf-8", data=html)
     return out
