@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.venv/
+.sim_cache/
+case_studies/*/output/
+case_studies/*/sweep/
+case_studies/*/sensitivity/
+isaac_renders/
+*.egg-info/

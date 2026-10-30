@@ -1,0 +1,165 @@
+{
+  "base": {
+    "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+    "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4774342566108096,
+    "Reheat valve \u2212 pipe jacket, winter 10:00": 7.609603346628479,
+    "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+    "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+  },
+  "rows": [
+    {
+      "parameter": "Insulation conductivity (W/m\u00b7K)",
+      "low": 0.03,
+      "high": 0.05,
+      "default": 0.04,
+      "results": {
+        "low": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.5581511941678343,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 8.20571047062597,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        },
+        "high": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4028819962427868,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.043541415165677,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        }
+      }
+    },
+    {
+      "parameter": "Plenum film coefficient (W/m\u00b2K)",
+      "low": 6.0,
+      "high": 10.0,
+      "default": 8.0,
+      "results": {
+        "low": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.516596795202524,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 6.861141479986493,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        },
+        "high": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4189716562521077,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 8.083968715391144,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        }
+      }
+    },
+    {
+      "parameter": "Stagnant-water time constant (steps)",
+      "low": 3,
+      "high": 12,
+      "default": 6,
+      "results": {
+        "low": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4774342566108096,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 8.629851779147977,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        },
+        "high": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4774342566108096,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 6.872745788761108,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        }
+      }
+    },
+    {
+      "parameter": "Diffuser face effectiveness \u03b7_max",
+      "low": 0.7,
+      "high": 0.95,
+      "default": 0.85,
+      "results": {
+        "low": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4774342566108096,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.609603346628479,
+          "Diffuser \u2212 ceiling, summer 15:00": -8.403130903467662,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        },
+        "high": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4774342566108096,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.609603346628479,
+          "Diffuser \u2212 ceiling, summer 15:00": -11.392598168408963,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        }
+      }
+    },
+    {
+      "parameter": "Duct-wrap facing emissivity",
+      "low": 0.1,
+      "high": 0.6,
+      "default": 0.3,
+      "results": {
+        "low": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -2.0525384718443576,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.609603346628479,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        },
+        "high": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -0.6091153130585134,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.609603346628479,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 21.141981932790785
+        }
+      }
+    },
+    {
+      "parameter": "Motor temperature rise (K)",
+      "low": 10.0,
+      "high": 20.0,
+      "default": 15.0,
+      "results": {
+        "low": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4774342566108096,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.609603346628479,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 16.58581225414288
+        },
+        "high": {
+          "Wall defect \u2212 wall, winter 07:00": -2.7416438698152668,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4774342566108096,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.609603346628479,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.19760726814301,
+          "Pump motor \u2212 roof air, summer 09:00": 25.7093005444813
+        }
+      }
+    },
+    {
+      "parameter": "Camera emissivity setting",
+      "low": 0.9,
+      "high": 1.0,
+      "default": 0.95,
+      "results": {
+        "low": {
+          "Wall defect \u2212 wall, winter 07:00": -2.8959433067803424,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.5544152101825048,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.999026308302017,
+          "Diffuser \u2212 ceiling, summer 15:00": -10.743452891731671,
+          "Pump motor \u2212 roof air, summer 09:00": 22.90137734063522
+        },
+        "high": {
+          "Wall defect \u2212 wall, winter 07:00": -2.6029563758215453,
+          "Duct insulation gap \u2212 wrapped duct, summer 15:00": -1.4077326401419548,
+          "Reheat valve \u2212 pipe jacket, winter 10:00": 7.2564497120041445,
+          "Diffuser \u2212 ceiling, summer 15:00": -9.704620686923256,
+          "Pump motor \u2212 roof air, summer 09:00": 19.539166862393458
+        }
+      }
+    }
+  ]
+}

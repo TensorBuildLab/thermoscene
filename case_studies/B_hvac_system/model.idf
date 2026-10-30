@@ -1,0 +1,190 @@
+
+Version, 25.2;
+
+SimulationControl, Yes, Yes, No, No, Yes, No, 1;
+
+Building, Single Room Case, 0, City, 0.04, 0.4, FullInteriorAndExterior, 25, 6;
+
+Timestep, 4;
+
+GlobalGeometryRules, UpperLeftCorner, Counterclockwise, Relative;
+
+! One summer and one winter weekday period (Phoenix TMY3)
+RunPeriod, Summer, 7, 15, , 7, 16, , Wednesday, No, No, No, No, No, No;
+RunPeriod, Winter, 1, 14, , 1, 15, , Wednesday, No, No, No, No, No, No;
+
+!---------------- Materials (thermal absorptance = long-wave emissivity) ----------------
+Material, Stucco,           Smooth,      0.025,  0.72, 1856,  840, 0.90, 0.70, 0.70;
+Material, Wall Insulation,  MediumRough, 0.090,  0.045,  30,  840, 0.90, 0.70, 0.70;
+Material, Gypsum 13mm,      Smooth,      0.0127, 0.16,  800, 1090, 0.90, 0.40, 0.40;
+Material, Concrete 100mm,   MediumRough, 0.100,  1.95, 2240,  900, 0.90, 0.70, 0.70;
+Material, Carpet,           VeryRough,   0.010,  0.06,  200, 1300, 0.90, 0.80, 0.80;
+Material, Ceiling Tile,     MediumSmooth,0.015,  0.06,  370,  590, 0.90, 0.30, 0.30;
+Material:AirGap, Partition Air, 0.15;
+WindowMaterial:SimpleGlazingSystem, Double Glazing, 2.5, 0.40, 0.60;
+
+!---------------- Constructions (outside -> inside) ----------------
+Construction, ExtWall,       Stucco, Wall Insulation, Gypsum 13mm;
+Construction, IntWall,       Gypsum 13mm, Partition Air, Gypsum 13mm;
+Construction, Floor,         Concrete 100mm, Carpet;
+Construction, CeilingTile,   Ceiling Tile;
+Construction, PlenumSlab,    Carpet, Concrete 100mm;          ! floor above (outside) -> plenum (inside)
+Construction, Window,        Double Glazing;
+
+Zone, Office, 0, 0, 0, 0, 1, 40, autocalculate, autocalculate;   ! multiplier 40: one of 40 identical offices
+Zone, Plenum, 0, 0, 0, 0, 1, 40, autocalculate, autocalculate;
+
+!---------------- Schedules ----------------
+ScheduleTypeLimits, Fraction, 0, 1, Continuous;
+ScheduleTypeLimits, Temperature, -60, 200, Continuous;
+ScheduleTypeLimits, AnyNumber;
+
+Schedule:Compact, Occupancy, Fraction, Through: 12/31,
+  For: Weekdays SummerDesignDay WinterDesignDay, Until: 08:00, 0, Until: 18:00, 1, Until: 24:00, 0,
+  For: AllOtherDays, Until: 24:00, 0;
+Schedule:Compact, Lighting, Fraction, Through: 12/31,
+  For: Weekdays SummerDesignDay WinterDesignDay, Until: 08:00, 0.05, Until: 18:00, 1, Until: 24:00, 0.05,
+  For: AllOtherDays, Until: 24:00, 0.05;
+Schedule:Compact, Equipment, Fraction, Through: 12/31,
+  For: Weekdays SummerDesignDay WinterDesignDay, Until: 08:00, 0.3, Until: 18:00, 1, Until: 24:00, 0.3,
+  For: AllOtherDays, Until: 24:00, 0.3;
+Schedule:Compact, Activity, AnyNumber, Through: 12/31, For: AllDays, Until: 24:00, 120;
+Schedule:Compact, Always On, Fraction, Through: 12/31, For: AllDays, Until: 24:00, 1;
+Schedule:Compact, Heating SP, Temperature, Through: 12/31,
+  For: Weekdays, Until: 07:00, 15.6, Until: 18:00, 21, Until: 24:00, 15.6,
+  For: WinterDesignDay, Until: 24:00, 21,
+  For: SummerDesignDay, Until: 24:00, 15.6,
+  For: AllOtherDays, Until: 24:00, 15.6;
+Schedule:Compact, Cooling SP, Temperature, Through: 12/31,
+  For: Weekdays, Until: 07:00, 29.4, Until: 18:00, 24, Until: 24:00, 29.4,
+  For: SummerDesignDay, Until: 24:00, 24,
+  For: WinterDesignDay, Until: 24:00, 29.4,
+  For: AllOtherDays, Until: 24:00, 29.4;
+
+!---------------- Internal gains ----------------
+People, Office People, Office, Occupancy, People, 2, , , 0.3, autocalculate, Activity;
+Lights, Office Lights, Office, Lighting, Watts/Area, , 10, , 0, 0.42, 0.18, 1;
+ElectricEquipment, Office Equipment, Office, Equipment, Watts/Area, , 10, , 0, 0.5, 0;
+ZoneInfiltration:DesignFlowRate, Office Infiltration, Office, Always On, AirChanges/Hour, , , , 0.3, 1, 0, 0, 0;
+
+!---------------- HVAC: central chilled-water VAV, air-cooled chiller, HW boiler, VAV + HW reheat ----------------
+Schedule:Compact, HVAC Avail, Fraction, Through: 12/31,
+  For: Weekdays SummerDesignDay WinterDesignDay, Until: 06:00, 0, Until: 19:00, 1, Until: 24:00, 0,
+  For: AllOtherDays, Until: 24:00, 0;
+HVACTemplate:Thermostat, Office Thermostat, Heating SP, , Cooling SP, ;
+HVACTemplate:Zone:VAV, Office, Central AHU, Office Thermostat, autosize, , , Constant, 0.3, , ,
+  flow/person, 0.00944, 0.0, 0.0, HotWater, , Reverse, , , 35, , , , None, , autosize,
+  SystemSupplyAirTemperature, , , SupplyAirTemperature, 35.0, ;
+HVACTemplate:System:VAV, Central AHU, HVAC Avail, autosize, autosize, 0.7, 1000, 0.9, 1,
+  ChilledWater, , , 12.8,
+  None, , , 10.0, 0.8, 0.0,
+  None, , , , 0.8, 0.0,
+  autosize, autosize, FixedMinimum, , DifferentialDryBulb, NoLockout, 19, 4, , ,
+  , Plenum, DrawThrough, InletVaneDampers, CycleOnAny, , None, 0.70, 0.65,
+  None, None, None, , 60.0, None, , 0.000001, 2690.0, , 30.0, NonCoincident, , , , , , ;
+HVACTemplate:Plant:ChilledWaterLoop, Chilled Water Loop, , INTERMITTENT, Default, , , 6.67,
+  ConstantPrimaryNoSecondary, 179352, 179352, Default, , , , 29.4, 179352, None, 12.2, 15.6, 6.7, 26.7,
+  , , , , , , , , , 7.22;
+HVACTemplate:Plant:Chiller, Rooftop Chiller, ElectricReciprocatingChiller, autosize, 2.9, AirCooled, 1, ;
+HVACTemplate:Plant:HotWaterLoop, Hot Water Loop, , INTERMITTENT, Default, , , 82, ConstantFlow, 179352,
+  OutdoorAirTemperatureReset, 82.2, -6.7, 65.6, 10;
+HVACTemplate:Plant:Boiler, Main Boiler, HotWaterBoiler, autosize, 0.85, NaturalGas, 1, ;
+
+!---------------- Outputs ----------------
+Output:Variable, *, Surface Inside Face Temperature, Timestep;
+Output:Variable, *, Surface Outside Face Temperature, Timestep;
+Output:Variable, *, Zone Mean Air Temperature, Timestep;
+Output:Variable, *, Zone Mean Radiant Temperature, Timestep;
+Output:Variable, *, Zone Air Terminal VAV Damper Position, Timestep;
+Output:Variable, *, Zone Air Terminal Sensible Cooling Rate, Timestep;
+Output:Variable, *, Zone Air Terminal Sensible Heating Rate, Timestep;
+Output:Variable, *, System Node Temperature, Timestep;
+Output:Variable, *, System Node Mass Flow Rate, Timestep;
+Output:Variable, *, Chiller Part Load Ratio, Timestep;
+Output:Variable, *, Chiller Electricity Rate, Timestep;
+Output:Variable, *, Chiller Evaporator Cooling Rate, Timestep;
+Output:Variable, *, Chiller Condenser Heat Transfer Rate, Timestep;
+Output:Variable, *, Fan Electricity Rate, Timestep;
+Output:Variable, *, Pump Electricity Rate, Timestep;
+Output:Variable, *, Boiler Heating Rate, Timestep;
+Output:Variable, *, Cooling Coil Total Cooling Rate, Timestep;
+Output:Variable, *, Heating Coil Heating Rate, Timestep;
+Output:Variable, Environment, Site Sky Temperature, Timestep;
+Output:Variable, Environment, Site Direct Solar Radiation Rate per Area, Timestep;
+Output:Variable, Environment, Site Diffuse Solar Radiation Rate per Area, Timestep;
+Output:Variable, Environment, Site Outdoor Air Dewpoint Temperature, Timestep;
+Output:Variable, Environment, Site Outdoor Air Drybulb Temperature, Timestep;
+Output:SQLite, SimpleAndTabular;
+
+!---------------- Design days (Phoenix Sky Harbor) ----------------
+SizingPeriod:DesignDay, Phoenix Ann Htg 99.6% Condns DB, 12, 21, WinterDesignDay, 3.7, 0.0, , , Wetbulb, 3.7,
+  , , , , 97342, 1.7, 100, No, No, No, ASHRAEClearSky, , , , , 0.0;
+SizingPeriod:DesignDay, Phoenix Ann Clg .4% Condns DB=>MWB, 7, 21, SummerDesignDay, 43.4, 12, , , Wetbulb, 21.1,
+  , , , , 97342, 4.1, 260, No, No, No, ASHRAEClearSky, , , , , 1.0;
+
+!---------------- Geometry (generated from room_geometry.py) ----------------
+BuildingSurface:Detailed, South_Wall, Wall, ExtWall, Office, , Outdoors, , SunExposed, WindExposed, autocalculate, 4,
+  0.0000, 0.0000, 3.0000,
+  0.0000, 0.0000, 0.0000,
+  5.0000, 0.0000, 0.0000,
+  5.0000, 0.0000, 3.0000;
+BuildingSurface:Detailed, West_Wall, Wall, ExtWall, Office, , Outdoors, , SunExposed, WindExposed, autocalculate, 4,
+  0.0000, 4.0000, 3.0000,
+  0.0000, 4.0000, 0.0000,
+  0.0000, 0.0000, 0.0000,
+  0.0000, 0.0000, 3.0000;
+BuildingSurface:Detailed, North_Wall, Wall, IntWall, Office, , Adiabatic, , NoSun, NoWind, autocalculate, 4,
+  5.0000, 4.0000, 3.0000,
+  5.0000, 4.0000, 0.0000,
+  0.0000, 4.0000, 0.0000,
+  0.0000, 4.0000, 3.0000;
+BuildingSurface:Detailed, East_Wall, Wall, IntWall, Office, , Adiabatic, , NoSun, NoWind, autocalculate, 4,
+  5.0000, 0.0000, 3.0000,
+  5.0000, 0.0000, 0.0000,
+  5.0000, 4.0000, 0.0000,
+  5.0000, 4.0000, 3.0000;
+BuildingSurface:Detailed, Floor, Floor, Floor, Office, , Adiabatic, , NoSun, NoWind, autocalculate, 4,
+  0.0000, 0.0000, 0.0000,
+  0.0000, 4.0000, 0.0000,
+  5.0000, 4.0000, 0.0000,
+  5.0000, 0.0000, 0.0000;
+BuildingSurface:Detailed, Ceiling, Ceiling, CeilingTile, Office, , Surface, Plenum_Floor, NoSun, NoWind, autocalculate, 4,
+  0.0000, 0.0000, 3.0000,
+  5.0000, 0.0000, 3.0000,
+  5.0000, 4.0000, 3.0000,
+  0.0000, 4.0000, 3.0000;
+BuildingSurface:Detailed, Plenum_Floor, Floor, CeilingTile, Plenum, , Surface, Ceiling, NoSun, NoWind, autocalculate, 4,
+  0.0000, 0.0000, 3.0000,
+  0.0000, 4.0000, 3.0000,
+  5.0000, 4.0000, 3.0000,
+  5.0000, 0.0000, 3.0000;
+BuildingSurface:Detailed, Plenum_Slab, Ceiling, PlenumSlab, Plenum, , Adiabatic, , NoSun, NoWind, autocalculate, 4,
+  0.0000, 0.0000, 3.9000,
+  5.0000, 0.0000, 3.9000,
+  5.0000, 4.0000, 3.9000,
+  0.0000, 4.0000, 3.9000;
+BuildingSurface:Detailed, Plenum_South_Wall, Wall, ExtWall, Plenum, , Outdoors, , SunExposed, WindExposed, autocalculate, 4,
+  0.0000, 0.0000, 3.9000,
+  0.0000, 0.0000, 3.0000,
+  5.0000, 0.0000, 3.0000,
+  5.0000, 0.0000, 3.9000;
+BuildingSurface:Detailed, Plenum_West_Wall, Wall, ExtWall, Plenum, , Outdoors, , SunExposed, WindExposed, autocalculate, 4,
+  0.0000, 4.0000, 3.9000,
+  0.0000, 4.0000, 3.0000,
+  0.0000, 0.0000, 3.0000,
+  0.0000, 0.0000, 3.9000;
+BuildingSurface:Detailed, Plenum_North_Wall, Wall, IntWall, Plenum, , Adiabatic, , NoSun, NoWind, autocalculate, 4,
+  5.0000, 4.0000, 3.9000,
+  5.0000, 4.0000, 3.0000,
+  0.0000, 4.0000, 3.0000,
+  0.0000, 4.0000, 3.9000;
+BuildingSurface:Detailed, Plenum_East_Wall, Wall, IntWall, Plenum, , Adiabatic, , NoSun, NoWind, autocalculate, 4,
+  5.0000, 0.0000, 3.9000,
+  5.0000, 0.0000, 3.0000,
+  5.0000, 4.0000, 3.0000,
+  5.0000, 4.0000, 3.9000;
+FenestrationSurface:Detailed, South_Window, Window, Window, South_Wall, , autocalculate, , 1, 4,
+  1.0000, 0.0000, 2.2000,
+  1.0000, 0.0000, 0.9000,
+  3.0000, 0.0000, 0.9000,
+  3.0000, 0.0000, 2.2000;

@@ -1,0 +1,158 @@
+"""Reference CPU renderer: reads only the USD; the 'answer key' for any simulator's thermal camera."""
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+
+import numpy as np
+from pxr import Usd, UsdGeom
+
+from .shading import Series, camera_environment, camera_rays, cameras, labels, thermal_frame, thermal_prims
+
+log = logging.getLogger(__name__)
+
+
+def fan(faces):
+    tris = []
+    for f in faces:
+        f = np.asarray(f, float)
+        tris += [f[[0, j, j + 1]] for j in range(1, len(f) - 1)]
+    return np.array(tris)
+
+
+def accel(face_lists):
+    """[(index, triangles, bbox_min, bbox_max)] from a list of polygon-face lists."""
+    out = []
+    for k, faces in enumerate(face_lists):
+        t = fan(faces)
+        if len(t):
+            p = t.reshape(-1, 3)
+            out.append((k, t, p.min(0) - 1e-4, p.max(0) + 1e-4))
+    return out
+
+
+def raycast(origin, dirs, meshes, normals=False):
+    n = len(dirs)
+    best_t = np.full(n, np.inf); best = np.full(n, -1)
+    nrm = np.zeros((n, 3)) if normals else None
+    inv_d = 1.0 / np.where(np.abs(dirs) < 1e-12, 1e-12, dirs)
+    for k, tris, lo, hi in meshes:
+        t0, t1 = (lo - origin) * inv_d, (hi - origin) * inv_d
+        tmin = np.minimum(t0, t1).max(1); tmax = np.maximum(t0, t1).min(1)
+        sel = np.nonzero((tmax >= np.maximum(tmin, 0)) & (tmin < best_t))[0]
+        if len(sel) == 0:
+            continue
+        d = dirs[sel]
+        for a, b, c in tris:
+            e1, e2 = b - a, c - a
+            p = np.cross(d, e2); det = p @ e1
+            ok = np.abs(det) > 1e-12
+            inv = np.where(ok, 1 / np.where(ok, det, 1), 0)
+            s = origin - a
+            u = (p @ s) * inv
+            q = np.cross(s, e1)
+            v = (d @ q) * inv
+            t = (q @ e2) * inv
+            hit = ok & (u >= 0) & (v >= 0) & (u + v <= 1) & (t > 1e-6) & (t < best_t[sel])
+            best_t[sel[hit]] = t[hit]; best[sel[hit]] = k
+            if normals and hit.any():
+                nn = np.cross(e1, e2); nrm[sel[hit]] = nn / (np.linalg.norm(nn) or 1.0)
+    return (best, best_t, nrm) if normals else (best, best_t)
+
+
+LEVELS = ["simulated", "physics", "engineering_rule", "heuristic", "assumed_layout", "user"]
+
+
+def provenance_map(prims, owner, hits=None, jet_extent=2.1):
+    """Per-pixel index into LEVELS of the provenance of the surface temperature seen (len(LEVELS) = background).
+    Ceiling pixels inside a diffuser's jet footprint (exp(-r/L) > 5 % at the longest jet) are 'heuristic'."""
+    lv = []
+    for p in prims:
+        a = p.GetAttribute("thermal:surfaceTemperature:provenance")
+        lv.append(LEVELS.index(a.Get()) if a and a.Get() in LEVELS else len(LEVELS))
+    prov = np.array(lv + [len(LEVELS)])[owner]
+    if hits is not None:
+        index = {str(p.GetPath()): i for i, p in enumerate(prims)}
+        for p in prims:
+            rel = p.GetRelationship("thermal:ceilingJetTarget")
+            if not rel or not rel.GetTargets() or str(rel.GetTargets()[0]) not in index:
+                continue
+            mask = owner == index[str(rel.GetTargets()[0])]
+            c = p.GetAttribute("thermal:ceilingJetCenter").Get(); half = p.GetAttribute("thermal:ceilingJetHalfSize").Get()
+            r = np.maximum(np.maximum(np.abs(hits[..., 0] - c[0]), np.abs(hits[..., 1] - c[1])) - half, 0)
+            prov[mask & (r < jet_extent)] = LEVELS.index("heuristic")
+    return prov
+
+
+def usd_faces(prim):
+    m = UsdGeom.Mesh(prim)
+    pts = np.array(m.GetPointsAttr().Get(), float); idx = np.array(m.GetFaceVertexIndicesAttr().Get())
+    faces, pos = [], 0
+    for c in m.GetFaceVertexCountsAttr().Get():
+        faces.append(pts[idx[pos:pos + c]]); pos += c
+    return faces
+
+
+def render_usd(usd_path, outdir, camera_names=None, frames=None, preview=True):
+    stage = Usd.Stage.Open(str(usd_path))
+    series, labs = Series(stage), labels(stage)
+    prims = thermal_prims(stage)
+    meshes = accel([usd_faces(p) for p in prims])
+    results = {}
+    for cam in cameras(stage):
+        name = cam.GetName()
+        if camera_names and name not in camera_names:
+            continue
+        o, d, (h, w) = camera_rays(cam)
+        hit, t = raycast(o, d.reshape(-1, 3), meshes)
+        owner = np.where(hit >= 0, hit, len(prims)).reshape(h, w)
+        hits = o + d * np.where(np.isfinite(t), t, 0).reshape(h, w, 1)
+        out = Path(outdir) / name; out.mkdir(parents=True, exist_ok=True)
+        np.save(out / "segmentation.npy", owner)
+        prov = provenance_map(prims, owner, hits)
+        np.save(out / "provenance_map.npy", prov)
+        levels = ["simulated", "physics", "engineering_rule", "heuristic", "assumed_layout", "user", "background"]
+        share = {lv: float(np.mean(prov == i)) for i, lv in enumerate(levels) if np.any(prov == i)}
+        (out / "provenance_share.json").write_text(__import__("json").dumps(share, indent=2))
+        (out / "segmentation_labels.txt").write_text("".join(f"{i}\t{p.GetPath()}\n" for i, p in enumerate(prims)))
+        fl = frames or list(cam.GetAttribute("thermal:previewFrames").Get() or [])
+        res = {}
+        for lab in fl:
+            tc = labs.index(lab)
+            true_map, app = thermal_frame(stage, series, tc, prims, owner, hits, cam, seed=tc)
+            tag = lab.replace(" ", "_").replace(":", "")
+            np.save(out / f"{tag}_true.npy", true_map.astype(np.float32))
+            np.save(out / f"{tag}_apparent.npy", app.astype(np.float32))
+            res[lab] = (tc, app)
+        results[name] = (owner, res)
+        if preview and res:
+            _figure(stage, series, cam, prims, owner, res, Path(outdir) / f"preview_{name}.png")
+    return results
+
+
+def _figure(stage, series, cam, prims, owner, res, png):
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    env = camera_environment(stage, cam)
+    n = len(res) + 1
+    cols = min(n, 3); rows = int(np.ceil(n / cols))
+    fig, axs = plt.subplots(rows, cols, figsize=(5 * cols, 3.9 * rows), squeeze=False)
+    ax = axs[0, 0]
+    ax.imshow(np.ma.masked_equal(owner, len(prims)), cmap="tab20", interpolation="nearest")
+    for i, p in enumerate(prims):
+        ys, xs = np.nonzero(owner == i)
+        if len(xs) > owner.size * 0.006:
+            ax.text(np.median(xs), np.median(ys), p.GetName().replace("_", " ")[:22], ha="center", va="center", fontsize=6,
+                    bbox=dict(fc="white", alpha=0.75, lw=0, pad=0.8))
+    ax.set_title(f"{cam.GetName()}: what the camera sees", fontsize=9); ax.axis("off")
+    for k, (lab, (tc, app)) in enumerate(res.items(), start=1):
+        ax = axs[k // cols, k % cols]
+        lo, hi = np.percentile(app, 1), np.percentile(app, 99.5)
+        im = ax.imshow(app, cmap="inferno", vmin=lo, vmax=hi)
+        fig.colorbar(im, ax=ax, fraction=0.035, pad=0.02, label="apparent °C")
+        air = series.get(env, "thermal:airTemperature", tc)
+        ax.set_title(f"{lab}   ({env.GetName()} air {air:.1f}°C)", fontsize=9); ax.axis("off")
+    for k in range(n, rows * cols):
+        axs[k // cols, k % cols].axis("off")
+    fig.tight_layout(); fig.savefig(png, dpi=120); plt.close(fig)

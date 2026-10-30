@@ -1,0 +1,29 @@
+# Case study B: one office served by a central chilled-water VAV system (AHU, air-cooled chiller, boiler),
+# with a return plenum above the ceiling. The model is an ordinary EnergyPlus file; nothing below is model-specific
+# except the zone name, the fault locations and the camera poses.
+name: B_hvac_system
+model:
+  idf: model.idf
+  epw: ../weather/USA_AZ_Phoenix-Sky.Harbor.Intl.AP.722780_TMY3.epw
+output_dir: output
+energyplus:
+  run_periods:
+    - {name: SUMMER, start: "07-15", end: "07-16", start_day_of_week: Wednesday}
+    - {name: WINTER, start: "01-14", end: "01-15", start_day_of_week: Wednesday}
+scene:
+  zone: Office
+  plenum: auto
+  roof: {source: box, elevation: 7.8, extent: [-2, 13, -4, 8]}   # office is one floor below the roof
+  exterior_skins: false             # only this floor is modelled; no facade between it and the roof
+faults:
+  - {type: envelope_defect, surface: South_Wall, rect: [4.0, 4.8, 0.3, 1.1], name: Insulation_Void}
+  - {type: duct_insulation_gap, on: discharge, position: 0.4, length_m: 0.18}
+cameras:
+  - {name: WallCamera, space: zone, eye: [0.6, 3.5, 1.6], target: [3.2, 0.0, 1.0],
+     frames: ["WINTER 07:00", "WINTER 15:00", "SUMMER 07:00", "SUMMER 15:00"]}
+  - {name: CeilingCamera, space: zone, eye: [2.8, 0.5, 1.3], target: [2.9, 2.6, 3.0],
+     frames: ["WINTER 22:00", "WINTER 07:30", "WINTER 09:00", "SUMMER 15:00"]}
+  - {name: PlenumCamera, space: plenum, hfov_deg: 75, auto: {target: TerminalBox, height: 0.72},
+     frames: ["WINTER 07:30", "WINTER 10:00", "WINTER 22:00", "SUMMER 15:00"]}
+  - {name: RooftopCamera, space: outdoors, eye: [13.0, -4.6, 11.6], target: [8.0, 1.2, 8.3], hfov_deg: 62,
+     frames: ["WINTER 03:00", "WINTER 09:00", "SUMMER 09:00", "SUMMER 15:00"]}

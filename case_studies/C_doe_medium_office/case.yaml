@@ -1,0 +1,29 @@
+# Case study C: "bring your own model". The unmodified DOE reference medium office shipped with EnergyPlus
+# (Chicago). Only the zone name is chosen; geometry, plenum, roof, HVAC chain and all cameras are derived.
+name: C_doe_medium_office
+model:
+  idf: ${ENERGYPLUS_DIR}/ExampleFiles/RefBldgMediumOfficeNew2004_Chicago.idf
+  epw: ${ENERGYPLUS_DIR}/WeatherData/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw
+output_dir: output
+energyplus:
+  run_periods:
+    - {name: SUMMER, start: "07-15", end: "07-16", start_day_of_week: Wednesday}
+    - {name: WINTER, start: "01-14", end: "01-15", start_day_of_week: Wednesday}
+scene:
+  zone: Perimeter_top_ZN_1          # top-floor south perimeter office
+  plenum: auto                      # -> TopFloor_Plenum
+  roof: {source: model}             # the plenum's own EnergyPlus roof surfaces
+faults:
+  - {type: envelope_defect, surface: Perimeter_top_ZN_1_Wall_South, rect: [8.0, 9.0, 0.2, 1.0], name: Insulation_Void}
+cameras:
+  - {name: WindowCamera, space: zone, auto: {target: Window, height: 1.5},
+     frames: ["WINTER 07:00", "WINTER 14:00", "SUMMER 14:00"]}
+  - {name: DiffuserCamera, space: zone, auto: {target: Diffuser, height: 1.3},
+     frames: ["WINTER 07:30", "WINTER 12:00", "SUMMER 15:00"]}
+  - {name: PlenumCamera, space: plenum, hfov_deg: 75, auto: {target: TerminalBox, min_distance: 2.0},
+     frames: ["WINTER 07:30", "WINTER 12:00", "SUMMER 15:00"]}
+  - {name: RooftopCamera, space: outdoors, auto: {target: CondenserCoil, distance: 9.0, height: 4.0},
+     frames: ["WINTER 03:00", "SUMMER 09:00", "SUMMER 15:00"]}
+
+storage:
+  time_series: sidecar             # time series in C_doe_medium_office.series.npz (compact; for long runs)

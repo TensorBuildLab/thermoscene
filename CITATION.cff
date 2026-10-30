@@ -1,0 +1,28 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying paper."
+title: "thermoscene: virtual thermal training environments for robots from building energy models"
+version: 0.1.0
+date-released: 2026-10-30
+license: MIT
+authors:
+  - family-names: Zhang
+    given-names: Liang
+    affiliation: "University of Arizona, Tucson, AZ, USA"
+  - family-names: Yang
+    given-names: Huanrui
+    affiliation: "University of Arizona, Tucson, AZ, USA"
+  - family-names: Jia
+    given-names: Yiyuan
+    affiliation: "Big Ladder Software, Denver, CO, USA"
+preferred-citation:
+  type: article
+  title: "Virtual thermal training environments for robots from building energy models: an ontology-driven pipeline for buildings and HVAC systems"
+  authors:
+    - family-names: Zhang
+      given-names: Liang
+    - family-names: Yang
+      given-names: Huanrui
+    - family-names: Jia
+      given-names: Yiyuan
+  year: 2026
+  status: submitted

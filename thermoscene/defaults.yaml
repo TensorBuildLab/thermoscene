@@ -1,0 +1,98 @@
+# thermoscene defaults. A case configuration overrides any key (deep merge).
+# Every quantity below that is not simulated is an assumption; its provenance level is noted.
+
+energyplus:
+  executable: null            # or set THERMOSCENE_ENERGYPLUS
+  timesteps_per_hour: 4
+  run_periods: null           # list of {name, start: "MM-DD", end: "MM-DD", start_day_of_week}
+  cache_dir: null             # default <case dir>/.sim_cache; identical prepared models are simulated once
+
+scene:
+  zone: null                  # the EnergyPlus zone to build (required)
+  plenum: auto                # auto | none | <zone name>: zone above the ceiling that becomes a Plenum space
+  interzone_offset_m: 0.005   # coincident interzone faces are pulled apart by this much (avoids z-fighting)
+  exterior_skins: true        # outdoor-facing surfaces also get an exterior face (outside-face temperature)
+  roof:                       # where rooftop equipment goes; null = no rooftop equipment
+    source: none              # none | model (Roof surfaces of the scene) | box
+    elevation: null           # box mode
+    extent: null              # box mode: [xmin, xmax, ymin, ymax]
+    anchor: auto              # shaft position under the AHU discharge: auto (above zone service corner) | [x, y]
+
+faults: []                    # see docs/configuration.md
+
+storage:
+  time_series: timesamples    # timesamples (in USD) | sidecar (NPZ next to the USD; for long runs)
+
+# ---------------------------------------------------------------- engineering rules (ENGINEERING_RULE)
+sizing:
+  air_density: 1.204
+  duct_velocity: {main: 6.0, branch: 4.0, rooftop: 7.0}         # m/s
+  pipe_velocity: {main: 1.8, branch: 1.2}                        # m/s
+  round_ducts_m: [0.10, 0.125, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.60]
+  steel_pipe_od_m: [0.0213, 0.0267, 0.0334, 0.0422, 0.0483, 0.0603, 0.0730, 0.0889, 0.1143, 0.1683]
+  steel_pipe_id_m: [0.0158, 0.0209, 0.0266, 0.0351, 0.0409, 0.0525, 0.0627, 0.0779, 0.1023, 0.1541]
+  diffuser: {size_m: 0.6, max_flow_m3s: 0.15, max_area_m2: 25.0, inset_m: 0.6}
+  return_grille: {size_m: 0.6}
+  main_duct_flow_fraction: 0.3          # share of the air-loop design flow carried by the floor main at this zone
+  coil_face_velocity: 2.5               # m/s, sets AHU cross-section
+  min_casing_m: {width: 1.2, height: 0.9}   # smallest catalogue rooftop unit / AHU cross-section
+  min_rect_duct_m: 0.15                 # smallest rectangular duct side
+  ahu_section_length_m: {OutdoorAirMixer: 1.0, Filter: 0.6, CoolingCoil: 0.8, DXCoolingCoil: 0.8,
+                         HeatingCoil: 0.5, HotWaterCoil: 0.5, Fan: 1.6, Discharge: 0.9, Condenser: 1.4}
+  chiller_length_m: {base: 1.6, per_kw: 0.02}
+  chiller_width_m: 1.2
+  chiller_height_m: 1.6
+
+# ---------------------------------------------------------------- layout rules (ASSUMED_LAYOUT)
+layout:
+  plenum_duct_elevation_frac: 0.6       # duct centre height as a fraction of the plenum depth
+  plenum_pipe_clearance_m: 0.1          # pipes run this far below the slab
+  main_wall_clearance_m: 0.25
+  terminal_offset_from_main_m: 0.6
+  roof_clearance_m: 2.0                 # between rooftop units
+  roof_curb_m: 0.3
+
+# ---------------------------------------------------------------- materials (emissivity, solar absorptance)
+materials:
+  fsk_foil:      {emissivity: 0.30, solar_absorptance: 0.20, note: "foil-scrim-kraft duct wrap, dusty"}
+  galv_bare:     {emissivity: 0.25, solar_absorptance: 0.60, note: "bare galvanised steel"}
+  asj_jacket:    {emissivity: 0.90, solar_absorptance: 0.30, note: "all-service-jacket pipe insulation"}
+  alu_jacket:    {emissivity: 0.12, solar_absorptance: 0.25, note: "aluminium jacket, outdoor insulation"}
+  brass_valve:   {emissivity: 0.60, solar_absorptance: 0.50, note: "oxidised brass/bronze"}
+  copper:        {emissivity: 0.65, solar_absorptance: 0.60, note: "oxidised copper"}
+  painted_steel: {emissivity: 0.85, solar_absorptance: 0.50, note: "light grey paint"}
+  coil_fins:     {emissivity: 0.85, solar_absorptance: 0.80, note: "finned coil seen as a cavity"}
+  roof_membrane: {emissivity: 0.90, solar_absorptance: 0.45, note: "light single-ply membrane"}
+  diffuser_face: {emissivity: 0.90, solar_absorptance: 0.30, note: "white powder-coated steel"}
+
+# element class -> material, by location (plenum / roof)
+material_rules:
+  plenum: {Duct: fsk_foil, Pipe: asj_jacket, Valve: brass_valve, TerminalBox: galv_bare, CoilSection: galv_bare,
+           InsulationDefect: galv_bare, ReturnGrille: galv_bare}
+  roof:   {Duct: painted_steel, Pipe: alu_jacket, Valve: brass_valve, EquipmentCasing: painted_steel,
+           CondenserCoil: coil_fins, CondenserFan: painted_steel, Motor: painted_steel, Louver: painted_steel,
+           RoofSurface: roof_membrane}
+  zone:   {Diffuser: diffuser_face, ReturnGrille: diffuser_face}
+
+# ---------------------------------------------------------------- thermal models
+thermal:
+  band_um: [8.0, 14.0]
+  film_coefficients: {inside_air: 20.0, plenum: 8.0, outdoor: 17.0, radiative: 5.0}   # W/m2K   (PHYSICS)
+  insulation: {conductivity: 0.040, duct_wrap_m: 0.038, box_lining_m: 0.025, pipe_plenum_m: 0.025, pipe_roof_m: 0.038}
+  stagnation_tau_steps: {air: 2, water: 6, valve: 3}                                    # (HEURISTIC)
+  diffuser: {eta_max: 0.85, flow_exp: 0.25, jet_strength_max: 0.5, jet_len0: 0.15, jet_len1: 0.45}   # (HEURISTIC)
+  return_grille_mix: 0.7                                                                # (HEURISTIC)
+  casing_coupling: {ahu: 0.05, duct_outdoor: 0.08}                                      # (HEURISTIC)
+  compressor_rise_per_plr: 12.0                                                         # K   (HEURISTIC)
+  condenser_coil_fraction: 0.6                                                          # of discharge rise (HEURISTIC)
+  condenser_air_flow_m3s_per_kw: 0.114                                                  # if not autosized (ENGINEERING_RULE)
+  motor_rise: 15.0                                                                      # K   (HEURISTIC)
+  sol_air: {vertical_solar_fraction: 0.6, vertical_sky_fraction: 0.5}                   # (HEURISTIC)
+
+camera:
+  resolution: [320, 240]
+  hfov_deg: 62.0
+  emissivity_setting: 0.95
+  reflected_setting_c: 20.0
+  netd_k: 0.05
+  blur_px: 0.7

@@ -1,0 +1,468 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thermal scene viewer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Semi+Condensed:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #e9ecec; --surface: #f8f9f9; --ink: #1d2427; --muted: #5a666b; --line: #cfd5d7;
+  --accent: #2b6a88; --accent-ink: #ffffff; --stage: #22272a; --stage-ink: #f2f4f4; --stage-muted: #b4bec2;
+  color-scheme: light;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121618; --surface: #1a2023; --ink: #e4e9ea; --muted: #8f9ca1; --line: #2c3539;
+    --accent: #79b4d1; --accent-ink: #0f1517; --stage: #0d1012; --stage-ink: #eef1f2; --stage-muted: #9aa6ab;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121618; --surface: #1a2023; --ink: #e4e9ea; --muted: #8f9ca1; --line: #2c3539;
+  --accent: #79b4d1; --accent-ink: #0f1517; --stage: #0d1012; --stage-ink: #eef1f2; --stage-muted: #9aa6ab;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: inherit; }
+html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+body {
+  height: 100%; margin: 0; background: var(--bg); color: var(--ink);
+  font: 400 14px/1.45 "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+.app { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
+.rail {
+  background: var(--surface); border-right: 1px solid var(--line); overflow-y: auto;
+  padding: 18px 18px 24px; display: flex; flex-direction: column; gap: 20px;
+}
+.rail h1 { font: 600 17px/1.25 "Barlow", sans-serif; margin: 0; }
+.rail .source { color: var(--muted); font-size: 12.5px; margin-top: 4px; }
+.group { display: flex; flex-direction: column; gap: 8px; }
+.group > .label { font-weight: 600; font-size: 13px; color: var(--muted); }
+.clock { display: flex; align-items: baseline; gap: 10px; }
+.clock .hm { font: 600 40px/1 "Barlow Semi Condensed", "Barlow", sans-serif; font-variant-numeric: tabular-nums; letter-spacing: .5px; }
+.clock .day { color: var(--muted); font-size: 13.5px; }
+.row { display: flex; align-items: center; gap: 8px; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+button, select, input[type=number] {
+  font: inherit; color: var(--ink); background: transparent; border: 1px solid var(--line);
+  border-radius: 6px; padding: 6px 10px; cursor: pointer;
+}
+input[type=number] { width: 72px; cursor: text; }
+button:hover { border-color: var(--muted); }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.seg button { text-align: left; }
+.views { display: flex; flex-wrap: wrap; gap: 6px; }
+.check { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.check input { accent-color: var(--accent); width: 16px; height: 16px; }
+.hint { color: var(--muted); font-size: 12.5px; }
+.stage { position: relative; background: var(--stage); min-height: 0; overflow: hidden; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.reticle { position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; transform: translate(-50%, -50%); pointer-events: none; }
+.reticle::before, .reticle::after { content: ""; position: absolute; background: rgba(255,255,255,.85); }
+.reticle::before { left: 12px; top: 0; width: 2px; height: 26px; }
+.reticle::after { top: 12px; left: 0; height: 2px; width: 26px; }
+.spot {
+  position: absolute; left: 16px; top: 14px; color: var(--stage-ink); pointer-events: none;
+  text-shadow: 0 1px 2px rgba(0,0,0,.6);
+}
+.spot .v { font: 600 30px/1 "Barlow Semi Condensed", sans-serif; font-variant-numeric: tabular-nums; }
+.spot .n { font-size: 13px; color: var(--stage-muted); margin-top: 4px; max-width: 46ch; }
+.scale { position: absolute; right: 18px; top: 50%; transform: translateY(-50%); display: flex; gap: 8px; align-items: stretch; height: min(62%, 420px); color: var(--stage-ink); }
+.scale canvas { width: 14px; height: 100%; border-radius: 2px; }
+.ticks { display: flex; flex-direction: column; justify-content: space-between; font: 500 13px/1 "Barlow Semi Condensed", sans-serif; font-variant-numeric: tabular-nums; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.legend { position: absolute; right: 18px; bottom: 16px; display: none; flex-direction: column; gap: 5px; color: var(--stage-ink); font-size: 12.5px; background: rgba(0,0,0,.35); padding: 10px 12px; border-radius: 6px; }
+.legend span { display: inline-block; width: 11px; height: 11px; border-radius: 2px; margin-right: 7px; vertical-align: -1px; }
+.tip {
+  position: absolute; pointer-events: none; display: none; max-width: 300px; padding: 9px 11px; border-radius: 6px;
+  background: rgba(16,20,22,.92); color: #eef1f2; font-size: 12.5px; line-height: 1.4;
+}
+.tip b { font-weight: 600; font-size: 13.5px; }
+.tip .k { color: #9aa6ab; }
+.mode-note { position: absolute; left: 16px; bottom: 14px; color: var(--stage-muted); font-size: 12.5px; pointer-events: none; text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+.err { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; color: var(--stage-ink); padding: 24px; text-align: center; }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: 58vh auto; height: auto; min-height: 100%; }
+  .stage { order: -1; height: 58vh; }
+  .rail { border-right: 0; border-top: 1px solid var(--line); }
+  .scale { right: 10px; height: 52%; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="rail" aria-label="Viewer controls">
+    <div>
+      <h1 id="title">Thermal scene</h1>
+      <div class="source" id="source"></div>
+    </div>
+    <div class="group" aria-label="Time">
+      <div class="clock"><span class="hm" id="hm">--:--</span><span class="day" id="day"></span></div>
+      <input type="range" id="time" min="0" max="1" step="1" value="0" aria-label="Simulated time">
+      <div class="row">
+        <button id="play" aria-pressed="false">Play</button>
+        <select id="speed" aria-label="Playback speed">
+          <option value="1">1 hour per second</option>
+          <option value="4" selected>4 hours per second</option>
+          <option value="12">12 hours per second</option>
+        </select>
+      </div>
+    </div>
+    <div class="group">
+      <div class="label">Show</div>
+      <div class="seg" role="radiogroup" aria-label="Display">
+        <button data-mode="0" class="on" role="radio" aria-checked="true">Camera reading</button>
+        <button data-mode="1" role="radio" aria-checked="false">True temperature</button>
+        <button data-mode="2" role="radio" aria-checked="false">Where values come from</button>
+        <button data-mode="3" role="radio" aria-checked="false">Geometry</button>
+      </div>
+    </div>
+    <div class="group">
+      <div class="label">Views</div>
+      <div class="views" id="views"></div>
+      <div class="hint">Drag to orbit, right-drag or two fingers to pan, scroll to zoom. Hover any surface for its temperatures.</div>
+    </div>
+    <div class="group">
+      <div class="label">Camera settings</div>
+      <label for="eps">Emissivity setting <span id="epsv"></span></label>
+      <input type="range" id="eps" min="0.5" max="1" step="0.01">
+      <div class="row"><label for="rc">Reflected temperature</label><input type="number" id="rc" step="1"> °C</div>
+      <label class="check"><input type="checkbox" id="noise" checked> Sensor noise</label>
+      <label class="check"><input type="checkbox" id="lock"> Lock colour range</label>
+    </div>
+    <div class="group">
+      <div class="label">Spaces</div>
+      <div id="layers" class="group"></div>
+    </div>
+    <div class="hint" id="about"></div>
+  </aside>
+  <main class="stage" id="stage">
+    <div class="reticle" aria-hidden="true"></div>
+    <div class="spot" aria-live="off"><div class="v" id="spotv">–</div><div class="n" id="spotn"></div></div>
+    <div class="scale" id="scale"><canvas id="bar" width="14" height="256"></canvas><div class="ticks" id="ticks"></div></div>
+    <div class="legend" id="legend"></div>
+    <div class="mode-note" id="note"></div>
+    <div class="tip" id="tip"></div>
+    <div class="err" id="err"></div>
+  </main>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>const DATA = /*__THERMOSCENE_DATA__*/null;</script>
+<script>
+(function () {
+"use strict";
+const $ = (id) => document.getElementById(id);
+const stage = $("stage");
+if (!window.THREE || !DATA) { $("err").style.display = "flex"; $("err").textContent = "The 3D library or the scene data could not be loaded. Check your connection and reload the page."; return; }
+
+// ------------------------------------------------------------------ data
+const f32 = (b) => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return new Float32Array(u.buffer); };
+const P = DATA.prims, NP = P.length, NS = DATA.n_steps, SP = DATA.spaces, NSP = SP.length, J = DATA.jets.slice(0, 16);
+const pos = f32(DATA.positions), owner = f32(DATA.owner), temps = f32(DATA.temps);
+const LEVEL_NAMES = ["Simulated by EnergyPlus", "Physics model", "Engineering rule", "Heuristic model", "Assumed layout", "User given", "Background"];
+const LEVEL_COLORS = ["#2f6db3", "#3a9a62", "#7c5ac2", "#d9792c", "#9aa4ab", "#6b767c", "#4a5256"];
+const CLASS_COLORS = {Wall: "#d6d1c4", Floor: "#b3ac98", Ceiling: "#e9e6de", Roof: "#9a978f", Window: "#9ec9df", Door: "#c49a6c",
+  Defect: "#e04848", Duct: "#90a4ae", Pipe: "#e8893a", Valve: "#d4a02c", TerminalBox: "#7f5ad0", CoilSection: "#b391f2",
+  Diffuser: "#f4f6f7", ReturnGrille: "#c9d1d6", EquipmentCasing: "#66a07a", CondenserCoil: "#4a785b", CondenserFan: "#30373d",
+  Motor: "#2f6db3", Louver: "#a0aab0", RoofSurface: "#9a978f", InsulationDefect: "#e04848"};
+
+// ------------------------------------------------------------------ radiometry (8-14 um band), same as thermoscene.thermal.radiometry
+const T0 = -90, T1 = 220, LUTN = 2048;
+const h = 6.62607015e-34, c = 2.99792458e8, kB = 1.380649e-23;
+function band(Tc) {
+  const T = Tc + 273.15, a = DATA.band[0] * 1e-6, b = DATA.band[1] * 1e-6, n = 160; let s = 0;
+  for (let i = 0; i <= n; i++) { const l = a + (b - a) * i / n, w = (i === 0 || i === n) ? 0.5 : 1;
+    s += w * 2 * h * c * c / Math.pow(l, 5) / (Math.exp(h * c / (l * kB * T)) - 1); }
+  return s * (b - a) / n;
+}
+const lut = new Float32Array(LUTN * 4), inv = new Float32Array(LUTN * 4), Lt = new Float64Array(LUTN);
+for (let i = 0; i < LUTN; i++) { Lt[i] = band(T0 + (T1 - T0) * i / (LUTN - 1)); lut[4 * i] = Lt[i]; }
+const L0 = Lt[0], L1 = Lt[LUTN - 1];
+for (let i = 0, j = 0; i < LUTN; i++) {
+  const L = L0 + (L1 - L0) * i / (LUTN - 1);
+  while (j < LUTN - 2 && Lt[j + 1] < L) j++;
+  const f = (L - Lt[j]) / (Lt[j + 1] - Lt[j]);
+  inv[4 * i] = T0 + (T1 - T0) * (j + Math.max(0, Math.min(1, f))) / (LUTN - 1);
+}
+const lerp1 = (arr, x) => { const i = Math.max(0, Math.min(LUTN - 2, Math.floor(x))), f = Math.max(0, Math.min(1, x - i)); return arr[4 * i] * (1 - f) + arr[4 * i + 4] * f; };
+const Lb = (T) => lerp1(lut, (T - T0) / (T1 - T0) * (LUTN - 1));
+const LbInv = (L) => lerp1(inv, (L - L0) / (L1 - L0) * (LUTN - 1));
+
+// ------------------------------------------------------------------ state
+const S = { t: 0, mode: 0, eps: DATA.camera.eps, rc: DATA.camera.refl, noise: true, lock: false, min: 15, max: 35, playing: false,
+            vis: SP.map(() => true) };
+const series = (arr, t) => { const i = Math.floor(t), j = Math.min(i + 1, arr.length - 1), f = t - i; return arr[i] * (1 - f) + arr[j] * f; };
+const tempAt = (p, t) => { const i = Math.floor(t), j = Math.min(i + 1, NS - 1), f = t - i; return temps[p * NS + i] * (1 - f) + temps[p * NS + j] * f; };
+function surfaceTemp(p, x, y, t) {
+  let T = tempAt(p, t), base = T, jet = false;
+  for (const g of J) if (g.target === p) {
+    const dx = x - g.center[0], dy = y - g.center[1], r = Math.max(Math.max(Math.abs(dx), Math.abs(dy)) - g.half, 0);
+    const lobes = 0.6 + 0.4 * Math.pow(Math.cos(2 * Math.atan2(dy, dx)), 2);
+    T += (tempAt(g.diffuser, t) - base) * series(g.strength, t) * Math.exp(-r / Math.max(series(g.length, t), 1e-3)) * lobes;
+    if (r < 2.1) jet = true;
+  }
+  return { T, jet };
+}
+function reading(T, eps, refl) {
+  const L = eps * Lb(T) + (1 - eps) * Lb(refl);
+  return LbInv((L - (1 - S.eps) * Lb(S.rc)) / S.eps);
+}
+
+// ------------------------------------------------------------------ three.js scene
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+stage.prepend(renderer.domElement);
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(50, 1, 0.02, 600);
+camera.up.set(0, 0, 1);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true; controls.dampingFactor = 0.12; controls.screenSpacePanning = true;
+
+const geom = new THREE.BufferGeometry();
+geom.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+geom.setAttribute("owner", new THREE.BufferAttribute(owner, 1));
+geom.computeVertexNormals();
+geom.computeBoundingBox();
+
+const tex = (data, w, hgt, type) => { const t = new THREE.DataTexture(data, w, hgt, THREE.RGBAFormat, type || THREE.FloatType);
+  t.minFilter = t.magFilter = THREE.NearestFilter; t.needsUpdate = true; return t; };
+const tempData = new Float32Array(NS * NP * 4);
+for (let p = 0; p < NP; p++) for (let i = 0; i < NS; i++) tempData[4 * (p * NS + i)] = temps[p * NS + i];
+const info = new Float32Array(NP * 4), colors = new Float32Array(NP * 4);
+P.forEach((q, k) => { info.set([q.eps, q.space, q.prov, 0], 4 * k);
+  const col = new THREE.Color(CLASS_COLORS[q.cls] || "#bbbbbb"); colors.set([col.r, col.g, col.b, 1], 4 * k); });
+const spaceData = new Float32Array(NSP * 4);
+const cm = new Uint8Array(256 * 4); for (let i = 0; i < 256; i++) cm.set([DATA.inferno[3 * i], DATA.inferno[3 * i + 1], DATA.inferno[3 * i + 2], 255], 4 * i);
+const cmTex = new THREE.DataTexture(cm, 256, 1, THREE.RGBAFormat); cmTex.minFilter = cmTex.magFilter = THREE.LinearFilter; cmTex.needsUpdate = true;
+const spaceTex = tex(spaceData, NSP, 1);
+const U = {
+  uTemps: { value: tex(tempData, NS, NP) }, uInfo: { value: tex(info, NP, 1) }, uColor: { value: tex(colors, NP, 1) },
+  uSpace: { value: spaceTex }, uLut: { value: tex(lut, LUTN, 1) }, uInv: { value: tex(inv, LUTN, 1) }, uCmap: { value: cmTex },
+  uNP: { value: NP }, uNS: { value: NS }, uNSp: { value: NSP }, uT: { value: 0 }, uMode: { value: 0 },
+  uCamEps: { value: S.eps }, uCamRefl: { value: S.rc }, uNetd: { value: DATA.camera.netd }, uSeed: { value: 0 },
+  uMin: { value: 15 }, uMax: { value: 35 }, uT0: { value: T0 }, uT1: { value: T1 }, uL0: { value: L0 }, uL1: { value: L1 }, uLutN: { value: LUTN },
+  uJetN: { value: J.length }, uJetTarget: { value: new Array(16).fill(-1) }, uJetDiff: { value: new Array(16).fill(-1) },
+  uJetC: { value: Array.from({ length: 16 }, () => new THREE.Vector2()) }, uJetHalf: { value: new Array(16).fill(0) },
+  uJetA: { value: new Array(16).fill(0) }, uJetL: { value: new Array(16).fill(1) },
+  uProv: { value: LEVEL_COLORS.map((x) => new THREE.Color(x)) },
+};
+J.forEach((g, i) => { U.uJetTarget.value[i] = g.target; U.uJetDiff.value[i] = g.diffuser; U.uJetC.value[i].set(g.center[0], g.center[1]); U.uJetHalf.value[i] = g.half; });
+
+const material = new THREE.ShaderMaterial({
+  uniforms: U, side: THREE.DoubleSide,
+  vertexShader: `
+    attribute float owner; varying float vOwner; varying vec3 vWorld; varying vec3 vN;
+    void main() { vOwner = owner; vec4 w = modelMatrix * vec4(position, 1.0); vWorld = w.xyz; vN = normal;
+      gl_Position = projectionMatrix * viewMatrix * w; }`,
+  fragmentShader: `
+    precision highp float;
+    uniform sampler2D uTemps, uInfo, uColor, uSpace, uLut, uInv, uCmap;
+    uniform float uNP, uNS, uNSp, uT, uMode, uCamEps, uCamRefl, uNetd, uSeed, uMin, uMax, uT0, uT1, uL0, uL1, uLutN, uJetN;
+    uniform float uJetTarget[16], uJetDiff[16], uJetHalf[16], uJetA[16], uJetL[16];
+    uniform vec2 uJetC[16];
+    uniform vec3 uProv[7];
+    varying float vOwner; varying vec3 vWorld; varying vec3 vN;
+    float row(sampler2D s, float x, float n) { float i = clamp(floor(x), 0.0, n - 2.0); float f = clamp(x - i, 0.0, 1.0);
+      return mix(texture2D(s, vec2((i + 0.5) / n, 0.5)).r, texture2D(s, vec2((i + 1.5) / n, 0.5)).r, f); }
+    float temp(float p) { float i = floor(uT); float j = min(i + 1.0, uNS - 1.0); float f = uT - i; float v = (p + 0.5) / uNP;
+      return mix(texture2D(uTemps, vec2((i + 0.5) / uNS, v)).r, texture2D(uTemps, vec2((j + 0.5) / uNS, v)).r, f); }
+    float Lb(float T) { return row(uLut, (T - uT0) / (uT1 - uT0) * (uLutN - 1.0), uLutN); }
+    float LbInv(float L) { return row(uInv, (L - uL0) / (uL1 - uL0) * (uLutN - 1.0), uLutN); }
+    vec3 cmap(float x) { return texture2D(uCmap, vec2(clamp(x, 0.0, 1.0) * 0.996 + 0.002, 0.5)).rgb; }
+    float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main() {
+      float p = floor(vOwner + 0.5);
+      vec4 inf = texture2D(uInfo, vec2((p + 0.5) / uNP, 0.5));
+      vec4 sp = texture2D(uSpace, vec2((inf.g + 0.5) / uNSp, 0.5));
+      if (sp.g < 0.5) discard;
+      float base = temp(p); float Ts = base; float jet = 0.0;
+      for (int i = 0; i < 16; i++) {
+        if (float(i) >= uJetN) break;
+        if (abs(uJetTarget[i] - p) < 0.5) {
+          vec2 d = vWorld.xy - uJetC[i];
+          float r = max(max(abs(d.x), abs(d.y)) - uJetHalf[i], 0.0);
+          float c2 = cos(2.0 * atan(d.y, d.x));
+          Ts += (temp(uJetDiff[i]) - base) * uJetA[i] * exp(-r / max(uJetL[i], 0.001)) * (0.6 + 0.4 * c2 * c2);
+          if (r < 2.1) jet = 1.0;
+        }
+      }
+      float shade = 0.58 + 0.42 * abs(dot(normalize(vN), normalize(vec3(0.35, -0.5, 0.8))));
+      vec3 col;
+      if (uMode < 0.5) {
+        float L = inf.r * Lb(Ts) + (1.0 - inf.r) * Lb(sp.r);
+        float Ta = LbInv((L - (1.0 - uCamEps) * Lb(uCamRefl)) / uCamEps);
+        vec2 q = floor(gl_FragCoord.xy) + uSeed;
+        float u1 = max(hash(q), 1e-6), u2 = hash(q + 17.3);
+        Ta += uNetd * sqrt(-2.0 * log(u1)) * cos(6.2831853 * u2);
+        col = cmap((Ta - uMin) / (uMax - uMin));
+      } else if (uMode < 1.5) {
+        col = cmap((Ts - uMin) / (uMax - uMin));
+      } else if (uMode < 2.5) {
+        float lv = jet > 0.5 ? 3.0 : inf.b;
+        col = uProv[0];
+        if (lv > 0.5) col = uProv[1]; if (lv > 1.5) col = uProv[2]; if (lv > 2.5) col = uProv[3];
+        if (lv > 3.5) col = uProv[4]; if (lv > 4.5) col = uProv[5]; if (lv > 5.5) col = uProv[6];
+        col *= shade;
+      } else {
+        col = texture2D(uColor, vec2((p + 0.5) / uNP, 0.5)).rgb * shade;
+      }
+      gl_FragColor = vec4(col, 1.0);
+    }`,
+});
+const mesh = new THREE.Mesh(geom, material);
+scene.add(mesh);
+
+// ------------------------------------------------------------------ cameras / views
+const bb = geom.boundingBox, center = bb.getCenter(new THREE.Vector3()), diag = bb.getSize(new THREE.Vector3()).length();
+const views = [{ name: "Overview", eye: center.clone().add(new THREE.Vector3(0.45, -0.8, 0.55).multiplyScalar(diag * 0.85)).toArray(),
+                 target: center.toArray(), hfov: 55 }].concat(DATA.cameras);
+const prettyName = (n) => n.replace(/Camera$/, "").replace(/([a-z])([A-Z])/g, "$1 $2");
+let tween = null;
+function goTo(v, instant) {
+  const aspect = Math.max(stage.clientWidth / Math.max(stage.clientHeight, 1), 0.3);
+  const vfov = 2 * Math.atan(Math.tan((v.hfov * Math.PI / 180) / 2) / aspect) * 180 / Math.PI;
+  const end = { eye: new THREE.Vector3(...v.eye), target: new THREE.Vector3(...v.target), fov: Math.min(Math.max(vfov, 25), 100) };
+  if (instant || matchMedia("(prefers-reduced-motion: reduce)").matches) { camera.position.copy(end.eye); controls.target.copy(end.target); camera.fov = end.fov; camera.updateProjectionMatrix(); return; }
+  tween = { t0: performance.now(), from: { eye: camera.position.clone(), target: controls.target.clone(), fov: camera.fov }, end };
+}
+const viewsEl = $("views");
+views.forEach((v, i) => { const b = document.createElement("button"); b.textContent = prettyName(v.name);
+  b.addEventListener("click", () => { [...viewsEl.children].forEach((x) => x.classList.remove("on")); b.classList.add("on");
+    goTo(v); if (v.frames && v.frames.length && !S.playing) setTime(v.frames[v.frames.length - 1]); });
+  viewsEl.appendChild(b); });
+
+// ------------------------------------------------------------------ UI
+$("title").textContent = DATA.title.replace(/_/g, " ");
+$("source").textContent = DATA.source;
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function setTime(t) { S.t = Math.max(0, Math.min(NS - 1, t)); $("time").value = Math.round(S.t); paintClock(); }
+function paintClock() {
+  const lab = DATA.labels[Math.round(S.t)], m = lab.match(/^(.*) (\d\d)-(\d\d) (\d\d:\d\d)$/);
+  if (m) { $("hm").textContent = m[4] === "24:00" ? "24:00" : m[4];
+    $("day").textContent = `${m[1].charAt(0) + m[1].slice(1).toLowerCase()}, ${+m[3]} ${months[+m[2] - 1]}`; }
+  else { $("hm").textContent = lab; $("day").textContent = ""; }
+}
+$("time").max = NS - 1;
+$("time").addEventListener("input", (e) => { S.t = +e.target.value; paintClock(); });
+$("play").addEventListener("click", () => { S.playing = !S.playing; $("play").textContent = S.playing ? "Pause" : "Play";
+  $("play").setAttribute("aria-pressed", S.playing); });
+const NOTES = ["Simulated thermal camera reading (8–14 µm), with emissivity, reflections and sensor noise.",
+  "Actual surface temperature: the ground-truth label.", "Colour shows where each temperature comes from.",
+  "Generated geometry by element type."];
+document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
+  document.querySelectorAll(".seg button").forEach((x) => { x.classList.remove("on"); x.setAttribute("aria-checked", "false"); });
+  b.classList.add("on"); b.setAttribute("aria-checked", "true"); S.mode = +b.dataset.mode; U.uMode.value = S.mode; paintLegend(); }));
+$("eps").value = S.eps; $("epsv").textContent = S.eps.toFixed(2); $("rc").value = S.rc;
+$("eps").addEventListener("input", (e) => { S.eps = +e.target.value; $("epsv").textContent = S.eps.toFixed(2); U.uCamEps.value = S.eps; });
+$("rc").addEventListener("change", (e) => { const v = parseFloat(e.target.value); if (isFinite(v)) { S.rc = v; U.uCamRefl.value = v; } });
+$("noise").addEventListener("change", (e) => { S.noise = e.target.checked; U.uNetd.value = S.noise ? DATA.camera.netd : 0; });
+$("lock").addEventListener("change", (e) => { S.lock = e.target.checked; });
+SP.forEach((s, i) => { const l = document.createElement("label"); l.className = "check";
+  l.innerHTML = `<input type="checkbox" checked> ${s.cls === "Outdoors" ? "Outdoors and roof" : s.name.replace(/_/g, " ")}`;
+  l.querySelector("input").addEventListener("change", (e) => { S.vis[i] = e.target.checked; });
+  $("layers").appendChild(l); });
+$("about").textContent = `${NP} surfaces and elements, ${NS} time steps of ${DATA.step_minutes} min. Temperatures from EnergyPlus and thermoscene models.`;
+function paintLegend() {
+  const prov = S.mode === 2, thermal = S.mode < 2;
+  $("scale").style.display = thermal ? "flex" : "none";
+  $("legend").style.display = prov ? "flex" : "none";
+  $("note").textContent = NOTES[S.mode];
+  if (prov) $("legend").innerHTML = [0, 1, 3, 4].map((i) => `<div><span style="background:${LEVEL_COLORS[i]}"></span>${LEVEL_NAMES[i]}</div>`).join("");
+}
+const bar = $("bar").getContext("2d");
+for (let y = 0; y < 256; y++) { const i = 255 - y; bar.fillStyle = `rgb(${DATA.inferno[3 * i]},${DATA.inferno[3 * i + 1]},${DATA.inferno[3 * i + 2]})`; bar.fillRect(0, y, 14, 1); }
+function paintTicks() { const n = 5, out = []; for (let k = 0; k < n; k++) out.push(`<div>${(S.max - (S.max - S.min) * k / (n - 1)).toFixed(1)}°</div>`);
+  $("ticks").innerHTML = out.join(""); }
+paintLegend();
+
+// ------------------------------------------------------------------ picking, spot meter, auto range
+const ray = new THREE.Raycaster();
+function pick(ndcX, ndcY) {
+  ray.setFromCamera({ x: ndcX, y: ndcY }, camera);
+  for (const hit of ray.intersectObject(mesh, false)) {
+    const p = Math.round(owner[hit.face.a]);
+    if (S.vis[P[p].space]) return { p, point: hit.point };
+  }
+  return null;
+}
+function valueAt(h) {
+  const q = P[h.p], s = SP[q.space], st = surfaceTemp(h.p, h.point.x, h.point.y, S.t);
+  const refl = series(s.refl, S.t);
+  return { T: st.T, cam: reading(st.T, q.eps, refl), jet: st.jet, q };
+}
+function autoRange() {
+  if (S.lock || S.mode > 1) return;
+  const vals = [];
+  for (let i = 0; i < 18; i++) for (let j = 0; j < 14; j++) {
+    const h = pick(-0.95 + 1.9 * i / 17, -0.95 + 1.9 * j / 13);
+    if (h) { const v = valueAt(h); vals.push(S.mode === 0 ? v.cam : v.T); }
+    else { const out = SP.find((s) => s.cls === "Outdoors"); if (out) vals.push(S.mode === 0 ? reading(series(out.bg, S.t), 1, 0) : series(out.bg, S.t)); }
+  }
+  if (!vals.length) return;
+  vals.sort((a, b) => a - b);
+  let lo = vals[Math.floor(vals.length * 0.02)], hi = vals[Math.ceil(vals.length * 0.98) - 1];
+  if (hi - lo < 1) { const m = (hi + lo) / 2; lo = m - 0.5; hi = m + 0.5; }
+  S.min += (lo - S.min) * 0.35; S.max += (hi - S.max) * 0.35;
+}
+function spot() {
+  const h = pick(0, 0);
+  if (!h) { $("spotv").textContent = "–"; $("spotn").textContent = ""; return; }
+  const v = valueAt(h);
+  $("spotv").textContent = `${(S.mode === 1 ? v.T : v.cam).toFixed(1)} °C`;
+  $("spotn").textContent = `${v.q.name.replace(/_/g, " ")}` + (S.mode === 0 ? ` · actual ${v.T.toFixed(1)} °C` : "");
+}
+const tip = $("tip");
+renderer.domElement.addEventListener("pointermove", (e) => {
+  const r = renderer.domElement.getBoundingClientRect();
+  const h = pick(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+  if (!h || e.buttons) { tip.style.display = "none"; return; }
+  const v = valueAt(h), lv = v.jet ? 3 : v.q.prov;
+  tip.innerHTML = `<b>${v.q.name.replace(/_/g, " ")}</b><br><span class="k">${v.q.cls}${v.q.size ? ", " + v.q.size : ""}</span><br>` +
+    `Actual ${v.T.toFixed(1)} °C &nbsp; Camera ${v.cam.toFixed(1)} °C<br><span class="k">Emissivity ${v.q.eps.toFixed(2)}. ${LEVEL_NAMES[lv]}${v.jet ? " (ceiling jet)" : ""}.</span>`;
+  tip.style.display = "block";
+  const x = Math.min(e.clientX - r.left + 14, r.width - tip.offsetWidth - 8), y = Math.min(e.clientY - r.top + 14, r.height - tip.offsetHeight - 8);
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+});
+renderer.domElement.addEventListener("pointerleave", () => { tip.style.display = "none"; });
+
+// ------------------------------------------------------------------ loop
+function resize() { const w = stage.clientWidth, hh = stage.clientHeight; renderer.setSize(w, hh, false); camera.aspect = w / Math.max(hh, 1); camera.updateProjectionMatrix(); }
+new ResizeObserver(resize).observe(stage); resize();
+goTo(views.length > 1 ? views[1] : views[0], true);
+viewsEl.children[views.length > 1 ? 1 : 0].classList.add("on");
+setTime(views[1] && views[1].frames && views[1].frames.length ? views[1].frames[0] : 0);
+let last = performance.now(), lastRange = 0, lastSpot = 0;
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  if (S.playing) { S.t += dt * (+$("speed").value) * 60 / DATA.step_minutes; if (S.t > NS - 1) S.t = 0; $("time").value = Math.round(S.t); paintClock(); }
+  if (tween) { const k = Math.min(1, (now - tween.t0) / 650), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+    camera.position.lerpVectors(tween.from.eye, tween.end.eye, e); controls.target.lerpVectors(tween.from.target, tween.end.target, e);
+    camera.fov = tween.from.fov + (tween.end.fov - tween.from.fov) * e; camera.updateProjectionMatrix(); if (k >= 1) tween = null; }
+  controls.update();
+  SP.forEach((s, i) => { spaceData[4 * i] = series(s.refl, S.t); spaceData[4 * i + 1] = S.vis[i] ? 1 : 0; spaceData[4 * i + 2] = series(s.bg, S.t); });
+  spaceTex.needsUpdate = true;
+  J.forEach((g, i) => { U.uJetA.value[i] = series(g.strength, S.t); U.uJetL.value[i] = series(g.length, S.t); });
+  U.uT.value = S.t; U.uSeed.value = S.noise ? (now * 0.37) % 997 : 0;
+  if (now - lastRange > 200) { autoRange(); lastRange = now; paintTicks(); }
+  if (now - lastSpot > 120) { spot(); lastSpot = now; }
+  U.uMin.value = S.min; U.uMax.value = S.max;
+  const out = SP.find((s) => s.cls === "Outdoors");
+  if (S.mode < 2 && out) { const v = S.mode === 0 ? reading(series(out.bg, S.t), 1, 0) : series(out.bg, S.t);
+    const i = Math.round(Math.max(0, Math.min(1, (v - S.min) / (S.max - S.min))) * 255);
+    renderer.setClearColor(new THREE.Color(`rgb(${DATA.inferno[3 * i]},${DATA.inferno[3 * i + 1]},${DATA.inferno[3 * i + 2]})`)); }
+  else renderer.setClearColor(new THREE.Color(getComputedStyle(stage).backgroundColor));
+  renderer.render(scene, camera);
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
