@@ -98,8 +98,12 @@ provenance levels; see `docs/ontology.md`.
 - Open review items (see the review folder, `07_changes_made.md`): an EnergyPlus FaultModel case (M3), HVAC energy
   penalty of the void from paired runs (M1), heuristic models vs. published data (M10), a source for every default
   (M11), jet renormalisation (M16), more system types for the tracer (M18), outdoor view factors (S3).
-- Authors must still decide: author list, acknowledgements/funding, competing-interest statement (Big Ladder),
-  public release + Zenodo DOI, and re-check the Energy and Buildings Guide for Authors (not downloadable here).
+- The GitHub repository is public since 2026-11-06 (it was private before); a Zenodo DOI for the submitted version is
+  still recommended. Authors must still decide: author list, acknowledgements/funding, competing-interest statement
+  (Big Ladder), and re-check the Energy and Buildings Guide for Authors (not downloadable here).
+- A retargeted submission package for Advanced Engineering Informatics (manuscript, figures as separate files,
+  compliance report against that journal's Guide for Authors) is in `../../Advanced Engineering Informatics Submission/`
+  (outside this repository; its `_source/` holds the Markdown sources and build scripts).
 - Isaac Sim script: Replicator calls written against the 4.5–6.x API, **never executed on a GPU**. The shading path it
   feeds is tested. First job on a GPU machine: run it on case B and compare with `renders/` (the script prints the
   segmentation agreement).

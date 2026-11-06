@@ -17,7 +17,7 @@ We submit the manuscript **"From energy models to thermal scenes: an ontology-dr
 
 The work is not validated against field thermography yet; the manuscript states this plainly and separates what rests on EnergyPlus output from what rests on heuristics, pixel by pixel.
 
-The manuscript is original, has not been published, and is not under consideration elsewhere. [Preprint: state whether a preprint has been posted.] All authors have approved the submission. [Competing interests: Yiyuan Jia is affiliated with Big Ladder Software, a building energy simulation software company; state whether the company has any interest in this work.] [Funding: state funders and grant numbers, or that the work received no specific grant.] Code and data are available at https://github.com/TensorBuildLab/thermoscene [state whether the repository is public at submission or how reviewers can access it]. The use of generative AI in preparing the manuscript is declared before the reference list.
+The manuscript is original, has not been published, and is not under consideration elsewhere. [Preprint: state whether a preprint has been posted.] All authors have approved the submission. [Competing interests: Yiyuan Jia is affiliated with Big Ladder Software, a building energy simulation software company; state whether the company has any interest in this work.] [Funding: state funders and grant numbers, or that the work received no specific grant.] Code and data are publicly available at https://github.com/TensorBuildLab/thermoscene. The use of generative AI in preparing the manuscript is declared before the reference list.
 
 [Suggested reviewers, if requested.]
 

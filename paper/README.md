@@ -66,6 +66,6 @@ provenance definition and a global sensitivity analysis. The revision:
   simulation, fault modelling and FDD datasets, eplusout.bnd); acronyms defined; generative-AI declaration added.
 
 Still open for the authors: the author list (a placeholder student author is in the title block), acknowledgements and
-funding, the competing-interest statement for the Big Ladder Software affiliation, whether the repository is public (and
-archived with a DOI) at submission, the journal's reference style in EndNote, and a check against the current Guide for
+funding, the competing-interest statement for the Big Ladder Software affiliation, a Zenodo DOI for the submitted code version
+(the repository is public since 6 November 2026), the journal's reference style in EndNote, and a check against the current Guide for
 Authors (it could not be downloaded automatically).
