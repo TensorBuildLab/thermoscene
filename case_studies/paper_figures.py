@@ -2,6 +2,7 @@
     python case_studies/paper_figures.py [fig_name ...]   -> docs/paper/figures/*.png
 """
 import json
+import re
 import sys
 import textwrap
 from pathlib import Path
@@ -189,20 +190,20 @@ def fig_topology():
         if k not in air:
             lanes.setdefault(info[k]["system"], []).append(k)
     short = lambda n: n.replace("Central AHU ", "").replace("Chilled Water Loop ", "").replace("Hot Water Loop ", "").replace("Office ", "")
-    label = lambda k: textwrap.fill(short(info[k]["name"]), 10)
-    sub = lambda k: info[k]["typ"].split(":")[-1]
+    label = lambda k: textwrap.fill(short(info[k]["name"]), 8)
+    sub = lambda k: textwrap.fill(re.sub(r"(?<=[a-z])(?=[A-Z])", " ", info[k]["typ"].split(":")[-1]), 9)   # CamelCase -> wrapped words
     W, H = 7.4, 3.5
     fig, ax = canvas(W, H)
     n = len(order) + 1
     left = 0.78
-    for ts in (7.2, 6.8, 6.4, 6.0, 5.6):                         # largest type that leaves a visible gap between boxes
-        ss = ts - 1.4
+    for ts in (8.0, 7.6, 7.2, 6.8, 6.4, 6.0, 5.6):               # largest type that leaves a visible gap between boxes
+        ss = ts - 1.0
         bw = max(max(measure(ax, label(k), ts, "bold")[0], measure(ax, sub(k), ss)[0]) for k in G) + 2 * PAD
         bw = max(bw, measure(ax, "Office\n(zone)", ts, "bold")[0] + 2 * PAD)
         step = (W - left - 0.06 - bw) / (n - 1)
-        if step - bw >= 0.2:
+        if step - bw >= 0.16:
             break
-    bh = max(measure(ax, label(k), ts, "bold")[1] for k in G) + measure(ax, "X", ss)[1] + 2 * PAD + 0.08
+    bh = max(measure(ax, label(k), ts, "bold")[1] for k in G) + max(measure(ax, sub(k), ss)[1] for k in G) + 2 * PAD + 0.08
     xs = {k: left + bw / 2 + i * step for i, k in enumerate(order)}
     y_air = H - 0.55 - bh / 2
     pos = {k: (xs[k], y_air) for k in order}
@@ -219,7 +220,7 @@ def fig_topology():
         c = ROLE_COLORS.get(info[k]["role"], "#a0aec0")
         ax.add_patch(FancyBboxPatch((x - bw / 2, yy - bh / 2), bw, bh, boxstyle="round,pad=0,rounding_size=0.05", fc=c, ec="#1a202c", lw=0.6))
         ax.text(x, yy + bh / 2 - PAD, label(k), ha="center", va="top", fontsize=ts, weight="bold", color="white", linespacing=1.3)
-        ax.text(x, yy - bh / 2 + PAD, sub(k), ha="center", va="bottom", fontsize=ss, color="white")
+        ax.text(x, yy - bh / 2 + PAD, sub(k), ha="center", va="bottom", fontsize=ss, color="white", linespacing=1.1)
         return (x, yy, bw, bh)
     B = {k: node_box(k, *pos[k]) for k in pos}
     zx = left + bw / 2 + (n - 1) * step
@@ -357,7 +358,7 @@ def fig_timeseries():
     a.plot(h, g("/World/Office/Surfaces/South_Wall", T, win), c="#2b6cb0", lw=1.6, label="insulated wall")
     a.plot(h, g("/World/Office", "thermal:airTemperature", win), c="k", ls="--", lw=1, label="zone air")
     a.plot(h, g("/World/Outdoors", "thermal:airTemperature", win), c="gray", ls=":", lw=1, label="outdoor air")
-    a.set_title("(a) Envelope, winter day"); a.set_ylabel("°C"); a.legend(fontsize=6.5, frameon=False)
+    a.set_title("(a) Envelope, winter day"); a.set_ylabel("temperature (°C)"); a.legend(fontsize=6.5, frameon=False)
     a = axs[0, 1]; a2 = a.twinx()
     a.plot(h, g("/World/Office/Elements/Supply_Diffuser_1", T, win), c="#319795", lw=1.6, label="diffuser face")
     a.plot(h, g("/World/Office/Surfaces/Ceiling", T, win), c="#dd6b20", lw=1.2, label="ceiling")
@@ -378,7 +379,7 @@ def fig_timeseries():
     a.plot(h, g("/World/Plenum/Elements/HW_Supply_Pipe", "mep:fluidTemperature", win), c="#dd6b20", ls=":", lw=1, label="water inside")
     a.plot(h, g("/World/Plenum/Elements/Duct_Insulation_Gap", T, win), c="#2b6cb0", lw=1.6, label="duct, insulation gap")
     a.plot(h, g("/World/Plenum/Elements/Discharge_Duct_1", T, win), c="#63b3ed", lw=1.2, label="duct, wrapped")
-    a.set_title("(c) Plenum, winter day"); a.set_ylabel("°C"); a.set_xlabel("hour")
+    a.set_title("(c) Plenum, winter day"); a.set_ylabel("temperature (°C)"); a.set_xlabel("hour")
     a.legend(fontsize=6.2, frameon=False, ncol=1, loc="center right")
     a = axs[1, 1]
     roof = [p for p in Usd.PrimRange(st.GetPrimAtPath("/World/Outdoors")) if p.HasAttribute(T)]
@@ -431,24 +432,25 @@ def fig_thermal_cases():
 
 
 def fig_graphical_abstract():
-    """Graphical abstract (Elsevier: >= 1328 x 531 px, ~2.5:1, readable at 5 x 13 cm). 8 x 3.2 in at 500 dpi."""
+    """Graphical abstract (Elsevier: >= 1328 px wide, landscape, readable at 13 cm wide). 8 x 3.2 in at 500 dpi;
+    the smallest text (9.5 pt) is still 6 pt when the image is shown 13 cm wide."""
     B = CS / "B_hvac_system/output/B_hvac_system.usda"
     W, H = 8.0, 3.2
     fig = plt.figure(figsize=(W, H))
     gap = 0.04
     pw = (1 - 0.03 - 3 * gap) / 4                              # four equal 4:3 panels
     ph = pw * W * 0.75 / H
-    y0 = 0.42
+    y0 = 0.43
     xs = [0.015 + k * (pw + gap) for k in range(4)]
     axs = [fig.add_axes([x, y0, pw, ph]) for x in xs]
-    titles = ["EnergyPlus model", "Generated 3D scene", "Simulated thermal image", "Pixel provenance"]
+    titles = ["Energy model", "3D scene", "Thermal image", "Provenance"]
     for x, t in zip(xs, titles):
-        fig.text(x + pw / 2, y0 + ph + 0.04, t, ha="center", va="bottom", fontsize=11, weight="bold", color="#1a202c")
+        fig.text(x + pw / 2, y0 + ph + 0.035, t, ha="center", va="bottom", fontsize=13, weight="bold", color="#1a202c")
     # 1: the input
     a = axs[0]; a.axis("off"); a.set_xlim(0, 1); a.set_ylim(0, 1)
     a.add_patch(FancyBboxPatch((0.02, 0.02), 0.96, 0.96, boxstyle="round,pad=0,rounding_size=0.05", fc="#fefcbf", ec="#4a5568", lw=1.0))
-    for k, line in enumerate(["zones and surfaces", "HVAC node graph", "weather file", "+ one zone name"]):
-        a.text(0.5, 0.82 - k * 0.19, line, ha="center", va="center", fontsize=9.5, color="#2d3748")
+    for k, line in enumerate(["EnergyPlus model", "HVAC node graph", "weather file", "+ a zone name"]):
+        a.text(0.5, 0.82 - k * 0.21, line, ha="center", va="center", fontsize=11, color="#2d3748")
     # 2: generated geometry (cut-away office and plenum of case B)
     hide = ("/Plenum/Surfaces/Plenum_Slab", "/Plenum/Surfaces/Plenum_South", "/Plenum/Surfaces/Plenum_West",
             "/Office/Surfaces/South", "/Office/Surfaces/West", "/Outdoors/", "Insulation_Void")
@@ -461,12 +463,13 @@ def fig_graphical_abstract():
     axs[3].imshow(prov_rgb(pm), aspect="auto")
     for ax in axs[2:]:
         ax.axis("off")
-    cax = fig.add_axes([xs[2] + 0.025, y0 - 0.075, pw - 0.05, 0.035])
-    cb = fig.colorbar(im, cax=cax, orientation="horizontal"); cb.ax.tick_params(labelsize=8, length=2, pad=1)
-    cb.set_label("apparent temperature (°C)", fontsize=8, labelpad=1)
+    cax = fig.add_axes([xs[2] + 0.02, y0 - 0.055, pw - 0.04, 0.03])
+    cb = fig.colorbar(im, cax=cax, orientation="horizontal"); cb.ax.tick_params(labelsize=9.5, length=2, pad=1)
+    cb.set_label("camera reading (°C)", fontsize=9.5, labelpad=1)
     handles = [plt.Rectangle((0, 0), 1, 1, color=PROV_COLORS[k]) for k in ("simulated", "physics", "heuristic")]
-    fig.legend(handles, ["simulated", "physics", "heuristic"], loc="upper center", ncol=3, fontsize=8, frameon=False,
-               bbox_to_anchor=(xs[3] + pw / 2, y0 - 0.02), handlelength=1.0, columnspacing=0.7, handletextpad=0.4)
+    fig.legend(handles, ["simulated", "physics", "heuristic"], loc="upper center", ncol=2, fontsize=9.5, frameon=False,
+               bbox_to_anchor=(xs[3] + pw / 2, y0 - 0.01), handlelength=0.9, columnspacing=0.8, handletextpad=0.4,
+               labelspacing=0.2)
     for k in range(3):                                         # flow arrows between panels
         fig.add_artist(FancyArrowPatch((xs[k] + pw + 0.006, y0 + ph / 2), (xs[k + 1] - 0.006, y0 + ph / 2),
                                        transform=fig.transFigure, arrowstyle="-|>", mutation_scale=15, color="#2d3748", lw=1.5))
@@ -478,16 +481,16 @@ def fig_graphical_abstract():
     cool = float(gap_r["extra gain as share of the office's sensible cooling (%)"])
     days = void_r["days with both a >= +0.5 K and a <= -0.5 K contrast"].split(" of ")
     g0, g1 = void_r[next(k for k in void_r if "annual heat gain" in k)]
-    fig.text(0.5, 0.215, "Visible is not the same as costly (one simulated year, Phoenix office):", ha="center", va="center",
-             fontsize=9.5, weight="bold", color="#1a202c")
+    fig.text(0.5, 0.213, "Most visible is not most costly (one simulated year, Phoenix office)", ha="center", va="center",
+             fontsize=11, weight="bold", color="#1a202c")
     for x, head, body in ((0.27, "Duct-insulation gap",
-                           f"visible (≥ 1 K) in {flow_1k:.0f} % of hours with air flow,\nadds {cool:.0f} % to the office's cooling"),
+                           f"visible in {flow_1k:.0f} % of hours with air flow\nadds {cool:.0f} % to the office's cooling"),
                           (0.73, "Wall insulation void",
-                           f"contrast reverses sign on {days[0]} of {days[1]} days,\nadds {100 * (g1 / g0 - 1):.0f} % to the wall's heat gain")):
-        fig.add_artist(FancyBboxPatch((x - 0.215, 0.015), 0.43, 0.15, boxstyle="round,pad=0,rounding_size=0.015",
+                           f"contrast flips sign on {days[0]} of {days[1]} days\nadds {100 * (g1 / g0 - 1):.0f} % to the wall's heat gain")):
+        fig.add_artist(FancyBboxPatch((x - 0.225, 0.008), 0.45, 0.165, boxstyle="round,pad=0,rounding_size=0.015",
                                       transform=fig.transFigure, fc="#edf2f7", ec="#a0aec0", lw=0.8))
-        fig.text(x, 0.135, head, ha="center", va="center", fontsize=9, weight="bold", color="#2d3748")
-        fig.text(x, 0.068, body, ha="center", va="center", fontsize=8.5, color="#2d3748", linespacing=1.3)
+        fig.text(x, 0.14, head, ha="center", va="center", fontsize=10.5, weight="bold", color="#2d3748")
+        fig.text(x, 0.063, body, ha="center", va="center", fontsize=10, color="#2d3748", linespacing=1.25)
     fig.savefig(OUT / "graphical_abstract.png", dpi=500); fig.savefig(OUT / "graphical_abstract.pdf"); plt.close(fig)
 
 
