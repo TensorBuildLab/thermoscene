@@ -484,7 +484,7 @@ def fig_graphical_abstract():
     fig.text(0.5, 0.213, "Most visible is not most costly (one simulated year, Phoenix office)", ha="center", va="center",
              fontsize=11, weight="bold", color="#1a202c")
     for x, head, body in ((0.27, "Duct-insulation gap",
-                           f"visible in {flow_1k:.0f} % of hours with air flow\nadds {cool:.0f} % to the office's cooling"),
+                           f"visible {flow_1k:.0f} % of the time air flows\nadds {cool:.0f} % to the office's cooling"),
                           (0.73, "Wall insulation void",
                            f"contrast flips sign on {days[0]} of {days[1]} days\nadds {100 * (g1 / g0 - 1):.0f} % to the wall's heat gain")):
         fig.add_artist(FancyBboxPatch((x - 0.225, 0.008), 0.45, 0.165, boxstyle="round,pad=0,rounding_size=0.015",
