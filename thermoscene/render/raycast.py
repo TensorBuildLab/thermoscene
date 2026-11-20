@@ -101,8 +101,17 @@ def render_usd(usd_path, outdir, camera_names=None, frames=None, preview=True):
         (out / "segmentation_labels.txt").write_text(encoding="utf-8", data="".join(f"{i}\t{p.GetPath()}\n" for i, p in enumerate(prims)))
         fl = frames or list(cam.GetAttribute("thermal:previewFrames").Get() or [])
         res, shares = {}, {}
+        dyn = [k for k, p in enumerate(prims) if p.HasAttribute("thermal:present")]
+        base = (owner, hits)
+        views = {(): base}
         for lab in fl:
             tc = labs.index(lab)
+            absent = tuple(k for k in dyn if not series.get(prims[k], "thermal:present", tc))
+            if absent not in views:          # generated occupants absent at this step: cast again without them
+                hit2, t2 = raycast(o, d.reshape(-1, 3), [m for m in meshes if m[0] not in absent])
+                own2 = np.where(hit2 >= 0, hit2, len(prims)).reshape(h, w)
+                views[absent] = (own2, o + d * np.where(np.isfinite(t2), t2, 0).reshape(h, w, 1))
+            owner, hits = views[absent]
             true_map, app = thermal_frame(stage, series, tc, prims, owner, hits, cam, seed=tc)
             tag = lab.replace(" ", "_").replace(":", "")
             np.save(out / f"{tag}_true.npy", true_map.astype(np.float32))
@@ -111,6 +120,7 @@ def render_usd(usd_path, outdir, camera_names=None, frames=None, preview=True):
             np.save(out / f"{tag}_provenance.npy", pf.astype(np.int8))
             shares[lab] = provenance_shares(pf)
             res[lab] = (tc, app)
+        owner, hits = base
         names = sorted({k for s in shares.values() for k in s}, key=(LEVELS + ["background"]).index)
         mean = {k: float(np.mean([s.get(k, 0.0) for s in shares.values()])) for k in names} if shares else {}
         (out / "provenance_share.json").write_text(encoding="utf-8", data=__import__("json").dumps(

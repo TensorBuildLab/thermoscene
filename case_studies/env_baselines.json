@@ -1,0 +1,28 @@
+{
+ "random": {
+  "episodes": 30,
+  "max_steps": 60,
+  "success": 4,
+  "success_rate": 0.13,
+  "median_steps_to_success": 30.0,
+  "false_alarms_per_episode": 5.4
+ },
+ "look-around": {
+  "episodes": 30,
+  "max_steps": 60,
+  "success": 2,
+  "success_rate": 0.07,
+  "median_steps_to_success": 5.0,
+  "false_alarms_per_episode": 0.63
+ },
+ "privileged": {
+  "episodes": 30,
+  "max_steps": 60,
+  "success": 12,
+  "success_rate": 0.4,
+  "median_steps_to_success": 7.5,
+  "false_alarms_per_episode": 0.0
+ },
+ "seconds": 1094,
+ "seconds_per_step": 0.203
+}

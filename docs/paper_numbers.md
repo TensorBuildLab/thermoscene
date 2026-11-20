@@ -58,33 +58,33 @@ Envelope voids: EnergyPlus inside-face conduction (negative = heat leaving the r
 
 | Camera | Shares |
 |---|---|
-| B CeilingCamera | simulated 56.3 (24.5–94.7), heuristic 43.7 (5.3–75.5) |
+| B CeilingCamera | simulated 48.9 (24.5–84.5), heuristic 51.1 (15.5–75.5) |
 | B PlenumCamera | simulated 80.9 (80.9–80.9), physics 12.6 (0–19.0), heuristic 6.5 (0.1–19.1) |
 | B RooftopCamera | physics 0.0 (0–0.0), heuristic 70.7 (70.7–70.7), background 29.3 (29.3–29.3) |
-| B WallCamera | simulated 99.9 (99.4–100.0), heuristic 0.1 (0–0.6) |
-| C DiffuserCamera | simulated 24.8 (12.4–37.9), heuristic 75.2 (62.1–87.6) |
+| B WallCamera | simulated 78.3 (77.5–78.9), physics 13.3 (9.9–16.8), heuristic 8.4 (4.3–12.7) |
+| C DiffuserCamera | simulated 60.9 (48.7–67.9), physics 3.1 (3.0–3.4), heuristic 35.9 (29.1–48.3) |
 | C PlenumCamera | simulated 97.8 (97.8–97.8), physics 2.2 (2.2–2.2) |
 | C RooftopCamera | simulated 56.7 (56.7–56.7), heuristic 14.3 (14.3–14.3), background 29.1 (29.1–29.1) |
-| C WindowCamera | simulated 89.7 (82.6–94.9), heuristic 10.3 (5.1–17.4) |
+| C WindowCamera | simulated 73.7 (66.9–78.4), physics 5.6 (5.0–6.8), heuristic 20.7 (14.8–28.1) |
 
 ## Counts (Section 5.1-5.2, README)
 
 | Case | Surfaces | Elements | Components | Surface temperatures by provenance |
 |---|---|---|---|---|
-| A_single_room | 8 | 12 | 8 | heuristic 12, simulated 8 |
-| B_hvac_system | 14 | 28 | 17 | heuristic 17, physics 11, simulated 14 |
-| C_doe_medium_office | 26 | 37 | 10 | heuristic 23, physics 14, simulated 26 |
+| A_single_room | 8 | 25 | 8 | heuristic 23, physics 2, simulated 8 |
+| B_hvac_system | 14 | 41 | 17 | heuristic 28, physics 13, simulated 14 |
+| C_doe_medium_office | 26 | 131 | 10 | heuristic 106, physics 25, simulated 26 |
 
 ## Cost (Section 5.6)
 
 | Quantity | Value |
 |---|---|
-| render B_hvac_system | WallCamera: ray cast 1.33 s, 0.023 s/frame (320x240); CeilingCamera: ray cast 5.54 s, 0.042 s/frame (320x240); PlenumCamera: ray cast 2.78 s, 0.025 s/frame (320x240); RooftopCamera: ray cast 1.22 s, 0.02 s/frame (320x240) |
-| build B_hvac_system, as last built (s) | seconds 10.94, energyplus_cached True |
-| build B_hvac_system, cached EnergyPlus run (s) | 10.8 |
-| render C_doe_medium_office | WindowCamera: ray cast 1.59 s, 0.069 s/frame (320x240); DiffuserCamera: ray cast 1.31 s, 0.14 s/frame (320x240); PlenumCamera: ray cast 1.62 s, 0.026 s/frame (320x240); RooftopCamera: ray cast 1.37 s, 0.019 s/frame (320x240) |
-| build C_doe_medium_office, as last built (s) | seconds 20.48, energyplus_cached True |
-| build C_doe_medium_office, cached EnergyPlus run (s) | 21.0 |
-| B stage size, time samples (MB) | 6.73 |
-| C stage size, sidecar: usda + npz (MB) | 0.48 |
-| C stage size, time samples (MB) | 48.4 |
+| render B_hvac_system | WallCamera: ray cast 0.92 s, 0.014 s/frame (320x240); CeilingCamera: ray cast 2.26 s, 0.013 s/frame (320x240); PlenumCamera: ray cast 1.14 s, 0.008 s/frame (320x240); RooftopCamera: ray cast 0.52 s, 0.007 s/frame (320x240) |
+| build B_hvac_system, as last built (s) | seconds 9.02, energyplus_cached True |
+| build B_hvac_system, cached EnergyPlus run (s) | 5.1 |
+| render C_doe_medium_office | WindowCamera: ray cast 1.4 s, 0.021 s/frame (320x240); DiffuserCamera: ray cast 1.42 s, 0.028 s/frame (320x240); PlenumCamera: ray cast 1.54 s, 0.013 s/frame (320x240); RooftopCamera: ray cast 1.31 s, 0.011 s/frame (320x240) |
+| build C_doe_medium_office, as last built (s) | seconds 29.44, energyplus_cached True |
+| build C_doe_medium_office, cached EnergyPlus run (s) | 15.7 |
+| B stage size, time samples (MB) | 7.28 |
+| C stage size, sidecar: usda + npz (MB) | 0.88 |
+| C stage size, time samples (MB) | 52.4 |

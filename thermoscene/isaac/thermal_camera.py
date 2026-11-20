@@ -37,6 +37,7 @@ app = SimulationApp({"headless": not args.interactive})
 import numpy as np  # noqa: E402
 import omni.timeline  # noqa: E402
 import omni.usd  # noqa: E402
+from pxr import UsdGeom  # noqa: E402
 
 from thermoscene.render.shading import (Series, camera_rays, cameras, labels, provenance_frame,  # noqa: E402
                                         thermal_frame, thermal_prims)
@@ -65,6 +66,7 @@ except ImportError:
 
 series, labs, prims = Series(stage), labels(stage), thermal_prims(stage)
 index = {str(p.GetPath()): i for i, p in enumerate(prims)}
+dyn = [k for k, p in enumerate(prims) if p.HasAttribute("thermal:present")]     # generated occupants (come and go)
 out_root = Path(args.out or Path(args.usd).resolve().parent / "isaac_renders")
 
 
@@ -101,23 +103,36 @@ for cam in cameras(stage):
     rgb_a = None
     if not args.no_rgb:
         rgb_a = rep.AnnotatorRegistry.get_annotator("rgb"); rgb_a.attach([rp])
-    timeline.set_current_time(0.0); render()
-    seg = seg_a.get_data()
-    ids = np.asarray(seg["data"]).reshape(int(h), int(w))
-    lut = {int(k): owner_of(v) for k, v in seg["info"]["idToLabels"].items()}
-    owner = np.vectorize(lambda i: lut.get(int(i), len(prims)))(ids)
-    depth = np.asarray(dep_a.get_data()).reshape(int(h), int(w)).astype(float)
     o, d, _ = camera_rays(cam)
-    hits = o + d * np.where(np.isfinite(depth), depth, 0.0)[..., None]       # z-depth along camera-space z=-1 rays
+
+    def visibility(absent):
+        """Segmentation and hit points with the generated occupants absent at this step made invisible."""
+        for k in dyn:
+            img = UsdGeom.Imageable(prims[k])
+            img.MakeInvisible() if k in absent else img.MakeVisible()
+        timeline.set_current_time(0.0); render()
+        seg = seg_a.get_data()
+        ids = np.asarray(seg["data"]).reshape(int(h), int(w))
+        lut = {int(k): owner_of(v) for k, v in seg["info"]["idToLabels"].items()}
+        own = np.vectorize(lambda i: lut.get(int(i), len(prims)))(ids)
+        depth = np.asarray(dep_a.get_data()).reshape(int(h), int(w)).astype(float)
+        return own, o + d * np.where(np.isfinite(depth), depth, 0.0)[..., None]  # z-depth along camera z=-1 rays
+
+    views = {(): visibility(())}
+    owner = views[()][0]
     out = out_root / name; out.mkdir(parents=True, exist_ok=True)
     np.save(out / "segmentation.npy", owner)
     frames = range(len(labs)) if args.all_frames else [labs.index(l) for l in (args.frames or cam.GetAttribute("thermal:previewFrames").Get() or [])]
     for tc in frames:
-        true_map, app_map = thermal_frame(stage, series, tc, prims, owner, hits, cam, seed=tc)
+        absent = tuple(k for k in dyn if not series.get(prims[k], "thermal:present", tc))
+        if absent not in views:
+            views[absent] = visibility(absent)
+        owner_t, hits = views[absent]
+        true_map, app_map = thermal_frame(stage, series, tc, prims, owner_t, hits, cam, seed=tc)
         tag = labs[tc].replace(" ", "_").replace(":", "")
         np.save(out / f"{tag}_true.npy", true_map.astype(np.float32))
         np.save(out / f"{tag}_apparent.npy", app_map.astype(np.float32))
-        np.save(out / f"{tag}_provenance.npy", provenance_frame(stage, series, tc, prims, owner, hits).astype(np.int8))
+        np.save(out / f"{tag}_provenance.npy", provenance_frame(stage, series, tc, prims, owner_t, hits).astype(np.int8))
         save_png(app_map, out / f"{tag}_apparent.png")
         if rgb_a is not None:
             timeline.set_current_time(tc / tcps); render()

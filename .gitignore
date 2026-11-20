@@ -9,3 +9,7 @@ isaac_renders/
 *.egg-info/
 case_studies/*/annual/
 case_studies/*/morris/
+case_studies/corpus/
+auto_output/
+case_studies/gallery/
+.claude/

@@ -72,6 +72,25 @@ cameras:
   outdoors, on a ring of radius `distance` at `height` above the target. The best candidate maximises the visible share
   of the target (capped at `max_fraction`) plus a small bonus for the number of distinct objects in view.
 * `frames`: exact labels (`"WINTER 01-15 07:30"`), or `"ENV HH:MM"` = that time on the last day of run period ENV.
+* `cameras: auto` (instead of a list): the cameras are chosen once the scene is generated (`thermoscene/auto.py`): a
+  zone camera on a diffuser, else the largest window, else the largest wall; a plenum camera on the terminal box, else
+  the largest duct (only with a plenum); a rooftop camera on the largest rooftop element (only with rooftop equipment).
+  A target no candidate viewpoint sees falls back to the next one. Parameters and preview frames: `auto.cameras`,
+  `auto.frames` in `defaults.yaml`; the resolved list is written to `summary.json` (`cameras`).
+
+## Auto mode (no case file)
+
+```bash
+python -m thermoscene auto model.idf [--epw FILE] [--zone NAME|largest|all] [--out DIR] [--render]
+```
+
+writes `<out>/auto_case.yaml` and builds it: the EPW in the EnergyPlus `WeatherData` folder nearest to the model's
+`Site:Location` (`auto.fallback_epw` without a location), run periods 14-15 January and 15-16 July (Wednesday start),
+the model's time step (at least `auto.min_timesteps_per_hour`), the conditioned zone with the longest traced HVAC chain
+(ties: floor area; no conditioned zone: the largest zone; `largest`: largest conditioned zone; `all`: one scene per
+conditioned zone in `<out>/<zone>/`), `plenum: auto`, `roof.source: model` if the scene has outdoor roof surfaces
+(else `none`), no faults, `cameras: auto` and sidecar storage. After the build the file holds the resolved cameras, so
+`python -m thermoscene build <out>/auto_case.yaml` reproduces the scene.
 
 ## storage
 

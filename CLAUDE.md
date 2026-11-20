@@ -4,22 +4,19 @@ Project memory for Claude Code. Read this before changing anything.
 
 ## What this is
 
-`thermoscene` turns an ordinary EnergyPlus model into a 3D thermal scene (OpenUSD) of one zone, its envelope and the
-HVAC system serving it: labelled, simulation-grounded thermography for building diagnostics, whether the camera is
-handheld, on a drone or on a ground robot. It accompanies a journal paper (target: Energy and Buildings):
+`thermoscene` turns an ordinary EnergyPlus model into a 3D thermal scene (OpenUSD) of one zone, its envelope, the
+HVAC system serving it and its occupants, and into an environment for embodied inspection agents (robots, drones,
+crawlers): observation from any pose and simulated time through a realistic thermal-camera model with per-pixel
+labels, a Gymnasium-style environment and a COCO dataset exporter (`thermoscene/embodied/`, `docs/embodied.md`).
 
-*From energy models to thermal scenes: an ontology-driven pipeline for physically grounded thermography of buildings
-and HVAC systems* — Liang Zhang (University of Arizona), Huanrui Yang (University of Arizona), a student author (TBD),
-Yiyuan Jia (Big Ladder Software). Reframed on 2026-10-30 after a mock review for Energy and Buildings (the review and
-the item-by-item changes are in `../../reviews/2026-10-29_energy-and-buildings_thermoscene/`).
-
-The manuscript is in `paper/`: `manuscript_EnB.docx` (current, Energy and Buildings format, real Word equations,
-EndNote citations) built from `manuscript_EnB.md` + `references.ris` with the `manuscript-template` skill (see
-`paper/README.md`); `manuscript.docx/.md` are the earlier author-year export. Figures are generated here:
-`docs/paper/figures/` (figs 4-8 at 300 dpi, graphical abstract); every number in Sections 5.1-5.7 comes from
-`case_studies/paper_numbers.py`. `paper/supplementary_EnB.*` is assembled from `docs/*.md` by
-`paper/build_supplementary.py`; `paper/submission/` holds the upload files (line-numbered manuscript, highlights,
-graphical abstract, cover letter).
+Current paper (revision of 2026-11-19, target Automation in Construction, single author Liang Zhang, University of
+Arizona and National Laboratory of the Rockies): *Building energy models as labelled thermal environments for embodied
+inspection agents*. Its sources, figures and upload files are in `../../Automation in Construction Submission/`
+(`_source/draft_v2_*.md`, `assemble_manuscript.py`, `make_figures.py`, `build_package.py`). Its figures come from
+`case_studies/embodied_figures.py`; its numbers from `case_studies/corpus_survey.py` (RQ1), `measurement_gap.py` (RQ2),
+`inspection_timing.py` and `annual.py` (RQ3) and `env_baselines.py` (agents). Earlier versions: Energy and Buildings
+manuscript in `paper/` (`manuscript_EnB.*`, figures from `paper_figures.py`, numbers from `paper_numbers.py`) and the
+Advanced Engineering Informatics package (desk-rejected 2026-11-18).
 
 ## Setup
 
@@ -36,10 +33,16 @@ export PYTHONUTF8=1                                                       # Wind
 ```bash
 python -m thermoscene inspect <model.idf> [--zone Z]       # zones, plenum, traced HVAC chain (no build)
 python -m thermoscene build case_studies/B_hvac_system/case.yaml --render
+python -m thermoscene auto <model.idf> [--epw F] [--zone NAME|largest|all] [--out DIR] [--render]
+                                                           # any model, no YAML: writes <out>/auto_case.yaml, then builds it
 python -m thermoscene render <scene.usda>                  # reference CPU renderer (renders/<camera>/...)
 python -m thermoscene web <scene.usda> -o viewer.html      # self-contained real-time browser viewer (see docs/viewer/)
 python -m pytest -q tests                                  # must pass before committing
 python case_studies/topology_survey.py                     # paper Table 7 -> docs/topology_survey.md
+python case_studies/corpus_survey.py topology [--jobs 4]   # ALL ExampleFiles, no simulation (~11 min) -> corpus_survey.json
+python case_studies/corpus_survey.py scenes [--jobs 3]     # auto mode + render on every example file (hours) -> corpus_scenes.json
+python case_studies/corpus_survey.py report                # docs/corpus_survey.md from both JSON files
+                                                           # (resumable: --redo all, --failed only failures, --only PATTERN)
 python case_studies/zone_sweep.py                          # paper Table 6 -> docs/zone_sweep.md
 python case_studies/morris.py                              # paper Table 8 -> docs/morris.md (~7 min)
 python case_studies/sensitivity.py                         # one-at-a-time (Supplementary) -> docs/sensitivity.md
@@ -47,6 +50,12 @@ python case_studies/annual.py                              # paper Table 9 -> do
 python case_studies/benchmark.py                           # Section 5.6 -> docs/benchmark.md
 python case_studies/paper_numbers.py                       # numbers in Sections 5.1-5.7 -> docs/paper_numbers.md
 python case_studies/paper_figures.py [fig_name ...]        # paper Figs 1-8 + graphical abstract -> docs/paper/figures/
+# embodied-inspection paper (2026-11 revision)
+python case_studies/measurement_gap.py [A|B|C]             # RQ2: pixel gap, contrast fidelity, distance (~70 min) -> docs/measurement_gap.md
+python case_studies/inspection_timing.py                   # RQ3: detectability over a TMY3 year, timing policies (~15 min)
+python case_studies/env_baselines.py                       # agents in InspectionEnv (random / label-free / privileged)
+python case_studies/embodied_figures.py [name ...]         # emb_* figures + graphical abstract -> docs/paper/figures/
+python -m thermoscene dataset <scene.usda> -o out --views N # COCO dataset;  python -m thermoscene episode ... (demo)
 ```
 
 Case outputs (`case_studies/*/output`, `sweep`, `sensitivity`, `morris`, `annual`, `.sim_cache`) are git-ignored and must be rebuilt
@@ -60,8 +69,10 @@ after a fresh clone (build A, B, C with `--render` before running the figure scr
 2. `scene/` — `spaces` (zone, auto-detected plenum, outdoors, exterior skins), `geometry`, `faults`.
 3. `generators/` — `air_devices` (diffusers, grilles), `distribution` (plenum ducts, terminal box, reheat piping),
    `equipment` (AHU sections from the traced air loop, packaged condenser, roof plant, pipes, pumps, valves).
-4. `thermal/` — `environment` (sun, sky, space environments), `models` (registry of surface-temperature models),
-   `radiometry` (8–14 µm band).
+4. `thermal/` — `environment` (sun, sky, space environments), `models` (registry of surface-temperature models,
+   including occupants (ISO 7730), luminaires and plug loads), `radiometry` (8–14 µm band).
+   `generators/internal_gains` places workstations/occupants and luminaires from the simulated occupant count and
+   lighting/plug power; occupants carry a `thermal:present` series honoured by all renderers.
 5. `usd/writer.py`, `render/` (`shading` shared by all renderers, `raycast` reference renderer + provenance maps,
    `cameras` explicit/automatic), `isaac/thermal_camera.py`, `web/` (exporter + `viewer.html`).
 
@@ -73,7 +84,9 @@ provenance levels; see `docs/ontology.md`.
 - **No model-specific names.** The topology tracer and generators must never look up EnergyPlus objects or nodes by
   name; derive everything from field semantics, loop/branch membership and ports (the plenum is found from declared
   plenums or unconditioned zones excluded from floor area, never by name). Re-run the topology survey after changing
-  `topology.py` (expected: 180/180 traced, precision 1.000, recall 0.998 = 2497/2503, 174/180 exact).
+  `topology.py` (expected since 2026-11-19: 180/180 traced, precision 1.000, recall 1.000 = 2503/2503, 180/180 exact;
+  it was recall 0.998, 174/180 exact before zone exhaust fans were linked to their zones) and the corpus topology
+  stage (`corpus_survey.py topology`, numbers in `docs/corpus_survey.md`).
 - **Every non-simulated quantity gets a provenance level** (`Thing.prov(...)` / `scene.set_series(..., level, note)`).
 - **All parameters live in `thermoscene/defaults.yaml`.** No magic numbers in code.
 - **One radiometry, three renderers.** `render/shading.py` (Python reference, Isaac) and `web/viewer.html` (JS + GLSL)
@@ -87,6 +100,15 @@ provenance levels; see `docs/ontology.md`.
   `case_studies/paper_numbers.json` (rerun `paper_numbers.py` after any change that can move a temperature).
 
 ## Status and open items
+
+- 2026-11-19 (embodied revision): new `thermoscene/embodied/` (world + rasteriser that reproduces render.raycast
+  pixel for pixel, sensor model with presets lepton35 / handheld_320 / drone_640 from datasheets in docs/sensors.md,
+  scene realism, InspectionEnv, dataset export, contrast_series); internal gains; corpus survey and auto mode (merged
+  from a helper worktree). Counts now A 8/25/8, B 14/41/17, C 26/131/10 (occupants, luminaires, desks added);
+  42 tests pass. Results: corpus 4,088/4,088 zones traced (P 0.993, R 1.000), 677 of 685 in-scope models built and rendered (all that EnergyPlus 22.2 runs as shipped);
+  cameras keep 87-99 % of envelope contrasts but 16-67 % on low-emissivity HVAC surfaces; the duct gap (true -6.45 K)
+  reads about -1.0 K (no sign flip); detection 49 % any time -> 100 % model-informed for the duct gap (sigma from 64 camera units per view; 100 % also for the noisiest tenth of units, 16 % any time).
+  Not committed yet (the user commits).
 
 - Repository re-verified 2026-10-30 with EnergyPlus 22.2 on Windows 11 (laptop i7-1185G7): counts A 8/12/8,
   B 14/28/17, C 26/37/10; topology survey 180/180 (precision 1.000, recall 0.998, 174/180 exact); zone sweep 15/15;
@@ -144,3 +166,18 @@ provenance levels; see `docs/ontology.md`.
   `_cached_simulation` and `Results` refuse empty files.
 - The sun comes from the EPW LOCATION header (Site:Location only without an EPW); for case C they differ by 0.2 deg.
 - In this environment Bash heredocs collapse double backslashes: write Python helper scripts to a file instead.
+- Object types written in fields are case-insensitive in EnergyPlus (`AirloopHVAC:UnitarySystem` in a Branch):
+  `EPModel.objs/obj` and `topology._excluded` match case-insensitively, and `obj` is indexed (a linear scan per call
+  made the reference walk of a 130-zone hospital take 6 minutes).
+- Zone equipment acting without an air inlet node (baseboards, radiant panels, exhaust fans) is linked to its zone via
+  the equipment list; declared equipment with no node fields (ERV, HX-assisted coil systems, electric baseboards) is a
+  component with its branch's and its parts' ports. Do not add per-class special cases where a field rule exists.
+- EnergyPlus may override the requested time step (Conduction Finite Difference forces 20 per hour); `Results` uses the
+  interval of the 'Zone Timestep' rows. With one time step per hour the SQLite file has HVAC sub-steps only (auto mode
+  raises the time step to at least 4 per hour).
+- Windows: USD cannot write a file whose path exceeds 260 characters (`TfSafeOutputFile` rename fails); auto mode and
+  the corpus survey keep scene names and folders short.
+- Windows cannot delete an open SQLite file: close/garbage-collect `Results` before deleting a simulation cache, and a
+  cache directory with `eplusout.sql` but no `eplusout.err` is incomplete (the pipeline re-simulates it).
+- Several example files do not run in EnergyPlus 22.2 as shipped; the corpus survey re-runs the unmodified file
+  (design days) to tell EnergyPlus's own failures from thermoscene's.

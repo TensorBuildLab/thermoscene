@@ -18,10 +18,26 @@ log = logging.getLogger(__name__)
 
 SURFACE_CLASSES = {"BuildingSurface:Detailed": None, "Wall:Detailed": "Wall",
                    "RoofCeiling:Detailed": "RoofCeiling", "Floor:Detailed": "Floor"}
-UNSUPPORTED_SURFACES = ("Wall:Exterior", "Wall:Adiabatic", "Wall:Underground", "Wall:Interzone", "Roof",
-                        "Ceiling:Adiabatic", "Ceiling:Interzone", "Floor:GroundContact", "Floor:Adiabatic", "Floor:Interzone")
-SIMPLE_SUBSURFACES = {"Window": "Window", "Door": "Door", "GlazedDoor": "GlassDoor"}
-UNSUPPORTED_SUBSURFACES = ("Window:Interzone", "Door:Interzone", "GlazedDoor:Interzone")
+# simplified rectangular surfaces: class -> (surface type, outside boundary condition, default tilt, size field 2);
+# 'Surface' boundaries name an adjacent surface or zone in outside_boundary_condition_object
+SIMPLE_SURFACES = {"Wall:Exterior": ("Wall", "Outdoors", 90.0, "height"), "Wall:Adiabatic": ("Wall", "Adiabatic", 90.0, "height"),
+                   "Wall:Underground": ("Wall", "Ground", 90.0, "height"), "Wall:Interzone": ("Wall", "Surface", 90.0, "height"),
+                   "Roof": ("Roof", "Outdoors", 0.0, "width"), "Ceiling:Adiabatic": ("Ceiling", "Adiabatic", 0.0, "width"),
+                   "Ceiling:Interzone": ("Ceiling", "Surface", 0.0, "width"),
+                   "Floor:GroundContact": ("Floor", "Ground", 180.0, "width"), "Floor:Adiabatic": ("Floor", "Adiabatic", 180.0, "width"),
+                   "Floor:Interzone": ("Floor", "Surface", 180.0, "width")}
+SIMPLE_SUBSURFACES = {"Window": "Window", "Door": "Door", "GlazedDoor": "GlassDoor", "Window:Interzone": "Window",
+                      "Door:Interzone": "Door", "GlazedDoor:Interzone": "GlassDoor"}
+
+
+def rectangle_vertices(azimuth, tilt, x0, y0, z0, length, height):
+    """Vertices of a simplified rectangular surface as EnergyPlus generates them (upper-left corner first,
+    counter-clockwise seen from outside; MakeRectangularVertices): length along the azimuth's horizontal axis,
+    height (or width) up the tilt."""
+    ca, sa = math.cos(math.radians(azimuth)), math.sin(math.radians(azimuth))
+    ct, st = math.cos(math.radians(tilt)), math.sin(math.radians(tilt))
+    xx, yy = (0.0, 0.0, length, length), (height, 0.0, 0.0, height)
+    return [(-x * ca - y * ct * sa + x0, x * sa - y * ct * ca + y0, y * st + z0) for x, y in zip(xx, yy)]
 
 
 def newell_normal(pts) -> np.ndarray:
@@ -58,14 +74,32 @@ class EPModel:
             self.warnings.append(msg)
 
     # ---------------------------------------------------------------- generic access
+    # Object types named in fields (Branch components, equipment lists, ...) and object names are case-insensitive in
+    # EnergyPlus ('AirloopHVAC:UnitarySystem' in a Branch is the class AirLoopHVAC:UnitarySystem).
+    def _class_key(self, cls: str) -> str:
+        if cls in self.d:
+            return cls
+        idx = getattr(self, "_classes", None)
+        if idx is None or len(idx) != len(self.d):
+            idx = self._classes = {k.upper(): k for k in self.d}
+        return idx.get(cls.upper(), cls)
+
     def objs(self, cls: str) -> dict:
-        return self.d.get(cls, {})
+        return self.d.get(self._class_key(cls), {})
 
     def obj(self, cls: str, name: str):
-        for k, v in self.objs(cls).items():
-            if k.upper() == name.upper():
-                return k, v
-        return None, None
+        c = self._class_key(cls)
+        objs = self.d.get(c)
+        if not objs or name is None:
+            return None, None
+        if name in objs:
+            return name, objs[name]
+        cache = self.__dict__.setdefault("_names", {})
+        idx = cache.get(c)
+        if idx is None or len(idx) != len(objs):          # indexed once per class (models have thousands of objects)
+            idx = cache[c] = {k.upper(): k for k in objs}
+        k = idx.get(str(name).upper())
+        return (k, objs[k]) if k is not None else (None, None)
 
     def classes(self) -> list[str]:
         return list(self.d)
@@ -131,10 +165,30 @@ class EPModel:
                 out.append(dict(name=name, type=st.capitalize() if st else "", construction=f.get("construction_name", ""),
                                 zone=zn, boundary=bc, boundary_object=f.get("outside_boundary_condition_object"),
                                 verts=self._to_world(verts, zn)))
-        for cls in UNSUPPORTED_SURFACES:
-            if self.objs(cls):
-                self.warn(f"{cls} objects are not read (convert to BuildingSurface:Detailed)")
+        for cls, (st, bc, tilt0, size2) in SIMPLE_SURFACES.items():
+            for name, f in self.objs(cls).items():
+                zn = f.get("zone_name", "")
+                if zone and zn.upper() != zone.upper():
+                    continue
+                try:
+                    verts = rectangle_vertices(float(f.get("azimuth_angle", 0.0)), float(f.get("tilt_angle", tilt0)),
+                                               float(f.get("starting_x_coordinate", 0.0)), float(f.get("starting_y_coordinate", 0.0)),
+                                               float(f.get("starting_z_coordinate", 0.0)), float(f["length"]), float(f[size2]))
+                except (KeyError, TypeError, ValueError):
+                    self.warn(f"{cls} {name}: no length/{size2}; not read")
+                    continue
+                obj = f.get("outside_boundary_condition_object")
+                b = bc
+                if bc == "Surface" and obj and not self._surface_exists(obj) and self.obj("Zone", obj)[0]:
+                    b = "Zone"                                     # interzone object may name the adjacent zone
+                # generated counter-clockwise whatever GlobalGeometryRules say; _to_world reverses clockwise input
+                v = np.asarray(verts)[::-1] if self.clockwise else np.asarray(verts)
+                out.append(dict(name=name, type=st, construction=f.get("construction_name", ""), zone=zn, boundary=b,
+                                boundary_object=obj, verts=self._to_world(v, zn)))
         return out
+
+    def _surface_exists(self, name: str) -> bool:
+        return any(self.obj(cls, name)[0] for cls in list(SURFACE_CLASSES) + list(SIMPLE_SURFACES))
 
     def surface(self, name: str) -> dict | None:
         return next((s for s in self.surfaces() if s["name"].upper() == name.upper()), None)
@@ -165,9 +219,6 @@ class EPModel:
                 pts = [ll + (x0) * u + (z0 + H) * v, ll + x0 * u + z0 * v, ll + (x0 + L) * u + z0 * v, ll + (x0 + L) * u + (z0 + H) * v]
                 out.append(dict(name=name, type=st, construction=f.get("construction_name", ""), verts=np.array(pts),
                                 multiplier=int(f.get("multiplier", 1) or 1)))
-        for cls in UNSUPPORTED_SUBSURFACES:
-            if self.objs(cls):
-                self.warn(f"{cls} objects are not read (convert to FenestrationSurface:Detailed)")
         return out
 
     def is_air_boundary(self, construction: str) -> bool:

@@ -202,6 +202,60 @@ def _(e, Tf, c):
     return np.where(on, mix * Tr + (1 - mix) * t_ceil, t_ceil), Provenance.HEURISTIC, "mix of return air and ceiling"
 
 
+# ------------------------------------------------------------------ internal gains (generators/internal_gains.py)
+def _power_fraction(e, c):
+    return np.clip(c.signal(e.attrs.get("power")), 0, None) / max(float(e.attrs.get("design_power_w") or 1.0), 1e-9)
+
+
+@model("luminaire")
+def _(e, Tf, c):
+    t_ceil = c.scene.series[(e.attrs["ceiling_surface"], "surfaceTemperature")]
+    return t_ceil + c.cfg["internal_gains"]["luminaire"]["rise_k"] * _power_fraction(e, c), Provenance.HEURISTIC, \
+        "ceiling + lens rise x simulated lighting power fraction"
+
+
+@model("plug_load")
+def _(e, Tf, c):
+    return c.ambient_air(e) + c.cfg["internal_gains"]["monitor_rise_k"] * _power_fraction(e, c), Provenance.HEURISTIC, \
+        "air + rise x simulated plug-load power fraction"
+
+
+def _occupant_state(e, c):
+    """Simulated air and mean radiant temperature, metabolic rate (W/m2) and ASHRAE 55 clothing of the zone."""
+    from ..generators.internal_gains import ashrae55_clothing
+    g = c.cfg["internal_gains"]["occupant"]
+    sp = c.scene.get(e.space)
+    ta = c.scene.series[(sp.id, "airTemperature")]
+    tr = c.scene.series.get((sp.id, "meanRadiantTemperature"), ta)
+    count = c.signal(e.attrs.get("people"))
+    heat = c.signal(e.attrs.get("people_heat"))
+    per_person = np.where(count > 1e-6, heat / np.maximum(count, 1e-6), g["default_activity_w"])
+    met = per_person / g["body_area_m2"]
+    t = c.r.time
+    day = t.Month.to_numpy() * 100 + t.Day.to_numpy()
+    six = (t.Hour.to_numpy() == 6) & (t.Minute.to_numpy() == 0)
+    t6 = {d: v for d, v, s in zip(day, c.env["T_out"], six) if s}
+    t_6am = np.array([t6.get(d, np.nan) for d in day])
+    daily_min = {d: np.nanmin(c.env["T_out"][day == d]) for d in np.unique(day)}
+    t_6am = np.where(np.isfinite(t_6am), t_6am, [daily_min[d] for d in day])
+    return ta, tr, met, ashrae55_clothing(t_6am), g
+
+
+@model("occupant_clothing")
+def _(e, Tf, c):
+    from ..generators.internal_gains import clothing_temperature
+    ta, tr, met, clo, g = _occupant_state(e, c)
+    return clothing_temperature(ta, tr, met, clo, g["air_velocity_ms"]), Provenance.HEURISTIC, \
+        "ISO 7730 clothing surface temperature; simulated air, MRT and activity; ASHRAE 55 dynamic clothing"
+
+
+@model("occupant_skin")
+def _(e, Tf, c):
+    from ..generators.internal_gains import skin_temperature
+    _, _, met, _, _ = _occupant_state(e, c)
+    return skin_temperature(met), Provenance.HEURISTIC, "ISO 7730 bare-skin limit, 35.7 - 0.028 M, from the simulated activity"
+
+
 # ------------------------------------------------------------------ assignment
 def assign(scene, ctx: Ctx) -> None:
     for s in scene.of(Surface):

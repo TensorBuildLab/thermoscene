@@ -66,6 +66,9 @@ def export(usd_path, out_html, title=None) -> Path:
     stag = np.array([[1 if p.HasAttribute("mep:stagnation") and p.HasAttribute("mep:fluidMassFlow") and v <= 0 else 0
                       for v in (sv(p, "mep:fluidMassFlow") if p.HasAttribute("mep:fluidMassFlow") else [1.0] * len(idx))]
                      for p in prims], np.uint8)
+    # 1 while the prim is in the scene (generated occupants come and go with the simulated occupant count)
+    pres = np.array([[1 if v else 0 for v in sv(p, "thermal:present")] if p.HasAttribute("thermal:present") else [1] * len(idx)
+                     for p in prims], np.uint8)
     info = []
     for p in prims:
         path = str(p.GetPath())
@@ -114,7 +117,7 @@ def export(usd_path, out_html, title=None) -> Path:
         inferno=(np.array([colormaps["inferno"](i / 255)[:3] for i in range(256)]) * 255).round().astype(int).ravel().tolist(),
         n_prims=len(prims), n_steps=len(idx),
         prov_threshold=float(meta.get("thermal:provenanceThresholdK", 0.1)),
-        positions=b64(pos), owner=b64(owner), temps=b64(temps), stag=b64(stag))
+        positions=b64(pos), owner=b64(owner), temps=b64(temps), stag=b64(stag), pres=b64(pres))
     html = TEMPLATE.read_text(encoding="utf-8").replace("/*__THERMOSCENE_DATA__*/null", json.dumps(data, separators=(",", ":")))
     out = Path(out_html); out.write_text(encoding="utf-8", data=html)
     return out

@@ -18,6 +18,33 @@ scene:
     extent: null              # box mode: [xmin, xmax, ymin, ymax]
     anchor: auto              # shaft position under the AHU discharge: auto (above zone service corner) | [x, y]
 
+# Occupants, luminaires and workstations from the energy model's internal gains (generators/internal_gains.py).
+# Counts, presence and powers are simulated; positions are ASSUMED_LAYOUT; surface temperatures HEURISTIC.
+internal_gains:
+  enabled: true
+  seed: 0
+  max_occupants: 20             # seated occupants (and workstations) generated at most per zone
+  max_luminaires: 60
+  monitor_rise_k: 8.0           # monitor housing above air at full plug-load power (HEURISTIC)
+  workstation: {desk_m: [1.2, 0.7, 0.74], monitor_m: [0.55, 0.05, 0.35], spacing_m: 2.2, inset_m: 0.9}
+  occupant:
+    torso_m: [0.40, 0.25, 0.60]   # width, depth, height of the seated torso
+    head_m: [0.18, 0.20, 0.24]
+    seat_m: 0.45
+    chair_offset_m: 0.35          # seat centre beyond the desk edge
+    body_area_m2: 1.8             # DuBois area of a standard person (ISO 7730)
+    air_velocity_ms: 0.1          # ISO 7730 still air
+    default_activity_w: 120.0     # per person when the zone is empty (only used for the hidden bodies)
+  luminaire:
+    fixture_w: 40.0               # LED troffer wattage used to count fixtures from the lighting power (ENGINEERING_RULE)
+    size_m: [0.6, 1.2]
+    depth_m: 0.03
+    rise_k: 8.0                   # lens above ceiling at full lighting power (HEURISTIC)
+    inset_m: 0.6
+    min_spacing_m: 1.2
+    min_area_per_fixture_m2: 2.0
+    clearance_from_air_devices_m: 0.9
+
 faults: []                    # see docs/configuration.md
 fault_defaults:               # used for every fault of that type unless the fault sets the key itself
   envelope_defect: {mode: cavity, cavity_resistance: 0.17}    # m2K/W, replaces the highest-resistance layer (ASSUMED)
@@ -69,6 +96,11 @@ materials:
   coil_fins:     {emissivity: 0.85, solar_absorptance: 0.80, note: "finned coil seen as a cavity"}
   roof_membrane: {emissivity: 0.90, solar_absorptance: 0.45, note: "light single-ply membrane"}
   diffuser_face: {emissivity: 0.90, solar_absorptance: 0.30, note: "white powder-coated steel"}
+  luminaire_lens: {emissivity: 0.90, solar_absorptance: 0.20, note: "acrylic/polycarbonate diffuser lens"}
+  desk:          {emissivity: 0.90, solar_absorptance: 0.50, note: "laminate desk top"}
+  monitor:       {emissivity: 0.90, solar_absorptance: 0.80, note: "plastic housing and glass screen"}
+  clothing:      {emissivity: 0.95, solar_absorptance: 0.60, note: "textiles"}
+  skin:          {emissivity: 0.98, solar_absorptance: 0.60, note: "human skin"}
 
 # element class -> material, by location (plenum / roof)
 material_rules:
@@ -107,3 +139,165 @@ camera:
   reflected_setting_c: 20.0
   netd_k: 0.05
   blur_px: 0.7
+
+# ---------------------------------------------------------------- embodied interface (thermoscene.embodied)
+# Thermal-camera presets for ThermalCamera.preset(name). Offsets and noise are in K, referred to a 30 degC scene
+# (converted to radiance with dL/dT at 30 degC, so their temperature equivalent grows in colder scenes, as in a real
+# microbolometer). Resolution, field of view, f-number, NETD, accuracy, output resolution, shutter interval, distortion
+# and time constant are datasheet values (docs/sensors.md). Residual non-uniformity, column/row offsets, vignetting and
+# drift are not published as numbers; they are assumed magnitudes (HEURISTIC) and are randomised per camera unit.
+sensors:
+  reference:          # the reference renderer's camera (white noise + Gaussian blur only); reproduces render.raycast
+    resolution: [320, 240]
+    hfov_deg: 62.0
+    netd_k: 0.05
+    blur_px: 0.7
+    reference_mode: true
+  ideal:              # no sensor effects at all (the camera reading differs from the truth only by emissivity/reflection)
+    resolution: [320, 240]
+    hfov_deg: 62.0
+    netd_k: 0.0
+    blur_px: 0.0
+  lepton35:           # FLIR Lepton 3.5 class (small robots, crawlers); datasheet: Teledyne FLIR Lepton (2025, 2018)
+    resolution: [160, 120]
+    hfov_deg: 57.0
+    netd_k: 0.050               # < 50 mK
+    accuracy_k: 5.0             # high gain: greater of +-5 degC or 5 %
+    accuracy_frac: 0.05
+    pixel_pitch_um: 12.0
+    f_number: 1.1
+    quant_k: 0.01               # TLinear output, 0.01 K
+    fpn_offset_k: 0.04          # residual non-uniformity after correction (HEURISTIC, ~0.8 x NETD)
+    fpn_gain: 0.004
+    stripe_col_k: 0.03
+    stripe_row_k: 0.015
+    vignetting_k: 0.4
+    drift_k_per_min: 0.15       # offset drift between shutter corrections (HEURISTIC)
+    ffc_interval_s: 180         # automatic flat-field correction every 3 min
+    dead_pixel_fraction: 0.00005   # typically one defective pixel
+    distortion_k1: -0.08        # barrel, about -12 % at the image corner (datasheet: < 13 %)
+    time_constant_ms: 12.0
+    supersample: 3
+  handheld_320:       # 320 x 240 inspection camera class (FLIR E8-XT), handheld or on a ground robot
+    resolution: [320, 240]
+    hfov_deg: 45.0              # 45 x 34 deg
+    netd_k: 0.050               # < 50 mK
+    accuracy_k: 2.0             # +-2 degC or +-2 % of reading
+    accuracy_frac: 0.02
+    pixel_pitch_um: 17.0
+    f_number: 1.5
+    quant_k: 0.01
+    fpn_offset_k: 0.03
+    fpn_gain: 0.003
+    stripe_col_k: 0.02
+    stripe_row_k: 0.01
+    vignetting_k: 0.3
+    drift_k_per_min: 0.10
+    ffc_interval_s: 180
+    dead_pixel_fraction: 0.0002
+    distortion_k1: -0.02
+    time_constant_ms: 10.0
+    supersample: 3
+  drone_640:          # 640 x 512 drone payload class (DJI Mavic 3T: 12 um, f/1.0, diagonal FOV 61 deg)
+    resolution: [640, 512]
+    hfov_deg: 49.4              # horizontal field of view from the 61 deg diagonal at 5:4
+    netd_k: 0.050               # <= 50 mK at f/1.0
+    accuracy_k: 2.0             # high gain: +-2 degC or +-2 %
+    accuracy_frac: 0.02
+    pixel_pitch_um: 12.0
+    f_number: 1.0
+    quant_k: 0.01
+    fpn_offset_k: 0.03
+    fpn_gain: 0.003
+    stripe_col_k: 0.02
+    stripe_row_k: 0.01
+    vignetting_k: 0.3
+    drift_k_per_min: 0.10
+    ffc_interval_s: 300
+    dead_pixel_fraction: 0.0002
+    distortion_k1: -0.03
+    time_constant_ms: 8.0
+    supersample: 2
+  defaults:           # values every preset inherits unless it sets them
+    emissivity_setting: 0.95
+    reflected_setting_c: 20.0
+    accuracy_k: 0.0
+    accuracy_frac: 0.0
+    pixel_pitch_um: 12.0
+    f_number: 1.0
+    lens_blur_px: 0.45          # aberration/defocus, added in quadrature to the diffraction blur (HEURISTIC)
+    quant_k: 0.0
+    fpn_offset_k: 0.0
+    fpn_gain: 0.0
+    stripe_col_k: 0.0
+    stripe_row_k: 0.0
+    vignetting_k: 0.0
+    drift_k_per_min: 0.0
+    drift_vignetting_share: 0.3   # share of the drift that has the radial shape of the vignetting (HEURISTIC)
+    ffc_interval_s: 0
+    dead_pixel_fraction: 0.0
+    dead_pixel_range_c: [-20.0, 80.0]
+    distortion_k1: 0.0
+    distortion_k2: 0.0
+    time_constant_ms: 0.0
+    supersample: 1
+    reference_mode: false
+    band_center_um: 10.0
+  randomize:          # domain-randomisation ranges (uniform) used by ThermalCamera.randomized(); multipliers of the preset
+    netd_k: [0.6, 1.6]
+    fpn_offset_k: [0.5, 2.0]
+    fpn_gain: [0.5, 2.0]
+    stripe_col_k: [0.3, 2.0]
+    stripe_row_k: [0.3, 2.0]
+    vignetting_k: [0.0, 2.0]
+    drift_k_per_min: [0.0, 2.0]
+    lens_blur_px: [0.6, 1.6]
+    emissivity_setting: [0.90, 1.00]       # absolute values (the operator's setting)
+    reflected_setting_c: [10.0, 30.0]      # absolute values
+
+# Scene realism applied when an embodied renderer observes the scene (thermoscene.embodied.world).
+realism:
+  angular_emissivity: true      # directional emissivity eps(theta) = eps_n * (1 - (1 - cos theta)^5) (HEURISTIC, Schlick)
+  specular_reflections: true    # one specular bounce on materials with specularity > 0 (PHYSICS with HEURISTIC specularity)
+  texture:                      # world-space value noise: emissivity and temperature variation within a surface (ASSUMED)
+    enabled: true
+    correlation_m: 0.25
+    temperature_k: 0.15         # standard deviation of the within-surface temperature variation
+    emissivity: 0.02            # standard deviation of the emissivity variation (multiplied per material, below)
+  min_specular_weight: 0.02    # trace a specular bounce only where (1 - eps) * specularity reaches this
+  atmosphere_extinction_per_m: 0.0001     # LWIR path transmittance exp(-beta d) toward the air temperature (HEURISTIC)
+  specularity:                  # share of the reflected radiance that is specular (the rest is diffuse, at the space MRT)
+    fsk_foil: 0.6
+    galv_bare: 0.5
+    alu_jacket: 0.7
+    brass_valve: 0.2
+    copper: 0.3
+    painted_steel: 0.05
+    coil_fins: 0.0
+    roof_membrane: 0.05
+    diffuser_face: 0.05
+    asj_jacket: 0.05
+    glazing: 0.9
+    surface: 0.05               # opaque EnergyPlus surfaces (paints, gypsum, masonry)
+  texture_emissivity_scale:     # multiplier of texture.emissivity per material (low-e metals vary most: dust, oxidation)
+    fsk_foil: 3.0
+    galv_bare: 2.5
+    alu_jacket: 2.0
+    glazing: 0.0
+
+# ---------------------------------------------------------------- auto mode (python -m thermoscene auto; thermoscene/auto.py)
+auto:
+  weather_dir: WeatherData      # in the EnergyPlus installation: the EPW nearest to the model's Site:Location is used
+  fallback_epw: USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw    # for a model without Site:Location
+  run_periods:                  # as the paper's cases
+    - {name: SUMMER, start: "07-15", end: "07-16", start_day_of_week: Wednesday}
+    - {name: WINTER, start: "01-14", end: "01-15", start_day_of_week: Wednesday}
+  timesteps_per_hour: 4         # only for a model without a Timestep object; otherwise the model's own is kept,
+  min_timesteps_per_hour: 4     # raised to at least this (with one step per hour the SQLite file has HVAC sub-steps only)
+  storage: sidecar              # time series storage of auto scenes
+  name_chars: [32, 24]          # scene name = first characters of the model file name + of the zone name (path length)
+  frames: ["WINTER 08:00", "SUMMER 15:00"]       # preview frames of every automatic camera
+  cameras:                      # targets: zone diffuser > window > largest wall; plenum terminal box > duct; largest rooftop element
+    zone:     {name: ZoneCamera, auto: {height: 1.4}, max_height_frac: 0.8, relax: [{min_distance: 0.6, inset: 0.1}]}
+    plenum:   {name: PlenumCamera, hfov_deg: 75.0, auto: {min_distance: 1.5}, relax: [{min_distance: 0.5, inset: 0.1}]}
+    outdoors: {name: RooftopCamera, auto: {distance: 8.0, height: 4.0}, distance_per_size: 2.0, relax: [{height: 8.0}]}

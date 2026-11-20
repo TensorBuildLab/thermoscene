@@ -1,0 +1,50 @@
+[
+ {
+  "usd": "gallery/2ZoneDataCenterHVAC_wEconomizer/2ZoneDataCenterHVAC_wEconomizer_East_Zone.usda",
+  "camera": "ZoneCamera",
+  "frame": "SUMMER 15:00",
+  "title": "Data centre, server room"
+ },
+ {
+  "usd": "gallery/HVACTemplate-5ZoneVRF/HVACTemplate-5ZoneVRF_SPACE5-1.usda",
+  "camera": "ZoneCamera",
+  "frame": "SUMMER 15:00",
+  "title": "Office zone with VRF units"
+ },
+ {
+  "usd": "gallery/RefBldgFullServiceRestaurantNew2004_Chicago/RefBldgFullServiceRestaurantNew2_Dining.usda",
+  "camera": "PlenumCamera",
+  "frame": "WINTER 08:00",
+  "title": "Restaurant, plenum ductwork"
+ },
+ {
+  "usd": "gallery/RefBldgFullServiceRestaurantNew2004_Chicago/RefBldgFullServiceRestaurantNew2_Dining.usda",
+  "camera": "RooftopCamera",
+  "frame": "SUMMER 15:00",
+  "title": "Restaurant, packaged rooftop unit"
+ },
+ {
+  "usd": "gallery/RefBldgHospitalNew2004_Chicago/RefBldgHospitalNew2004_Chicago_Kitchen_Flr_5.usda",
+  "camera": "ZoneCamera",
+  "frame": "SUMMER 15:00",
+  "title": "Hospital kitchen"
+ },
+ {
+  "usd": "gallery/RefBldgLargeOfficeNew2004_Chicago/RefBldgLargeOfficeNew2004_Chicag_Core_top.usda",
+  "camera": "ZoneCamera",
+  "frame": "SUMMER 15:00",
+  "title": "Large office core, central plant"
+ },
+ {
+  "usd": "gallery/RefBldgMidriseApartmentNew2004_Chicago/RefBldgMidriseApartmentNew2004_C_T_SW_Apartment.usda",
+  "camera": "ZoneCamera",
+  "frame": "WINTER 08:00",
+  "title": "Apartment, winter morning"
+ },
+ {
+  "usd": "gallery/RefBldgWarehouseNew2004_Chicago/RefBldgWarehouseNew2004_Chicago_FineStorage.usda",
+  "camera": "ZoneCamera",
+  "frame": "WINTER 08:00",
+  "title": "Warehouse, winter morning"
+ }
+]

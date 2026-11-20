@@ -287,10 +287,11 @@ def test_isaac_shading_path_matches_reference_renderer():
             if not ref.exists():
                 continue
             o, d, (h, w) = camera_rays(cam)
-            hit, t = raycast(o, d.reshape(-1, 3), meshes)
+            tc = labs.index(frames[-1])
+            absent = {k for k, p in enumerate(prims) if p.HasAttribute("thermal:present") and not ser.get(p, "thermal:present", tc)}
+            hit, t = raycast(o, d.reshape(-1, 3), [m for m in meshes if m[0] not in absent])   # Isaac hides them
             depth = np.where(np.isfinite(t), t, 0.0).reshape(h, w)          # = Isaac distance_to_image_plane
             owner = np.where(hit >= 0, hit, len(prims)).reshape(h, w)
-            tc = labs.index(frames[-1])
             _, app = thermal_frame(st, ser, tc, prims, owner, o + d * depth[..., None], cam, seed=tc)
             assert np.abs(app - np.load(ref)).max() < 1e-4, (case, cam.GetName())
             checked += 1

@@ -1,0 +1,1060 @@
+{
+ "k_ccr": 3.0,
+ "n_min": 4,
+ "units_per_view": 8,
+ "presets": [
+  "lepton35",
+  "handheld_320",
+  "drone_640"
+ ],
+ "A_pixel_gap": {
+  "views": [
+   {
+    "case": "B",
+    "camera": "WallCamera",
+    "frame": "WINTER 01-15 07:00",
+    "pixels": 76800,
+    "physics_over_1K": 0.4,
+    "total_over_1K": 30.1,
+    "total_over_2K": 1.3,
+    "median_abs_total": 0.63
+   },
+   {
+    "case": "B",
+    "camera": "WallCamera",
+    "frame": "WINTER 01-15 15:00",
+    "pixels": 76800,
+    "physics_over_1K": 1.7,
+    "total_over_1K": 39.6,
+    "total_over_2K": 1.3,
+    "median_abs_total": 0.84
+   },
+   {
+    "case": "B",
+    "camera": "WallCamera",
+    "frame": "SUMMER 07-16 07:00",
+    "pixels": 76800,
+    "physics_over_1K": 0.8,
+    "total_over_1K": 5.0,
+    "total_over_2K": 0.0,
+    "median_abs_total": 0.34
+   },
+   {
+    "case": "B",
+    "camera": "WallCamera",
+    "frame": "SUMMER 07-16 15:00",
+    "pixels": 76800,
+    "physics_over_1K": 4.2,
+    "total_over_1K": 25.9,
+    "total_over_2K": 1.3,
+    "median_abs_total": 0.63
+   },
+   {
+    "case": "B",
+    "camera": "CeilingCamera",
+    "frame": "WINTER 01-15 22:00",
+    "pixels": 76800,
+    "physics_over_1K": 0.0,
+    "total_over_1K": 0.6,
+    "total_over_2K": 0.0,
+    "median_abs_total": 0.25
+   },
+   {
+    "case": "B",
+    "camera": "CeilingCamera",
+    "frame": "WINTER 01-15 07:30",
+    "pixels": 76800,
+    "physics_over_1K": 0.0,
+    "total_over_1K": 27.1,
+    "total_over_2K": 0.5,
+    "median_abs_total": 0.46
+   },
+   {
+    "case": "B",
+    "camera": "CeilingCamera",
+    "frame": "WINTER 01-15 09:00",
+    "pixels": 76800,
+    "physics_over_1K": 1.3,
+    "total_over_1K": 12.4,
+    "total_over_2K": 1.3,
+    "median_abs_total": 0.39
+   },
+   {
+    "case": "B",
+    "camera": "CeilingCamera",
+    "frame": "SUMMER 07-16 15:00",
+    "pixels": 76800,
+    "physics_over_1K": 8.0,
+    "total_over_1K": 63.4,
+    "total_over_2K": 6.8,
+    "median_abs_total": 1.18
+   },
+   {
+    "case": "B",
+    "camera": "PlenumCamera",
+    "frame": "WINTER 01-15 07:30",
+    "pixels": 76800,
+    "physics_over_1K": 10.1,
+    "total_over_1K": 22.4,
+    "total_over_2K": 0.6,
+    "median_abs_total": 0.63
+   },
+   {
+    "case": "B",
+    "camera": "PlenumCamera",
+    "frame": "WINTER 01-15 10:00",
+    "pixels": 76800,
+    "physics_over_1K": 15.3,
+    "total_over_1K": 40.2,
+    "total_over_2K": 2.7,
+    "median_abs_total": 0.69
+   },
+   {
+    "case": "B",
+    "camera": "PlenumCamera",
+    "frame": "WINTER 01-15 22:00",
+    "pixels": 76800,
+    "physics_over_1K": 0.0,
+    "total_over_1K": 1.3,
+    "total_over_2K": 0.0,
+    "median_abs_total": 0.27
+   },
+   {
+    "case": "B",
+    "camera": "PlenumCamera",
+    "frame": "SUMMER 07-16 15:00",
+    "pixels": 76800,
+    "physics_over_1K": 15.8,
+    "total_over_1K": 33.7,
+    "total_over_2K": 11.1,
+    "median_abs_total": 0.68
+   },
+   {
+    "case": "B",
+    "camera": "RooftopCamera",
+    "frame": "WINTER 01-15 03:00",
+    "pixels": 54319,
+    "physics_over_1K": 90.8,
+    "total_over_1K": 95.2,
+    "total_over_2K": 55.5,
+    "median_abs_total": 2.11
+   },
+   {
+    "case": "B",
+    "camera": "RooftopCamera",
+    "frame": "WINTER 01-15 09:00",
+    "pixels": 54319,
+    "physics_over_1K": 87.9,
+    "total_over_1K": 57.7,
+    "total_over_2K": 51.1,
+    "median_abs_total": 2.16
+   },
+   {
+    "case": "B",
+    "camera": "RooftopCamera",
+    "frame": "SUMMER 07-16 09:00",
+    "pixels": 54319,
+    "physics_over_1K": 64.2,
+    "total_over_1K": 44.4,
+    "total_over_2K": 20.4,
+    "median_abs_total": 0.87
+   },
+   {
+    "case": "B",
+    "camera": "RooftopCamera",
+    "frame": "SUMMER 07-16 15:00",
+    "pixels": 54319,
+    "physics_over_1K": 63.5,
+    "total_over_1K": 71.5,
+    "total_over_2K": 49.9,
+    "median_abs_total": 1.99
+   },
+   {
+    "case": "C",
+    "camera": "WindowCamera",
+    "frame": "WINTER 01-15 07:00",
+    "pixels": 76800,
+    "physics_over_1K": 17.9,
+    "total_over_1K": 21.3,
+    "total_over_2K": 11.1,
+    "median_abs_total": 0.47
+   },
+   {
+    "case": "C",
+    "camera": "WindowCamera",
+    "frame": "WINTER 01-15 14:00",
+    "pixels": 76800,
+    "physics_over_1K": 10.4,
+    "total_over_1K": 56.4,
+    "total_over_2K": 13.6,
+    "median_abs_total": 1.22
+   },
+   {
+    "case": "C",
+    "camera": "WindowCamera",
+    "frame": "SUMMER 07-16 14:00",
+    "pixels": 76800,
+    "physics_over_1K": 13.5,
+    "total_over_1K": 59.1,
+    "total_over_2K": 12.0,
+    "median_abs_total": 1.11
+   },
+   {
+    "case": "C",
+    "camera": "DiffuserCamera",
+    "frame": "WINTER 01-15 07:30",
+    "pixels": 76800,
+    "physics_over_1K": 18.3,
+    "total_over_1K": 40.3,
+    "total_over_2K": 6.7,
+    "median_abs_total": 0.88
+   },
+   {
+    "case": "C",
+    "camera": "DiffuserCamera",
+    "frame": "WINTER 01-15 12:00",
+    "pixels": 76800,
+    "physics_over_1K": 10.3,
+    "total_over_1K": 16.7,
+    "total_over_2K": 4.8,
+    "median_abs_total": 0.45
+   },
+   {
+    "case": "C",
+    "camera": "DiffuserCamera",
+    "frame": "SUMMER 07-16 15:00",
+    "pixels": 76800,
+    "physics_over_1K": 12.7,
+    "total_over_1K": 28.3,
+    "total_over_2K": 5.2,
+    "median_abs_total": 0.68
+   },
+   {
+    "case": "C",
+    "camera": "PlenumCamera",
+    "frame": "WINTER 01-15 07:30",
+    "pixels": 76800,
+    "physics_over_1K": 18.5,
+    "total_over_1K": 43.0,
+    "total_over_2K": 8.0,
+    "median_abs_total": 0.86
+   },
+   {
+    "case": "C",
+    "camera": "PlenumCamera",
+    "frame": "WINTER 01-15 12:00",
+    "pixels": 76800,
+    "physics_over_1K": 2.6,
+    "total_over_1K": 20.9,
+    "total_over_2K": 0.9,
+    "median_abs_total": 0.63
+   },
+   {
+    "case": "C",
+    "camera": "PlenumCamera",
+    "frame": "SUMMER 07-16 15:00",
+    "pixels": 76800,
+    "physics_over_1K": 4.8,
+    "total_over_1K": 43.8,
+    "total_over_2K": 4.1,
+    "median_abs_total": 0.87
+   },
+   {
+    "case": "C",
+    "camera": "RooftopCamera",
+    "frame": "WINTER 01-15 03:00",
+    "pixels": 54487,
+    "physics_over_1K": 99.9,
+    "total_over_1K": 99.9,
+    "total_over_2K": 99.9,
+    "median_abs_total": 6.4
+   },
+   {
+    "case": "C",
+    "camera": "RooftopCamera",
+    "frame": "SUMMER 07-16 09:00",
+    "pixels": 54487,
+    "physics_over_1K": 76.3,
+    "total_over_1K": 90.2,
+    "total_over_2K": 58.2,
+    "median_abs_total": 2.29
+   },
+   {
+    "case": "C",
+    "camera": "RooftopCamera",
+    "frame": "SUMMER 07-16 15:00",
+    "pixels": 54487,
+    "physics_over_1K": 73.5,
+    "total_over_1K": 85.8,
+    "total_over_2K": 62.6,
+    "median_abs_total": 2.52
+   }
+  ],
+  "ideal_sensor": {
+   "pixels": 1993537,
+   "median_abs_K": 0.42,
+   "p95_abs_K": 3.24,
+   "share_over_1K": 21.6,
+   "share_over_2K": 8.8
+  },
+  "realistic_camera": {
+   "pixels": 3982400,
+   "median_abs_K": 0.76,
+   "p95_abs_K": 4.19,
+   "share_over_1K": 39.2,
+   "share_over_2K": 14.4
+  },
+  "by_material": {
+   "low-emissivity metal": {
+    "ideal_sensor": {
+     "pixels": 53453,
+     "median_abs_K": 1.44,
+     "p95_abs_K": 3.85,
+     "share_over_1K": 68.2,
+     "share_over_2K": 32.1
+    },
+    "realistic_camera": {
+     "pixels": 106010,
+     "median_abs_K": 1.17,
+     "p95_abs_K": 4.29,
+     "share_over_1K": 54.2,
+     "share_over_2K": 23.8
+    }
+   },
+   "glass": {
+    "ideal_sensor": {
+     "pixels": 118873,
+     "median_abs_K": 0.46,
+     "p95_abs_K": 2.76,
+     "share_over_1K": 23.5,
+     "share_over_2K": 7.6
+    },
+    "realistic_camera": {
+     "pixels": 233180,
+     "median_abs_K": 0.76,
+     "p95_abs_K": 3.43,
+     "share_over_1K": 40.2,
+     "share_over_2K": 17.5
+    }
+   },
+   "high-emissivity": {
+    "ideal_sensor": {
+     "pixels": 1821211,
+     "median_abs_K": 0.41,
+     "p95_abs_K": 3.24,
+     "share_over_1K": 20.1,
+     "share_over_2K": 8.2
+    },
+    "realistic_camera": {
+     "pixels": 3643210,
+     "median_abs_K": 0.75,
+     "p95_abs_K": 4.28,
+     "share_over_1K": 38.6,
+     "share_over_2K": 13.9
+    }
+   }
+  }
+ },
+ "B_contrasts": [
+  {
+   "case": "B",
+   "pair": "envelope void vs wall (inside)",
+   "frame": "WINTER 07:00",
+   "distance_m": 2.0,
+   "pixels": 23716,
+   "true_K": -2.9,
+   "clean_reading_K": -2.74,
+   "ideal_sensor_K": -2.53,
+   "realistic_mean_K": -2.53,
+   "realistic_sd_K": 0.15,
+   "sign_flip": false,
+   "realistic_ccr_median": 9.1,
+   "realistic_p_detect": 1.0
+  },
+  {
+   "case": "B",
+   "pair": "envelope void vs wall (inside)",
+   "frame": "SUMMER 15:00",
+   "distance_m": 2.0,
+   "pixels": 23716,
+   "true_K": 5.62,
+   "clean_reading_K": 5.31,
+   "ideal_sensor_K": 5.44,
+   "realistic_mean_K": 5.47,
+   "realistic_sd_K": 0.18,
+   "sign_flip": false,
+   "realistic_ccr_median": 18.8,
+   "realistic_p_detect": 1.0
+  },
+  {
+   "case": "B",
+   "pair": "duct-insulation gap vs wrapped duct",
+   "frame": "SUMMER 15:00",
+   "distance_m": 1.2,
+   "pixels": 3964,
+   "true_K": -6.45,
+   "clean_reading_K": -1.48,
+   "ideal_sensor_K": -1.12,
+   "realistic_mean_K": -1.04,
+   "realistic_sd_K": 0.04,
+   "sign_flip": false,
+   "realistic_ccr_median": 2.7,
+   "realistic_p_detect": 0.38
+  },
+  {
+   "case": "B",
+   "pair": "duct-insulation gap vs wrapped duct",
+   "frame": "WINTER 07:30",
+   "distance_m": 1.2,
+   "pixels": 3964,
+   "true_K": 1.38,
+   "clean_reading_K": 0.42,
+   "ideal_sensor_K": 0.69,
+   "realistic_mean_K": 0.63,
+   "realistic_sd_K": 0.04,
+   "sign_flip": false,
+   "realistic_ccr_median": 1.9,
+   "realistic_p_detect": 0.12
+  },
+  {
+   "case": "B",
+   "pair": "reheat valve vs insulated pipe",
+   "frame": "WINTER 07:30",
+   "distance_m": 1.0,
+   "pixels": 496,
+   "true_K": 38.04,
+   "clean_reading_K": 24.52,
+   "ideal_sensor_K": 24.89,
+   "realistic_mean_K": 25.41,
+   "realistic_sd_K": 0.49,
+   "sign_flip": false,
+   "realistic_ccr_median": 79.1,
+   "realistic_p_detect": 1.0
+  },
+  {
+   "case": "B",
+   "pair": "reheat valve vs insulated pipe",
+   "frame": "WINTER 10:00",
+   "distance_m": 1.0,
+   "pixels": 496,
+   "true_K": 6.29,
+   "clean_reading_K": 3.28,
+   "ideal_sensor_K": 3.18,
+   "realistic_mean_K": 3.14,
+   "realistic_sd_K": 0.13,
+   "sign_flip": false,
+   "realistic_ccr_median": 9.7,
+   "realistic_p_detect": 1.0
+  },
+  {
+   "case": "B",
+   "pair": "supply diffuser vs ceiling",
+   "frame": "SUMMER 15:00",
+   "distance_m": 1.5,
+   "pixels": 9200,
+   "true_K": -8.51,
+   "clean_reading_K": -7.99,
+   "ideal_sensor_K": -7.75,
+   "realistic_mean_K": -7.76,
+   "realistic_sd_K": 0.28,
+   "sign_flip": false,
+   "realistic_ccr_median": 8.7,
+   "realistic_p_detect": 1.0
+  },
+  {
+   "case": "B",
+   "pair": "supply diffuser vs ceiling",
+   "frame": "WINTER 07:30",
+   "distance_m": 1.5,
+   "pixels": 9200,
+   "true_K": 1.6,
+   "clean_reading_K": 1.51,
+   "ideal_sensor_K": 1.46,
+   "realistic_mean_K": 1.48,
+   "realistic_sd_K": 0.16,
+   "sign_flip": false,
+   "realistic_ccr_median": 3.9,
+   "realistic_p_detect": 1.0
+  },
+  {
+   "case": "B",
+   "pair": "luminaire vs ceiling",
+   "frame": "SUMMER 15:00",
+   "distance_m": 1.5,
+   "pixels": 18888,
+   "true_K": 8.43,
+   "clean_reading_K": 7.96,
+   "ideal_sensor_K": 8.11,
+   "realistic_mean_K": 8.02,
+   "realistic_sd_K": 0.24,
+   "sign_flip": false,
+   "realistic_ccr_median": 16.4,
+   "realistic_p_detect": 1.0
+  },
+  {
+   "case": "C",
+   "pair": "envelope void vs wall (outside)",
+   "frame": "WINTER 07:00",
+   "distance_m": 8.0,
+   "pixels": 1824,
+   "true_K": 4.92,
+   "clean_reading_K": 4.83,
+   "ideal_sensor_K": 4.79,
+   "realistic_mean_K": 4.6,
+   "realistic_sd_K": 0.11,
+   "sign_flip": false,
+   "realistic_ccr_median": 13.2,
+   "realistic_p_detect": 1.0
+  },
+  {
+   "case": "C",
+   "pair": "envelope void vs wall (outside)",
+   "frame": "SUMMER 14:00",
+   "distance_m": 8.0,
+   "pixels": 1824,
+   "true_K": -2.13,
+   "clean_reading_K": -2.03,
+   "ideal_sensor_K": -2.12,
+   "realistic_mean_K": -2.1,
+   "realistic_sd_K": 0.04,
+   "sign_flip": false,
+   "realistic_ccr_median": 3.1,
+   "realistic_p_detect": 0.75
+  }
+ ],
+ "C_detectability": [
+  {
+   "target": "envelope void, inside (B)",
+   "frame": "WINTER 07:00",
+   "distance_m": 1.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": -2.9,
+   "lepton35": {
+    "pixels": 12296,
+    "contrast_K": -2.42,
+    "sigma_K": 0.463,
+    "ccr_median": 5.3,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 72500,
+    "contrast_K": -2.6,
+    "sigma_K": 0.259,
+    "ccr_median": 9.9,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 276596,
+    "contrast_K": -2.57,
+    "sigma_K": 0.334,
+    "ccr_median": 8.0,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, inside (B)",
+   "frame": "WINTER 07:00",
+   "distance_m": 1.5,
+   "clean_ccr": "inf",
+   "true_contrast_K": -2.9,
+   "lepton35": {
+    "pixels": 5776,
+    "contrast_K": -2.58,
+    "sigma_K": 0.378,
+    "ccr_median": 6.9,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 41572,
+    "contrast_K": -2.43,
+    "sigma_K": 0.23,
+    "ccr_median": 10.6,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 134326,
+    "contrast_K": -2.45,
+    "sigma_K": 0.297,
+    "ccr_median": 8.2,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, inside (B)",
+   "frame": "WINTER 07:00",
+   "distance_m": 2.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": -2.9,
+   "lepton35": {
+    "pixels": 3364,
+    "contrast_K": -2.67,
+    "sigma_K": 0.445,
+    "ccr_median": 6.0,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 23716,
+    "contrast_K": -2.49,
+    "sigma_K": 0.311,
+    "ccr_median": 8.1,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 76341,
+    "contrast_K": -2.6,
+    "sigma_K": 0.319,
+    "ccr_median": 8.1,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, inside (B)",
+   "frame": "WINTER 07:00",
+   "distance_m": 2.5,
+   "clean_ccr": "inf",
+   "true_contrast_K": -2.9,
+   "lepton35": {
+    "pixels": 2116,
+    "contrast_K": -2.72,
+    "sigma_K": 0.467,
+    "ccr_median": 5.5,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 15132,
+    "contrast_K": -2.67,
+    "sigma_K": 0.326,
+    "ccr_median": 8.2,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 48841,
+    "contrast_K": -2.66,
+    "sigma_K": 0.319,
+    "ccr_median": 8.2,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, inside (B)",
+   "frame": "WINTER 07:00",
+   "distance_m": 3.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": -2.9,
+   "lepton35": {
+    "pixels": 1600,
+    "contrast_K": -2.56,
+    "sigma_K": 0.378,
+    "ccr_median": 7.0,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 10404,
+    "contrast_K": -2.69,
+    "sigma_K": 0.341,
+    "ccr_median": 7.9,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 34122,
+    "contrast_K": -2.69,
+    "sigma_K": 0.334,
+    "ccr_median": 8.1,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, inside (B)",
+   "frame": "WINTER 07:00",
+   "distance_m": 3.5,
+   "clean_ccr": "inf",
+   "true_contrast_K": -2.9,
+   "lepton35": {
+    "pixels": 1156,
+    "contrast_K": -2.63,
+    "sigma_K": 0.4,
+    "ccr_median": 6.7,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 7744,
+    "contrast_K": -2.67,
+    "sigma_K": 0.311,
+    "ccr_median": 8.5,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 24964,
+    "contrast_K": -2.69,
+    "sigma_K": 0.393,
+    "ccr_median": 7.2,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "duct-insulation gap (B)",
+   "frame": "SUMMER 15:00",
+   "distance_m": 0.5,
+   "clean_ccr": "inf",
+   "true_contrast_K": -6.45,
+   "lepton35": {
+    "pixels": 3644,
+    "contrast_K": -0.92,
+    "sigma_K": 0.445,
+    "ccr_median": 2.1,
+    "p_detect": 0.12
+   },
+   "handheld_320": {
+    "pixels": 25568,
+    "contrast_K": -0.97,
+    "sigma_K": 0.408,
+    "ccr_median": 2.5,
+    "p_detect": 0.0
+   },
+   "drone_640": {
+    "pixels": 82547,
+    "contrast_K": -0.94,
+    "sigma_K": 0.408,
+    "ccr_median": 2.3,
+    "p_detect": 0.12
+   }
+  },
+  {
+   "target": "duct-insulation gap (B)",
+   "frame": "SUMMER 15:00",
+   "distance_m": 0.75,
+   "clean_ccr": "inf",
+   "true_contrast_K": -6.45,
+   "lepton35": {
+    "pixels": 1572,
+    "contrast_K": -0.99,
+    "sigma_K": 0.474,
+    "ccr_median": 2.1,
+    "p_detect": 0.12
+   },
+   "handheld_320": {
+    "pixels": 10592,
+    "contrast_K": -1.04,
+    "sigma_K": 0.397,
+    "ccr_median": 2.7,
+    "p_detect": 0.12
+   },
+   "drone_640": {
+    "pixels": 34515,
+    "contrast_K": -1.02,
+    "sigma_K": 0.385,
+    "ccr_median": 2.7,
+    "p_detect": 0.25
+   }
+  },
+  {
+   "target": "duct-insulation gap (B)",
+   "frame": "SUMMER 15:00",
+   "distance_m": 1.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": -6.45,
+   "lepton35": {
+    "pixels": 856,
+    "contrast_K": -0.96,
+    "sigma_K": 0.452,
+    "ccr_median": 2.0,
+    "p_detect": 0.0
+   },
+   "handheld_320": {
+    "pixels": 5896,
+    "contrast_K": -1.02,
+    "sigma_K": 0.356,
+    "ccr_median": 2.8,
+    "p_detect": 0.38
+   },
+   "drone_640": {
+    "pixels": 18727,
+    "contrast_K": -1.07,
+    "sigma_K": 0.4,
+    "ccr_median": 2.6,
+    "p_detect": 0.25
+   }
+  },
+  {
+   "target": "duct-insulation gap (B)",
+   "frame": "SUMMER 15:00",
+   "distance_m": 1.5,
+   "clean_ccr": "inf",
+   "true_contrast_K": -6.45,
+   "lepton35": {
+    "pixels": 360,
+    "contrast_K": -0.96,
+    "sigma_K": 0.556,
+    "ccr_median": 1.7,
+    "p_detect": 0.0
+   },
+   "handheld_320": {
+    "pixels": 2536,
+    "contrast_K": -1.02,
+    "sigma_K": 0.385,
+    "ccr_median": 2.6,
+    "p_detect": 0.38
+   },
+   "drone_640": {
+    "pixels": 8200,
+    "contrast_K": -1.03,
+    "sigma_K": 0.437,
+    "ccr_median": 2.3,
+    "p_detect": 0.25
+   }
+  },
+  {
+   "target": "duct-insulation gap (B)",
+   "frame": "SUMMER 15:00",
+   "distance_m": 2.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": -6.45,
+   "lepton35": {
+    "pixels": 196,
+    "contrast_K": -0.95,
+    "sigma_K": 0.448,
+    "ccr_median": 2.1,
+    "p_detect": 0.12
+   },
+   "handheld_320": {
+    "pixels": 1368,
+    "contrast_K": -1.03,
+    "sigma_K": 0.334,
+    "ccr_median": 3.0,
+    "p_detect": 0.5
+   },
+   "drone_640": {
+    "pixels": 4578,
+    "contrast_K": -1.05,
+    "sigma_K": 0.378,
+    "ccr_median": 2.8,
+    "p_detect": 0.38
+   }
+  },
+  {
+   "target": "duct-insulation gap (B)",
+   "frame": "SUMMER 15:00",
+   "distance_m": 3.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": -6.45,
+   "lepton35": {
+    "pixels": 100,
+    "contrast_K": -0.86,
+    "sigma_K": 0.43,
+    "ccr_median": 2.0,
+    "p_detect": 0.0
+   },
+   "handheld_320": {
+    "pixels": 624,
+    "contrast_K": -0.96,
+    "sigma_K": 0.378,
+    "ccr_median": 2.6,
+    "p_detect": 0.25
+   },
+   "drone_640": {
+    "pixels": 2002,
+    "contrast_K": -1.01,
+    "sigma_K": 0.408,
+    "ccr_median": 2.5,
+    "p_detect": 0.38
+   }
+  },
+  {
+   "target": "envelope void, outside (C)",
+   "frame": "WINTER 07:00",
+   "distance_m": 2.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": 4.92,
+   "lepton35": {
+    "pixels": 4176,
+    "contrast_K": 4.77,
+    "sigma_K": 0.437,
+    "ccr_median": 10.6,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 29472,
+    "contrast_K": 5.02,
+    "sigma_K": 0.393,
+    "ccr_median": 12.8,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 95066,
+    "contrast_K": 4.91,
+    "sigma_K": 0.348,
+    "ccr_median": 13.8,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, outside (C)",
+   "frame": "WINTER 07:00",
+   "distance_m": 4.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": 4.92,
+   "lepton35": {
+    "pixels": 1080,
+    "contrast_K": 4.83,
+    "sigma_K": 0.493,
+    "ccr_median": 9.4,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 7488,
+    "contrast_K": 4.72,
+    "sigma_K": 0.385,
+    "ccr_median": 12.8,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 23874,
+    "contrast_K": 4.97,
+    "sigma_K": 0.371,
+    "ccr_median": 13.3,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, outside (C)",
+   "frame": "WINTER 07:00",
+   "distance_m": 8.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": 4.92,
+   "lepton35": {
+    "pixels": 252,
+    "contrast_K": 4.7,
+    "sigma_K": 0.415,
+    "ccr_median": 11.8,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 1824,
+    "contrast_K": 4.68,
+    "sigma_K": 0.348,
+    "ccr_median": 13.1,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 6090,
+    "contrast_K": 4.88,
+    "sigma_K": 0.371,
+    "ccr_median": 13.1,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, outside (C)",
+   "frame": "WINTER 07:00",
+   "distance_m": 12.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": 4.92,
+   "lepton35": {
+    "pixels": 120,
+    "contrast_K": 4.46,
+    "sigma_K": 0.419,
+    "ccr_median": 10.6,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 832,
+    "contrast_K": 4.63,
+    "sigma_K": 0.393,
+    "ccr_median": 12.1,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 2726,
+    "contrast_K": 4.71,
+    "sigma_K": 0.348,
+    "ccr_median": 13.7,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, outside (C)",
+   "frame": "WINTER 07:00",
+   "distance_m": 16.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": 4.92,
+   "lepton35": {
+    "pixels": 80,
+    "contrast_K": 4.54,
+    "sigma_K": 0.423,
+    "ccr_median": 11.5,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 480,
+    "contrast_K": 4.71,
+    "sigma_K": 0.415,
+    "ccr_median": 10.9,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 1505,
+    "contrast_K": 4.63,
+    "sigma_K": 0.371,
+    "ccr_median": 12.9,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, outside (C)",
+   "frame": "WINTER 07:00",
+   "distance_m": 24.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": 4.92,
+   "lepton35": {
+    "pixels": 24,
+    "contrast_K": 4.18,
+    "sigma_K": 0.597,
+    "ccr_median": 7.8,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 224,
+    "contrast_K": 4.6,
+    "sigma_K": 0.389,
+    "ccr_median": 11.9,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 667,
+    "contrast_K": 4.71,
+    "sigma_K": 0.356,
+    "ccr_median": 13.2,
+    "p_detect": 1.0
+   }
+  },
+  {
+   "target": "envelope void, outside (C)",
+   "frame": "WINTER 07:00",
+   "distance_m": 32.0,
+   "clean_ccr": "inf",
+   "true_contrast_K": 4.92,
+   "lepton35": {
+    "pixels": 16,
+    "contrast_K": 4.12,
+    "sigma_K": 0.726,
+    "ccr_median": 5.7,
+    "p_detect": 1.0
+   },
+   "handheld_320": {
+    "pixels": 120,
+    "contrast_K": 4.74,
+    "sigma_K": 0.419,
+    "ccr_median": 11.5,
+    "p_detect": 1.0
+   },
+   "drone_640": {
+    "pixels": 374,
+    "contrast_K": 4.72,
+    "sigma_K": 0.371,
+    "ccr_median": 12.8,
+    "p_detect": 1.0
+   }
+  }
+ ],
+ "seconds": 408
+}

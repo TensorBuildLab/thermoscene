@@ -6,7 +6,7 @@ import re
 
 import numpy as np
 from pxr import Gf
-from shapely.geometry import Point
+from shapely.geometry import MultiPoint, Point
 from shapely.ops import unary_union
 
 from ..ontology import Camera, Element, Provenance, Surface
@@ -69,6 +69,18 @@ def _center(faces):
     return (p.min(0) + p.max(0)) / 2
 
 
+def _indoor_plan(scene, spaces):
+    """Plan outline in which indoor camera positions are sought: the space's floors and ceilings; for a space without
+    either (a ground floor whose floor is a Kiva or basement foundation surface of another object), its roofs; failing
+    those, the outline of all its surfaces."""
+    own = [s for s in scene.of(Surface) if s.space in spaces]
+    for types in (("Floor", "Ceiling"), ("Roof",)):
+        plan = unary_union([plan_polygon(s.polygon) for s in own if s.surface_type in types])
+        if not plan.is_empty and plan.area > 1e-6:
+            return plan
+    return MultiPoint([tuple(v[:2]) for s in own for v in s.polygon]).convex_hull
+
+
 def auto_pose(scene, ids, cam_cfg, meshes_fn, raycast_fn):
     auto = cam_cfg["auto"]
     space = _space_id(cam_cfg["space"], ids)
@@ -82,8 +94,7 @@ def auto_pose(scene, ids, cam_cfg, meshes_fn, raycast_fn):
         r = auto.get("distance", 7.0); hgt = auto.get("height", 3.0)
         cands = [tc + [r * np.cos(t), r * np.sin(t), hgt] for t in np.linspace(0, 2 * np.pi, 16, endpoint=False)]
     else:
-        zone_like = [s for s in scene.of(Surface) if s.space in (space, ids["zone"]) and s.surface_type in ("Floor", "Ceiling")]
-        plan = unary_union([plan_polygon(s.polygon) for s in zone_like]).buffer(-auto.get("inset", 0.3))
+        plan = _indoor_plan(scene, (space, ids["zone"])).buffer(-auto.get("inset", 0.3))
         z = sp.z_floor + auto.get("height", (sp.z_ceiling - sp.z_floor) / 2)     # height above the space floor
         xmin, ymin, xmax, ymax = plan.bounds
         cands = [np.array([x, y, z]) for x in np.linspace(xmin, xmax, 9) for y in np.linspace(ymin, ymax, 9)

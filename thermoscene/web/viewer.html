@@ -168,6 +168,7 @@ const P = DATA.prims, NP = P.length, NS = DATA.n_steps, SP = DATA.spaces, NSP = 
 const u8 = (b) => { const s = atob(b), u = new Uint8Array(s.length); for (let i = 0; i < s.length; i++) u[i] = s.charCodeAt(i); return u; };
 const pos = f32(DATA.positions), owner = f32(DATA.owner), temps = f32(DATA.temps);
 const stag = DATA.stag ? u8(DATA.stag) : new Uint8Array(NP * NS), PROV_THR = DATA.prov_threshold || 0.1;
+const pres = DATA.pres ? u8(DATA.pres) : null;
 const stagAt = (p, t) => stag[p * NS + Math.min(Math.round(t), NS - 1)] > 0;
 const LEVEL_NAMES = ["Simulated by EnergyPlus", "Physics model", "Engineering rule", "Heuristic model", "Assumed layout", "User given", "Background"];
 const LEVEL_COLORS = ["#2f6db3", "#3a9a62", "#7c5ac2", "#d9792c", "#9aa4ab", "#6b767c", "#4a5256"];
@@ -239,7 +240,8 @@ const tex = (data, w, hgt, type) => { const t = new THREE.DataTexture(data, w, h
   t.minFilter = t.magFilter = THREE.NearestFilter; t.needsUpdate = true; return t; };
 const tempData = new Float32Array(NS * NP * 4);
 for (let p = 0; p < NP; p++) for (let i = 0; i < NS; i++) {
-  tempData[4 * (p * NS + i)] = temps[p * NS + i]; tempData[4 * (p * NS + i) + 1] = stag[p * NS + i]; }
+  tempData[4 * (p * NS + i)] = temps[p * NS + i]; tempData[4 * (p * NS + i) + 1] = stag[p * NS + i];
+  tempData[4 * (p * NS + i) + 2] = pres ? pres[p * NS + i] : 1; }
 const info = new Float32Array(NP * 4), colors = new Float32Array(NP * 4);
 P.forEach((q, k) => { info.set([q.eps, q.space, q.prov, 0], 4 * k);
   const col = new THREE.Color(CLASS_COLORS[q.cls] || "#bbbbbb"); colors.set([col.r, col.g, col.b, 1], 4 * k); });
@@ -281,6 +283,8 @@ const material = new THREE.ShaderMaterial({
       return mix(texture2D(uTemps, vec2((i + 0.5) / uNS, v)).r, texture2D(uTemps, vec2((j + 0.5) / uNS, v)).r, f); }
     float stagnant(float p) { float i = min(floor(uT + 0.5), uNS - 1.0);
       return texture2D(uTemps, vec2((i + 0.5) / uNS, (p + 0.5) / uNP)).g; }
+    float present(float p) { float i = min(floor(uT + 0.5), uNS - 1.0);
+      return texture2D(uTemps, vec2((i + 0.5) / uNS, (p + 0.5) / uNP)).b; }
     float Lb(float T) { return row(uLut, (T - uT0) / (uT1 - uT0) * (uLutN - 1.0), uLutN); }
     float LbInv(float L) { return row(uInv, (L - uL0) / (uL1 - uL0) * (uLutN - 1.0), uLutN); }
     vec3 cmap(float x) { return texture2D(uCmap, vec2(clamp(x, 0.0, 1.0) * 0.996 + 0.002, 0.5)).rgb; }
@@ -289,7 +293,7 @@ const material = new THREE.ShaderMaterial({
       float p = floor(vOwner + 0.5);
       vec4 inf = texture2D(uInfo, vec2((p + 0.5) / uNP, 0.5));
       vec4 sp = texture2D(uSpace, vec2((inf.g + 0.5) / uNSp, 0.5));
-      if (sp.g < 0.5) discard;
+      if (sp.g < 0.5 || present(p) < 0.5) discard;
       float base = temp(p); float Ts = base; float jet = 0.0;
       for (int i = 0; i < 16; i++) {
         if (float(i) >= uJetN) break;
@@ -398,7 +402,7 @@ function pick(ndcX, ndcY) {
   ray.setFromCamera({ x: ndcX, y: ndcY }, camera);
   for (const hit of ray.intersectObject(mesh, false)) {
     const p = Math.round(owner[hit.face.a]);
-    if (S.vis[P[p].space]) return { p, point: hit.point };
+    if (S.vis[P[p].space] && (!pres || pres[p * NS + Math.min(Math.round(S.t), NS - 1)] > 0)) return { p, point: hit.point };
   }
   return null;
 }

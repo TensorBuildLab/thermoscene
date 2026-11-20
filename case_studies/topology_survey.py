@@ -25,14 +25,21 @@ KEY = ["VAVTerminalUnit", "AirTerminalUnit", "FanCoilUnit", "PackagedTerminalUni
 # The tracer walks the node graph. The reference below reads only the objects that DECLARE the system structure:
 # the zone's equipment list, the air distribution unit and its terminal, the air loop whose supply path feeds the
 # zone's terminal, that loop's supply branches, outdoor-air equipment list, supply path and return path, and, for every
-# water-side component, the supply side of the plant/condenser loop whose demand branches contain it (plus the demand
-# inlet branch and the components ahead of it on its own branch). Child components come from <x>_object_type /
-# <x>_name field pairs (coils inside terminals, fan coils and CoilSystem containers). Nothing is matched by name.
+# component that sits on the demand side of a plant/condenser loop, the supply side of that loop (plus the demand
+# inlet branch and the components ahead of it on its own branch); repeated, so a chiller, heat exchanger or storage
+# tank pulls in the loop on its other side. Child components come from <x>_object_type / <x>_name (or <x>_object_name)
+# field pairs (coils inside terminals, fan coils and CoilSystem containers) and from a zone outdoor-air unit's
+# equipment list. Children named without a type field are not followed. Nothing is matched by name.
 def _refs(f):
     out = []
     for k, v in f.items():
-        if k.endswith("_object_type") and isinstance(v, str) and isinstance(f.get(k[:-12] + "_name"), str):
-            out.append((v, f[k[:-12] + "_name"]))
+        if k.endswith("_object_type") and isinstance(v, str):
+            n = f.get(k[:-12] + "_name", f.get(k[:-12] + "_object_name"))     # VRF terminals: <x>_object_name
+            if not isinstance(n, str):                                       # window AC: dx_cooling_coil_name
+                cands = [x for x in f if x.endswith("_" + k[:-12] + "_name") and isinstance(f[x], str)]
+                n = f[cands[0]] if len(cands) == 1 else None
+            if isinstance(n, str):
+                out.append((v, n))
     return out
 
 
@@ -47,10 +54,13 @@ def declared_chain(m, zone):
             return
         if not _excluded(t):
             truth.add(key(t, n))
-            if any("water" in k and "inlet_node" in k for k in f) or t.startswith(("Chiller", "Boiler")):
-                water.append((t, n))
+            water.append((t, n))           # checked below against the demand branches of every plant/condenser loop
         for ct, cn in _refs(f):
             add(ct, cn, depth + 1)
+        if f.get("outdoor_air_unit_list_name"):                 # a zone outdoor-air unit's equipment list
+            _, lst = m.obj("ZoneHVAC:OutdoorAirUnit:EquipmentList", f["outdoor_air_unit_list_name"])
+            for ct, cn in _refs(lst or {}):
+                add(ct, cn, depth + 1)
 
     def branch_comps(bname):
         _, b = m.obj("Branch", bname)
@@ -69,7 +79,7 @@ def declared_chain(m, zone):
     feed = set(zone_inlets)                                   # nodes through which an air loop can reach the zone
     for item in (eql or {}).get("equipment", []):
         t, n = item["zone_equipment_object_type"], item["zone_equipment_name"]
-        if t == "ZoneHVAC:AirDistributionUnit":
+        if t.upper() == "ZONEHVAC:AIRDISTRIBUTIONUNIT":
             _, adu = m.obj(t, n)
             tt, tn = adu["air_terminal_object_type"], adu["air_terminal_name"]
             add(tt, tn)
@@ -86,8 +96,8 @@ def declared_chain(m, zone):
         outlets = set()
         for t, n in comps:
             _, f = m.obj(t, n)
-            outlets |= {x["outlet_node_name"].upper() for x in (f or {}).get("nodes", []) if "outlet_node_name" in x}
-            outlets |= {v.upper() for k, v in (f or {}).items() if isinstance(v, str) and k.startswith("outlet_node")}
+            outlets |= {n for x in (f or {}).get("nodes", []) if "outlet_node_name" in x for n in expand(x["outlet_node_name"])}
+            outlets |= {n for k, v in (f or {}).items() if isinstance(v, str) and k.startswith("outlet_node") for n in expand(v)}
         if not (outlets & feed) and not (demand_in & feed):
             continue
         for t, n in comps:
@@ -99,7 +109,7 @@ def declared_chain(m, zone):
         _, bl = m.obj("BranchList", loop["branch_list_name"])
         for b in (bl or {}).get("branches", []):
             for t, n in branch_comps(b["branch_name"]):
-                if t == "AirLoopHVAC:OutdoorAirSystem":
+                if t.upper() == "AIRLOOPHVAC:OUTDOORAIRSYSTEM":
                     _, oas = m.obj(t, n)
                     _, oel = m.obj("AirLoopHVAC:OutdoorAirSystem:EquipmentList", (oas or {}).get("outdoor_air_equipment_list_name", ""))
                     for ct, cn in _refs(oel or {}):
@@ -130,7 +140,7 @@ def declared_chain(m, zone):
                     add(*c)
                 _, cl = m.obj("ConnectorList", loop.get(dem_cl) or loop.get("demand_side_connector_list_name", ""))
                 for ct, cn in _refs(cl or {}):
-                    if ct == "Connector:Splitter":
+                    if ct.upper() == "CONNECTOR:SPLITTER":
                         _, sp = m.obj(ct, cn)
                         for c in branch_comps((sp or {}).get("inlet_branch_name", "")):
                             add(*c)

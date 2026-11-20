@@ -25,6 +25,19 @@ def plenum_zones(model) -> set[str]:
     return names
 
 
+def adjacent_zone(model, s: dict) -> str | None:
+    """Zone on the other side of an interzone surface (outside boundary condition Surface or Zone)."""
+    bc, obj = s["boundary"].lower(), s.get("boundary_object")
+    if not obj:
+        return None
+    if bc == "surface":
+        adj = model.surface(obj)
+        return adj["zone"] if adj else None
+    if bc == "zone":
+        return model.obj("Zone", obj)[0]
+    return None
+
+
 def find_plenum(model, zone: str, setting) -> str | None:
     if setting in (None, "none", False):
         return None
@@ -33,15 +46,16 @@ def find_plenum(model, zone: str, setting) -> str | None:
     known = plenum_zones(model)
     conditioned = {f["zone_name"].upper() for f in model.objs("ZoneHVAC:EquipmentConnections").values()}
     for s in model.surfaces(zone):
-        if s["type"] == "Ceiling" and s["boundary"].lower() == "surface" and s["boundary_object"]:
-            adj = model.surface(s["boundary_object"])
-            if not adj:
-                continue
-            _, z = model.obj("Zone", adj["zone"])
-            # a declared plenum, or an unconditioned zone the model excludes from the floor area (no names are used)
-            if adj["zone"].upper() in known or (adj["zone"].upper() not in conditioned
-                                                and str((z or {}).get("part_of_total_floor_area", "Yes")).lower() == "no"):
-                return adj["zone"]
+        if s["type"] != "Ceiling":
+            continue
+        adj = adjacent_zone(model, s)
+        if not adj or adj.upper() == zone.upper():
+            continue
+        _, z = model.obj("Zone", adj)
+        # a declared plenum, or an unconditioned zone the model excludes from the floor area (no names are used)
+        if adj.upper() in known or (adj.upper() not in conditioned
+                                    and str((z or {}).get("part_of_total_floor_area", "Yes")).lower() == "no"):
+            return adj
     return None
 
 
@@ -76,10 +90,9 @@ def build(scene, model, cfg) -> dict:
             n = newell_normal(s["verts"])
             subs = model.subsurfaces(s)
             poly, holes = s["verts"], [ss["verts"] for ss in subs]
-            if s["boundary"].lower() == "surface" and s["boundary_object"]:
-                adj = model.surface(s["boundary_object"])
-                if adj and adj["zone"].upper() in included:          # pull coincident interzone faces apart
-                    poly = np.array(offset(poly, -n, eps)); holes = [np.array(offset(h, -n, eps)) for h in holes]
+            adj = adjacent_zone(model, s)
+            if adj and adj.upper() in included:                      # pull coincident interzone faces apart
+                poly = np.array(offset(poly, -n, eps)); holes = [np.array(offset(h, -n, eps)) for h in holes]
             host = scene.add(Surface(
                 id=uid(sp.id, sid(s["name"]), s["name"].upper()), cls="Surface", name=s["name"], space=sp.id, sim_surface=s["name"],
                 polygon=[tuple(p) for p in poly], holes=[[tuple(p) for p in h] for h in holes],

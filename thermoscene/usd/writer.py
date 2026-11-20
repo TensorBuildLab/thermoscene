@@ -183,6 +183,8 @@ class Writer:
                                 ("jetStrength", "thermal:ceilingJetStrength"), ("jetLength", "thermal:ceilingJetDecayLength")):
                     if (thing.id, q) in sc.series:
                         self.series(prim, name, sc.series[(thing.id, q)])
+                if (thing.id, "present") in sc.series:          # occupants: present while simulated count allows
+                    self.series(prim, "thermal:present", sc.series[(thing.id, "present")], T.Bool)
                 if (thing.id, "condensationRisk") in sc.series:
                     self.series(prim, "thermal:condensationRisk", sc.series[(thing.id, "condensationRisk")], T.Bool)
                 if thing.cls == "Diffuser":
@@ -190,7 +192,7 @@ class Writer:
                     self.put(prim, "thermal:ceilingJetHalfSize", T.Float, float(thing.attrs["jet_half"]))
             self.provenance(prim, thing, {"surfaceTemperature": "thermal:surfaceTemperature", "fluidTemperature": "mep:fluidTemperature",
                                           "fluidMassFlow": "mep:fluidMassFlow", "geometry": "ts:geometry", "size": "mep:size",
-                                          "material": "mep:material"})
+                                          "material": "mep:material", "present": "thermal:present"})
             if isinstance(thing, Surface) and thing.id in jet_targets and self.mode == "timesamples":
                 self._jet_colors(m, thing, ts, ranges[thing.space])
             else:

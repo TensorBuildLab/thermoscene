@@ -16,13 +16,9 @@ authors:
     affiliation: "Big Ladder Software, Denver, CO, USA"
 preferred-citation:
   type: article
-  title: "Virtual thermal training environments for robots from building energy models: an ontology-driven pipeline for buildings and HVAC systems"
+  title: "Building energy models as labelled thermal environments for embodied inspection agents"
   authors:
     - family-names: Zhang
       given-names: Liang
-    - family-names: Yang
-      given-names: Huanrui
-    - family-names: Jia
-      given-names: Yiyuan
   year: 2026
   status: submitted

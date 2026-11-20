@@ -109,6 +109,10 @@ CLASSES: dict[str, dict[str, str]] = {
     "Louver":                dict(parent="Element",     brick="brick:Damper",                   s223="s223:Equipment"),
     "RoofSurface":           dict(parent="Element",     brick="brick:Roof",                     s223=""),
     "InsulationDefect":      dict(parent="Element",     brick="",                               s223=""),
+    "Luminaire":             dict(parent="Element",     brick="brick:Luminaire",                s223="s223:Luminaire"),
+    "PlugLoad":              dict(parent="Element",     brick="brick:Equipment",                s223="s223:Equipment"),
+    "Furniture":             dict(parent="Element",     brick="",                               s223=""),
+    "Occupant":              dict(parent="Element",     brick="",                               s223=""),
     "Camera":                dict(parent="",            brick="brick:Camera",                   s223="s223:Sensor"),
 }
 

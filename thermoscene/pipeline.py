@@ -1,6 +1,7 @@
 """End-to-end pipeline: EnergyPlus model + case configuration -> thermal scene (USD + ontology graph)."""
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 import shutil
@@ -14,7 +15,7 @@ from .energyplus.model import EPModel
 from .energyplus.results import Results
 from .energyplus.runner import energyplus_dir, engine_version, prepare, simulate, to_epjson
 from .energyplus.topology import HVACGraph
-from .generators import air_devices, distribution, equipment
+from .generators import air_devices, distribution, equipment, internal_gains
 from .generators.common import Gen
 from .ontology import Element, SceneGraph, SimComponent, Surface
 from .render.cameras import build_cameras
@@ -61,14 +62,14 @@ def _cached_simulation(prepared, epw, out, exe, cache_root, model_dir=None):
     key = h.hexdigest()[:16]
     cdir = Path(cache_root) / key
     sql = cdir / "eplusout.sql"
-    if sql.exists() and sql.stat().st_size == 0:          # never re-use a run without results
-        shutil.rmtree(cdir, ignore_errors=True)
+    if sql.exists() and (sql.stat().st_size == 0 or not (cdir / "eplusout.err").exists()):
+        shutil.rmtree(cdir, ignore_errors=True)           # never re-use a run without results or an incomplete one
     if sql.exists():
         log.info("EnergyPlus: re-using cached run %s", key)
         exp = cdir / "eplusout.expidf"
         err = (cdir / "eplusout.err").read_text(encoding="utf-8", errors="ignore")
         return dict(sql=cdir / "eplusout.sql", err=cdir / "eplusout.err", model_idf=exp if exp.exists() else prepared,
-                    warnings=err.count("** Warning **"), severe=err.count("** Severe  **"), cached=True)
+                    warnings=err.count("** Warning **"), severe=err.count("** Severe  **"), cached=True, key=key)
     try:
         sim = simulate(prepared, epw, cdir, exe, cwd=model_dir)
     except Exception:
@@ -77,8 +78,22 @@ def _cached_simulation(prepared, epw, out, exe, cache_root, model_dir=None):
     for f in cdir.iterdir():                      # keep only what the pipeline reads
         if f.name not in ("eplusout.sql", "eplusout.err", "eplusout.expidf"):
             f.unlink()
-    sim["cached"] = False
+    sim.update(cached=False, key=key)
     return sim
+
+
+@contextlib.contextmanager
+def stage(name: str):
+    """Label an exception with the pipeline stage it came from (`exc.thermoscene_stage`), for reports and surveys."""
+    try:
+        yield
+    except Exception as e:
+        try:
+            if not hasattr(e, "thermoscene_stage"):
+                e.thermoscene_stage = name
+        except AttributeError:
+            pass
+        raise
 
 
 def build(case_path, render: bool = False, overrides: dict | None = None) -> Path:
@@ -93,58 +108,76 @@ def build(case_path, render: bool = False, overrides: dict | None = None) -> Pat
     log.info("case %s -> %s", cfg["name"], out)
 
     # 1. faults that must be simulated are injected into the user's model
-    pre = load_model(cfg["model"]["idf"], exe, out / "_work" / "pre")
-    extra, defects = faults_mod.injection_objects(pre, cfg.get("faults", []), cfg.get("fault_defaults"))
-    prepared = out / "prepared.idf"
-    prepare(cfg["model"]["idf"], prepared, cfg["energyplus"].get("run_periods"), extra, cfg["energyplus"].get("timesteps_per_hour"))
+    with stage("expand"):
+        pre = load_model(cfg["model"]["idf"], exe, out / "_work" / "pre")
+        extra, defects = faults_mod.injection_objects(pre, cfg.get("faults", []), cfg.get("fault_defaults"))
+        if cfg.get("internal_gains", {}).get("enabled"):
+            extra = list(extra) + internal_gains.output_objects()
     # 2. simulate (cached) and read
-    cache = cfg["energyplus"].get("cache_dir") or str(Path(cfg["case_dir"]) / ".sim_cache")
-    sim = _cached_simulation(prepared, cfg["model"]["epw"], out, exe, cache, Path(cfg["model"]["idf"]).parent)
+    with stage("simulate"):
+        prepared = out / "prepared.idf"
+        prepare(cfg["model"]["idf"], prepared, cfg["energyplus"].get("run_periods"), extra,
+                cfg["energyplus"].get("timesteps_per_hour"))
+        cache = cfg["energyplus"].get("cache_dir") or str(Path(cfg["case_dir"]) / ".sim_cache")
+        sim = _cached_simulation(prepared, cfg["model"]["epw"], out, exe, cache, Path(cfg["model"]["idf"]).parent)
     log.info("EnergyPlus: %d warnings, %d severe", sim["warnings"], sim["severe"])
-    tph = cfg["energyplus"].get("timesteps_per_hour")
-    results = Results(sim["sql"], 60 // int(tph) if tph else None)
-    model = EPModel(to_epjson(sim["model_idf"], exe, out / "_work" / "post"))
-    graph = HVACGraph(model)
+    with stage("read results"):
+        tph = cfg["energyplus"].get("timesteps_per_hour")
+        results = Results(sim["sql"], 60 // int(tph) if tph else None)
+        model = EPModel(to_epjson(sim["model_idf"], exe, out / "_work" / "post"))
+    with stage("topology"):
+        graph = HVACGraph(model)
     # 3. spaces, surfaces, topology
     scene = SceneGraph()
     scene.meta["source"] = f"{engine_version(exe)}; model {Path(cfg['model']['idf']).name}; weather {Path(cfg['model']['epw']).name}"
     scene.meta["north_axis_deg"] = model.north_axis()        # geometry stays in building coordinates
-    ids = spaces.build(scene, model, cfg)
-    zone_name = scene.get(ids["zone"]).sim_zone
-    chain = graph.serving(zone_name) if zone_name.upper() in graph.zone_inlets else {"components": [], "inlet_nodes": [], "loops": []}
-    sizes = results.component_sizes()
-    for c, d in chain["components"]:
-        c.sizes = sizes.get(c.name.upper(), {})
-        c.attrs["distance"] = d
-        scene.add(c)
-    scene.feeds = graph.feeds_edges({c.id for c, _ in chain["components"]})
+    with stage("spaces"):
+        ids = spaces.build(scene, model, cfg)
+    with stage("topology"):
+        zone_name = scene.get(ids["zone"]).sim_zone
+        chain = graph.serving(zone_name) if zone_name.upper() in graph.zone_inlets else {"components": [], "inlet_nodes": [], "loops": []}
+        sizes = results.component_sizes()
+        for c, d in chain["components"]:
+            c.sizes = sizes.get(c.name.upper(), {})
+            c.attrs["distance"] = d
+            scene.add(c)
+        scene.feeds = graph.feeds_edges({c.id for c, _ in chain["components"]})
     # 4. generators
-    gen = Gen(scene, graph, results, cfg, model, ids, chain)
-    el_faults = [f for f in cfg.get("faults", []) if f["type"] not in ("envelope_defect", "energyplus_object")]
-    devices = air_devices.generate(gen)
-    dist = distribution.generate(gen, devices, el_faults)
-    equipment.generate(gen, dist)
+    with stage("generators"):
+        gen = Gen(scene, graph, results, cfg, model, ids, chain)
+        el_faults = [f for f in cfg.get("faults", []) if f["type"] not in ("envelope_defect", "energyplus_object")]
+        devices = air_devices.generate(gen)
+        internal_gains.generate(gen, devices)
+        dist = distribution.generate(gen, devices, el_faults)
+        equipment.generate(gen, dist)
     # 5. thermal
-    env = environment.outdoor(results, model, cfg["model"]["epw"])
-    environment.assign_space_environments(scene, results, env)
-    models.assign(scene, models.Ctx(scene, results, cfg, env))
-    # 6. cameras (explicit or automatic)
+    with stage("thermal"):
+        env = environment.outdoor(results, model, cfg["model"]["epw"])
+        environment.assign_space_environments(scene, results, env)
+        models.assign(scene, models.Ctx(scene, results, cfg, env))
+    # 6. cameras (explicit or automatic; `cameras: auto` lets thermoscene.auto choose targets in the generated scene)
     def meshes_fn():
         pairs = scene_meshes(scene)
         return accel([f for _, f in pairs]), [t.id for t, _ in pairs]
-    build_cameras(scene, ids, cfg, results.labels, meshes_fn, raycast)
+    with stage("cameras"):
+        if cfg.get("cameras") == "auto":
+            from .auto import choose_cameras
+            cfg["cameras"] = choose_cameras(scene, ids, cfg, results.labels, meshes_fn, raycast)
+        build_cameras(scene, ids, cfg, results.labels, meshes_fn, raycast)
     # 7. write
-    usd = out / f"{cfg['name']}.usda"
-    if usd.exists():
-        usd.unlink()
-    Writer(scene, cfg, results.labels, results.step_minutes).write(usd)
-    (out / "scene.ttl").write_text(encoding="utf-8", data=scene.to_turtle())
-    summary = _summary(scene, cfg, ids, chain, sim, results)
-    summary["build_seconds"] = round(time.time() - t0, 2)
-    (out / "summary.json").write_text(encoding="utf-8", data=json.dumps(summary, indent=2))
+    with stage("write"):
+        usd = out / f"{cfg['name']}.usda"
+        if usd.exists():
+            usd.unlink()
+        Writer(scene, cfg, results.labels, results.step_minutes).write(usd)
+        (out / "scene.ttl").write_text(encoding="utf-8", data=scene.to_turtle())
+        summary = _summary(scene, cfg, ids, chain, sim, results)
+        summary["build_seconds"] = round(time.time() - t0, 2)
+        (out / "summary.json").write_text(encoding="utf-8", data=json.dumps(summary, indent=2))
     log.info("wrote %s (%.0f s)", usd, time.time() - t0)
     if render:
-        render_usd(usd, out / "renders")
+        with stage("render"):
+            render_usd(usd, out / "renders")
     return usd
 
 
@@ -156,7 +189,8 @@ def _summary(scene, cfg, ids, chain, sim, results):
     return dict(
         case=cfg["name"], zone=ids["zone"], plenum=ids["plenum"], timesteps=results.n, step_minutes=results.step_minutes,
         source=scene.meta.get("source", ""),
-        energyplus=dict(warnings=sim["warnings"], severe=sim["severe"], cached=sim["cached"]),
+        energyplus=dict(warnings=sim["warnings"], severe=sim["severe"], cached=sim["cached"], cache_key=sim.get("key")),
+        cameras=cfg.get("cameras") or [],
         serving_chain=[dict(cls=c.cls, type=c.sim_type, name=c.name, role=c.role, system=c.system, distance=d)
                        for c, d in chain["components"]],
         counts=dict(surfaces=len(scene.of(Surface)), elements=len(scene.of(Element)), components=len(scene.of(SimComponent))),

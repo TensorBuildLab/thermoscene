@@ -3,14 +3,19 @@ name = "thermoscene"
 version = "0.1.0"
 description = "Virtual thermal training environments for robots and drones, generated from EnergyPlus building models"
 requires-python = ">=3.10"
-dependencies = ["usd-core", "numpy", "pandas", "scipy", "shapely>=2", "mapbox_earcut", "networkx", "pyyaml", "matplotlib"]
+dependencies = ["usd-core", "numpy", "pandas", "scipy", "shapely>=2", "mapbox_earcut", "networkx", "pyyaml", "matplotlib",
+                "pillow"]
+
+[project.optional-dependencies]
+rl = ["gymnasium>=0.29"]
 
 [project.scripts]
 thermoscene = "thermoscene.__main__:main"
 
 [tool.setuptools]
 packages = ["thermoscene", "thermoscene.energyplus", "thermoscene.scene", "thermoscene.generators",
-            "thermoscene.thermal", "thermoscene.render", "thermoscene.usd", "thermoscene.isaac", "thermoscene.web"]
+            "thermoscene.thermal", "thermoscene.render", "thermoscene.usd", "thermoscene.isaac", "thermoscene.web",
+            "thermoscene.embodied"]
 
 [tool.setuptools.package-data]
 thermoscene = ["defaults.yaml", "web/viewer.html"]

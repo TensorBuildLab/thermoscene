@@ -1,12 +1,15 @@
 # thermoscene
 
-**Virtual thermal training environments for robots and drones, generated from building energy models.**
+**Labelled thermal environments for embodied inspection agents (robots, drones, crawlers), generated from building
+energy models.**
 
 `thermoscene` turns an ordinary EnergyPlus model into a 3D scene in which every visible surface (walls, windows,
-ceilings, diffusers, ducts, pipes, valves, air-handling units, chillers, roofs) carries a simulated or physically derived,
-time-varying temperature, ready for thermal-camera simulation in Isaac Sim (OpenUSD), in the browser, or with the bundled
-CPU renderer. Every quantity states where it comes from: `simulated`, `physics`, `engineering_rule`, `heuristic`,
-`assumed_layout` or `user`.
+ceilings, diffusers, ducts, pipes, valves, air-handling units, chillers, roofs, occupants, luminaires, workstations)
+carries a simulated or physically derived, time-varying temperature, and into an environment an agent can act in:
+observe from any pose at any simulated time through a realistic thermal-camera model, with per-pixel labels (true
+temperature, instance, category, provenance, depth, emissivity, fault mask); a Gymnasium-style inspection
+environment; and a COCO-style dataset exporter. Every quantity states where it comes from: `simulated`, `physics`,
+`engineering_rule`, `heuristic`, `assumed_layout` or `user`.
 
 ![generated geometry](docs/img/geometry.png)
 
@@ -42,10 +45,38 @@ objects they use are the same in 22.2 and 25.2) or convert them with EnergyPlus'
 python -m thermoscene inspect path/to/model.idf                       # zones, plenums, traced HVAC per zone
 python -m thermoscene inspect path/to/model.idf --zone "Perimeter_top_ZN_1"
 python -m thermoscene build case_studies/C_doe_medium_office/case.yaml --render
+python -m thermoscene auto path/to/model.idf --render                 # any model, no case file (writes auto_case.yaml)
 python -m thermoscene render case_studies/C_doe_medium_office/output/C_doe_medium_office.usda
 python -m thermoscene web case_studies/B_hvac_system/output/B_hvac_system.usda -o viewer.html   # real-time browser viewer
 ~/isaacsim/python.sh thermoscene/isaac/thermal_camera.py case_studies/C_doe_medium_office/output/C_doe_medium_office.usda
 ```
+
+### Embodied interface (agents, realistic cameras, datasets)
+
+```python
+from thermoscene.embodied import ThermalWorld, ThermalCamera, Pose
+from thermoscene.embodied.env import InspectionEnv
+
+world = ThermalWorld("case_studies/B_hvac_system/output/B_hvac_system.usda")
+cam = ThermalCamera.preset("handheld_320", seed=3)        # or lepton35, drone_640; .randomized(rng) for new units
+frame = world.observe(Pose.look_at([2.5, 2.0, 1.6], [2.5, 0.0, 1.2]), world.time_index("WINTER 07:00"), cam)
+frame.reading, frame.true, frame.instance, frame.provenance, frame.depth, frame.fault
+
+env = InspectionEnv(world, camera="lepton35", space="Plenum", task="fault_search")
+obs, info = env.reset(seed=0)
+obs, reward, terminated, truncated, info = env.step(env.action_space.sample())
+```
+
+```bash
+python -m thermoscene dataset <scene.usda> -o data/ --views 500          # COCO-style labelled dataset
+python -m thermoscene episode <scene.usda> -o frames/ --space Plenum        # one random-agent episode, saved frames
+```
+
+The camera model (distortion, diffraction and lens blur, non-uniformity, column/row offsets, shading, drift between
+shutter corrections, NETD noise, calibration error, dead pixels, quantisation, 8-bit AGC) and the scene realism
+(directional emissivity, specular reflections, within-surface variation, occupants/luminaires/workstations from the
+simulated schedules) are described in [docs/embodied.md](docs/embodied.md); every value and its source is in
+[docs/sensors.md](docs/sensors.md). The rasteriser reproduces the reference ray caster pixel for pixel, 10-60 times faster.
 
 ### Real-time viewer in the browser
 
@@ -97,8 +128,12 @@ Everything else falls back to `defaults.yaml`. Your model file is never modified
 
 * **Topology correctness** ([docs/topology_survey.md](docs/topology_survey.md)): 12 EnergyPlus example models, 8 HVAC
   system types, **180 of 180 conditioned zones traced** without configuration. Compared component by component with the
-  chain declared by each model's own system objects: **precision 1.000, recall 0.998**, 174 of 180 chains identical (the
-  six misses are zone exhaust fans, which are not upstream of their zones).
+  chain declared by each model's own system objects: **precision 1.000, recall 1.000**, 180 of 180 chains identical
+  (every item of a zone's equipment list, zone exhaust fans included, belongs to its chain).
+* **Every EnergyPlus example file** ([docs/corpus_survey.md](docs/corpus_survey.md), `case_studies/corpus_survey.py`):
+  the tracer on all 719 `ExampleFiles` of EnergyPlus 22.2 (no simulation): **4,088 of 4,088 conditioned zones traced**,
+  precision 0.993, recall 1.000; and `thermoscene auto` (simulation, scene, rendering) on each of them: **677 of 685
+  in-scope models built and rendered**, i.e. every model EnergyPlus 22.2 runs as shipped, with a failure taxonomy.
 * **Whole-building robustness** ([docs/zone_sweep.md](docs/zone_sweep.md)): scenes for **all 15 conditioned zones** of the
   unmodified DOE reference medium office, 2–7 s each on a laptop CPU with one shared simulation.
 * **Benchmarks** ([docs/benchmark.md](docs/benchmark.md)): the physics-level element models agree with an independent
