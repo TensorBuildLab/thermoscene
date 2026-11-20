@@ -7,13 +7,7 @@ license: MIT
 authors:
   - family-names: Zhang
     given-names: Liang
-    affiliation: "University of Arizona, Tucson, AZ, USA"
-  - family-names: Yang
-    given-names: Huanrui
-    affiliation: "University of Arizona, Tucson, AZ, USA"
-  - family-names: Jia
-    given-names: Yiyuan
-    affiliation: "Big Ladder Software, Denver, CO, USA"
+    affiliation: "University of Arizona, Tucson, AZ, USA; National Laboratory of the Rockies, Golden, CO, USA"
 preferred-citation:
   type: article
   title: "Building energy models as labelled thermal environments for embodied inspection agents"
