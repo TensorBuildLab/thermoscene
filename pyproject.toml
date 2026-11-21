@@ -1,6 +1,6 @@
 [project]
 name = "thermoscene"
-version = "0.2.0"
+version = "0.3.0"
 description = "Virtual thermal training environments for robots and drones, generated from EnergyPlus building models"
 requires-python = ">=3.10"
 dependencies = ["usd-core", "numpy", "pandas", "scipy", "shapely>=2", "mapbox_earcut", "networkx", "pyyaml", "matplotlib",
