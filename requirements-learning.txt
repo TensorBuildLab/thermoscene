@@ -1,0 +1,5 @@
+# Extra dependency of the learning experiments only (case_studies/detector_train.py, the learned agent of
+# case_studies/env_baselines.py and the detector figure); the platform and its tests do not need it.
+# CPU build used for the paper: pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+-r requirements.txt
+torch>=2.2

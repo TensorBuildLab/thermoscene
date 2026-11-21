@@ -1,28 +1,2405 @@
 {
- "random": {
-  "episodes": 30,
-  "max_steps": 60,
-  "success": 4,
-  "success_rate": 0.13,
-  "median_steps_to_success": 30.0,
-  "false_alarms_per_episode": 5.4
+ "B": {
+  "building": "Phoenix office",
+  "random": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 4,
+   "success_rate": 0.13,
+   "success_95ci": [
+    0.05,
+    0.3
+   ],
+   "median_steps_to_success": 30.0,
+   "false_alarms_per_episode": 5.4,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": true,
+     "steps": 25,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": true,
+     "steps": 45,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 9
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 10
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 8
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 8
+    },
+    {
+     "found": true,
+     "steps": 25,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": true,
+     "steps": 35,
+     "false_declarations": 1
+    }
+   ]
+  },
+  "look-around": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 13,
+   "success_rate": 0.43,
+   "success_95ci": [
+    0.27,
+    0.61
+   ],
+   "median_steps_to_success": 12.0,
+   "false_alarms_per_episode": 7.27,
+   "per_episode": [
+    {
+     "found": true,
+     "steps": 22,
+     "false_declarations": 8
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 46,
+     "false_declarations": 15
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 49,
+     "false_declarations": 14
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 20
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": true,
+     "steps": 44,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": true,
+     "steps": 2,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 15
+    },
+    {
+     "found": true,
+     "steps": 2,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 14
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 16
+    },
+    {
+     "found": true,
+     "steps": 12,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 7,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 2,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 21,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": true,
+     "steps": 8,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 18
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 20
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 12,
+     "false_declarations": 3
+    },
+    {
+     "found": true,
+     "steps": 59,
+     "false_declarations": 15
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 21
+    }
+   ]
+  },
+  "hot-spot": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 21,
+   "success_rate": 0.7,
+   "success_95ci": [
+    0.52,
+    0.83
+   ],
+   "median_steps_to_success": 16.0,
+   "false_alarms_per_episode": 5.53,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 12
+    },
+    {
+     "found": true,
+     "steps": 23,
+     "false_declarations": 4
+    },
+    {
+     "found": true,
+     "steps": 22,
+     "false_declarations": 5
+    },
+    {
+     "found": true,
+     "steps": 9,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 21,
+     "false_declarations": 4
+    },
+    {
+     "found": true,
+     "steps": 54,
+     "false_declarations": 12
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 59,
+     "false_declarations": 15
+    },
+    {
+     "found": true,
+     "steps": 14,
+     "false_declarations": 3
+    },
+    {
+     "found": true,
+     "steps": 4,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": true,
+     "steps": 2,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 17
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 13,
+     "false_declarations": 3
+    },
+    {
+     "found": true,
+     "steps": 20,
+     "false_declarations": 6
+    },
+    {
+     "found": true,
+     "steps": 3,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 23,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 14,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 15
+    },
+    {
+     "found": true,
+     "steps": 6,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 40,
+     "false_declarations": 10
+    },
+    {
+     "found": true,
+     "steps": 14,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 13
+    },
+    {
+     "found": true,
+     "steps": 16,
+     "false_declarations": 4
+    },
+    {
+     "found": true,
+     "steps": 15,
+     "false_declarations": 3
+    },
+    {
+     "found": true,
+     "steps": 29,
+     "false_declarations": 6
+    },
+    {
+     "found": true,
+     "steps": 29,
+     "false_declarations": 6
+    }
+   ]
+  },
+  "learned": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 17,
+   "success_rate": 0.57,
+   "success_95ci": [
+    0.39,
+    0.73
+   ],
+   "median_steps_to_success": 15.0,
+   "false_alarms_per_episode": 2.97,
+   "per_episode": [
+    {
+     "found": true,
+     "steps": 6,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": true,
+     "steps": 10,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 10,
+     "false_declarations": 2
+    },
+    {
+     "found": true,
+     "steps": 18,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": true,
+     "steps": 15,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": true,
+     "steps": 2,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": true,
+     "steps": 19,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": true,
+     "steps": 26,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 8
+    },
+    {
+     "found": true,
+     "steps": 23,
+     "false_declarations": 6
+    },
+    {
+     "found": true,
+     "steps": 20,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 24,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": true,
+     "steps": 57,
+     "false_declarations": 4
+    },
+    {
+     "found": true,
+     "steps": 6,
+     "false_declarations": 2
+    },
+    {
+     "found": true,
+     "steps": 12,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": true,
+     "steps": 11,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 11,
+     "false_declarations": 3
+    },
+    {
+     "found": true,
+     "steps": 46,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    }
+   ]
+  },
+  "privileged": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 26,
+   "success_rate": 0.87,
+   "success_95ci": [
+    0.7,
+    0.95
+   ],
+   "median_steps_to_success": 7.0,
+   "false_alarms_per_episode": 0.0,
+   "per_episode": [
+    {
+     "found": true,
+     "steps": 5,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 56,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 9,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 8,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 7,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 8,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 6,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 20,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 7,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 2,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 2,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 11,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 6,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 3,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 3,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 12,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 7,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 4,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 43,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 3,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 9,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 10,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 9,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 4,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 4,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 3,
+     "false_declarations": 0
+    }
+   ]
+  },
+  "learned-true": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 6,
+   "success_rate": 0.2,
+   "success_95ci": [
+    0.1,
+    0.37
+   ],
+   "median_steps_to_success": 15.0,
+   "false_alarms_per_episode": 1.47,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": true,
+     "steps": 10,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 26,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 16,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 14,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 23,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": true,
+     "steps": 3,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    }
+   ]
+  },
+  "learned-ideal": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 5,
+   "success_rate": 0.17,
+   "success_95ci": [
+    0.07,
+    0.34
+   ],
+   "median_steps_to_success": 13.0,
+   "false_alarms_per_episode": 0.9,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 9,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 22,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 17,
+     "false_declarations": 2
+    },
+    {
+     "found": true,
+     "steps": 13,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 3,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    }
+   ]
+  }
  },
- "look-around": {
-  "episodes": 30,
-  "max_steps": 60,
-  "success": 2,
-  "success_rate": 0.07,
-  "median_steps_to_success": 5.0,
-  "false_alarms_per_episode": 0.63
+ "C": {
+  "building": "Chicago top-floor perimeter office",
+  "random": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 0,
+   "success_rate": 0.0,
+   "success_95ci": [
+    0.0,
+    0.11
+   ],
+   "median_steps_to_success": null,
+   "false_alarms_per_episode": 5.77,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 9
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 6
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 10
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 8
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 8
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    }
+   ]
+  },
+  "look-around": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 3,
+   "success_rate": 0.1,
+   "success_95ci": [
+    0.03,
+    0.26
+   ],
+   "median_steps_to_success": 24.0,
+   "false_alarms_per_episode": 14.27,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 24
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 25
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": true,
+     "steps": 24,
+     "false_declarations": 10
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 22
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 21
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 24
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 18
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 19
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 26
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 23
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 10
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 15
+    },
+    {
+     "found": true,
+     "steps": 28,
+     "false_declarations": 8
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 9
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": true,
+     "steps": 15,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 18
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 26
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 14
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 27
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 25
+    }
+   ]
+  },
+  "hot-spot": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 5,
+   "success_rate": 0.17,
+   "success_95ci": [
+    0.07,
+    0.34
+   ],
+   "median_steps_to_success": 8.0,
+   "false_alarms_per_episode": 12.8,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 16
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 10
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 9
+    },
+    {
+     "found": true,
+     "steps": 7,
+     "false_declarations": 1
+    },
+    {
+     "found": true,
+     "steps": 8,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 18
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 5,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 16
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 13
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 12
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 16
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 17
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 17
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 20
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 18
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 19
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 13
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 13
+    },
+    {
+     "found": true,
+     "steps": 31,
+     "false_declarations": 10
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 15
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 21
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 15
+    },
+    {
+     "found": true,
+     "steps": 15,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 15
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 11
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 17
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 22
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 13
+    }
+   ]
+  },
+  "learned": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 2,
+   "success_rate": 0.07,
+   "success_95ci": [
+    0.02,
+    0.21
+   ],
+   "median_steps_to_success": 9.5,
+   "false_alarms_per_episode": 3.3,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": true,
+     "steps": 6,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 8
+    },
+    {
+     "found": true,
+     "steps": 13,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 5
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 10
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 7
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 12
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    }
+   ]
+  },
+  "privileged": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 12,
+   "success_rate": 0.4,
+   "success_95ci": [
+    0.25,
+    0.58
+   ],
+   "median_steps_to_success": 10.5,
+   "false_alarms_per_episode": 0.0,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 11,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 5,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 5,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 3,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 49,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 46,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 9,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 10,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 12,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 57,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 5,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 52,
+     "false_declarations": 0
+    }
+   ]
+  },
+  "learned-true": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 1,
+   "success_rate": 0.03,
+   "success_95ci": [
+    0.01,
+    0.17
+   ],
+   "median_steps_to_success": 13.0,
+   "false_alarms_per_episode": 0.77,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 8
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 13,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 2
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    }
+   ]
+  },
+  "learned-ideal": {
+   "episodes": 30,
+   "max_steps": 60,
+   "success": 1,
+   "success_rate": 0.03,
+   "success_95ci": [
+    0.01,
+    0.17
+   ],
+   "median_steps_to_success": 10.0,
+   "false_alarms_per_episode": 0.47,
+   "per_episode": [
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": true,
+     "steps": 10,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 4
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 1
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 3
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    },
+    {
+     "found": false,
+     "steps": 60,
+     "false_declarations": 0
+    }
+   ]
+  }
  },
- "privileged": {
-  "episodes": 30,
-  "max_steps": 60,
-  "success": 12,
-  "success_rate": 0.4,
-  "median_steps_to_success": 7.5,
-  "false_alarms_per_episode": 0.0
+ "perception_check": {
+  "B": {
+   "views": 60,
+   "views_with_active_void": 54,
+   "true": {
+    "voids": 54,
+    "recall": 0.019,
+    "precision": 0.019,
+    "f1": 0.019,
+    "recall_by_true_contrast": {
+     "0.5-1.0 K": 0.0,
+     "1.0-2.0 K": 0.0,
+     ">= 2.0 K": 0.022
+    }
+   },
+   "ideal": {
+    "voids": 54,
+    "recall": 0.037,
+    "precision": 0.038,
+    "f1": 0.038,
+    "recall_by_true_contrast": {
+     "0.5-1.0 K": 0.0,
+     "1.0-2.0 K": 0.0,
+     ">= 2.0 K": 0.044
+    }
+   },
+   "real": {
+    "voids": 54,
+    "recall": 0.833,
+    "precision": 0.421,
+    "f1": 0.559,
+    "recall_by_true_contrast": {
+     "0.5-1.0 K": 1.0,
+     "1.0-2.0 K": 1.0,
+     ">= 2.0 K": 0.8
+    }
+   },
+   "hot-spot": {
+    "voids": 54,
+    "recall": 0.852,
+    "precision": 0.064,
+    "f1": 0.118,
+    "recall_by_true_contrast": {
+     "0.5-1.0 K": 0.0,
+     "1.0-2.0 K": 0.125,
+     ">= 2.0 K": 1.0
+    }
+   }
+  },
+  "C": {
+   "views": 60,
+   "views_with_active_void": 48,
+   "true": {
+    "voids": 48,
+    "recall": 0.042,
+    "precision": 0.061,
+    "f1": 0.049,
+    "recall_by_true_contrast": {
+     "0.5-1.0 K": 0.0,
+     "1.0-2.0 K": 0.0,
+     ">= 2.0 K": 0.056
+    }
+   },
+   "ideal": {
+    "voids": 48,
+    "recall": 0.0,
+    "precision": 0.0,
+    "f1": 0.0,
+    "recall_by_true_contrast": {
+     "0.5-1.0 K": 0.0,
+     "1.0-2.0 K": 0.0,
+     ">= 2.0 K": 0.0
+    }
+   },
+   "real": {
+    "voids": 48,
+    "recall": 0.396,
+    "precision": 0.211,
+    "f1": 0.275,
+    "recall_by_true_contrast": {
+     "0.5-1.0 K": 0.429,
+     "1.0-2.0 K": 0.4,
+     ">= 2.0 K": 0.389
+    }
+   },
+   "hot-spot": {
+    "voids": 48,
+    "recall": 0.188,
+    "precision": 0.006,
+    "f1": 0.012,
+    "recall_by_true_contrast": {
+     "0.5-1.0 K": 0.0,
+     "1.0-2.0 K": 0.0,
+     ">= 2.0 K": 0.25
+    }
+   }
+  }
  },
- "seconds": 1094,
- "seconds_per_step": 0.203
+ "learned_threshold": 0.95,
+ "hot_spot_threshold_K": 1.5,
+ "seconds_per_step": 0.212
 }

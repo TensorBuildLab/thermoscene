@@ -78,6 +78,22 @@ shutter corrections, NETD noise, calibration error, dead pixels, quantisation, 8
 simulated schedules) are described in [docs/embodied.md](docs/embodied.md); every value and its source is in
 [docs/sensors.md](docs/sensors.md). The rasteriser reproduces the reference ray caster pixel for pixel, 10-60 times faster.
 
+### Learning in the environments (virtual training)
+
+A U-Net void detector trained only on scenes generated from 45 EnergyPlus example buildings found 79 % of the
+insulation voids in 23 buildings it had never seen (instance F1 0.51 on realistic camera readings). The same network
+trained on the true temperature fields or on idealised images of the same views found almost none (F1 0.04 and 0.02).
+In the inspection environment of an unseen office, the agent steered by the realistic-trained detector found the void in
+17 of 30 episodes, against 6 and 5 for the other two detectors and 4 for random actions
+([docs/detector.md](docs/detector.md), [docs/env_baselines.md](docs/env_baselines.md)). Learning needs PyTorch
+(`pip install -r requirements-learning.txt`):
+
+```bash
+python case_studies/detector_data.py all --jobs 5       # after corpus_survey.py: void scenes, 40 views per building
+python case_studies/detector_train.py --epochs 15 --seeds 3
+python case_studies/env_baselines.py                    # agents in cases B and C; --perception adds the aimed-view check
+```
+
 ### Real-time viewer in the browser
 
 `thermoscene web` packs a scene into one self-contained HTML file (ready-made: [`docs/viewer/`](docs/viewer)). Open it in

@@ -10,7 +10,7 @@ authors:
     affiliation: "University of Arizona, Tucson, AZ, USA; National Laboratory of the Rockies, Golden, CO, USA"
 preferred-citation:
   type: article
-  title: "Building energy models as labelled thermal environments for embodied inspection agents"
+  title: "thermoscene: building energy models as virtual training environments for embodied thermal inspection"
   authors:
     - family-names: Zhang
       given-names: Liang

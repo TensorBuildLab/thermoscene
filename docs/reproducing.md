@@ -15,7 +15,7 @@ python -m thermoscene build case_studies/A_single_room/case.yaml --render
 python -m thermoscene build case_studies/B_hvac_system/case.yaml --render
 python -m thermoscene build case_studies/C_doe_medium_office/case.yaml --render
 
-# evaluations (E1-E7 of the paper)
+# evaluations (E1-E7 of the Energy and Buildings manuscript in paper/; see below for the current paper)
 python case_studies/zone_sweep.py          # E3 -> docs/zone_sweep.md                 (Table 6)
 python case_studies/topology_survey.py     # E4 -> docs/topology_survey.md            (Table 7)
 python case_studies/morris.py              # E6 -> docs/morris.md                     (Table 8, ~7 min)
@@ -55,6 +55,36 @@ Outputs are written to `case_studies/<case>/output/` (ignored by git), and the a
 `case_studies/<case>/annual/` and `morris/`. EnergyPlus runs are cached in `case_studies/<case>/.sim_cache/`; delete it
 to force a new simulation. The evaluation JSON files, the markdown tables in `docs/`, the figures and the viewers are
 committed so that the paper's numbers can be checked without rerunning.
+
+## The embodied-inspection paper (Automation in Construction revision)
+
+*thermoscene: building energy models as virtual training environments for embodied thermal inspection* numbers its
+experiments E1-E9. Figures come from `case_studies/embodied_figures.py`.
+
+```bash
+python case_studies/corpus_survey.py                      # E1-E2: topology and scene builds on all 719 example models
+pip install -r requirements-learning.txt                   # E3-E4 need PyTorch (CPU build is enough)
+python case_studies/detector_data.py all --jobs 5          # E3 data: 76 corpus buildings with injected voids (~2 h)
+python case_studies/detector_train.py --epochs 15 --seeds 3  # E3 -> docs/detector.md (~3 h on a laptop CPU)
+python case_studies/env_baselines.py                       # E4 -> docs/env_baselines.md (7 agents, cases B and C)
+python case_studies/env_baselines.py --perception          # E4: detectors on views aimed at each case's void
+python case_studies/measurement_gap.py                     # E5-E7 -> docs/measurement_gap.md (~70 min)
+python case_studies/inspection_timing.py                   # E8 -> docs/inspection_timing.md (~15 min)
+python case_studies/annual.py                              # E9
+python case_studies/embodied_figures.py                    # figures and graphical abstract
+```
+
+| Experiment | Source |
+|---|---|
+| E1-E2 (corpus) | `case_studies/corpus_survey.py`, `docs/corpus_survey.md` |
+| E3 (detector trained in the environments) | `case_studies/detector_train.py`, `case_studies/detector_results.json`, `docs/detector.md`; models in `case_studies/detector/` (git-ignored, re-created by the script; `case_studies/detector_model.pt` is the first-seed realistic detector) |
+| E4 (agents) | `case_studies/env_baselines.py`, `case_studies/env_baselines.json`, `docs/env_baselines.md` |
+| E5-E7 (measurement gap) | `case_studies/measurement_gap.py`, `docs/measurement_gap.md` |
+| E8 (inspection timing) | `case_studies/inspection_timing.py`, `docs/inspection_timing.md` |
+| E9 (energy) | `case_studies/annual.py`, `docs/annual.md` |
+
+Training on a CPU is not bit-reproducible across machines; seeds fix the data split, the views and the
+initialisation, and the paper reports the mean and spread over three seeds.
 
 ## Continuous integration
 

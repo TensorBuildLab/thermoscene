@@ -1,0 +1,1214 @@
+{
+ "epochs": 15,
+ "seeds": 3,
+ "active_threshold_K": 0.5,
+ "width": [
+  8,
+  16,
+  32,
+  64
+ ],
+ "train_buildings": 45,
+ "val_buildings": 8,
+ "test_buildings": 23,
+ "train_views": 1800,
+ "test_views": 920,
+ "test_views_with_active_void": 466,
+ "test_void_true_contrast_K_p10_p50_p90": [
+  0.13,
+  1.27,
+  3.78
+ ],
+ "conditions": {
+  "true": [
+   {
+    "test_real": {
+     "threshold": 0.95,
+     "pixel_ap": 0.624,
+     "voids": 468,
+     "recall": 0.158,
+     "precision": 0.097,
+     "f1": 0.12,
+     "false_blobs_per_view_without_void": 0.183,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.063,
+      "1.0-2.0 K": 0.118,
+      ">= 2.0 K": 0.219
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.188,
+        "precision": 0.09,
+        "f1": 0.122,
+        "false_blobs_per_view_without_void": 0.167,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.176,
+        "precision": 0.091,
+        "f1": 0.12,
+        "false_blobs_per_view_without_void": 0.196,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.122,
+        "precision": 0.115,
+        "f1": 0.118,
+        "false_blobs_per_view_without_void": 0.177,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.153,
+        "precision": 0.076,
+        "f1": 0.101,
+        "false_blobs_per_view_without_void": 0.211,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.174,
+        "precision": 0.1,
+        "f1": 0.127,
+        "false_blobs_per_view_without_void": 0.176,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.147,
+        "precision": 0.128,
+        "f1": 0.137,
+        "false_blobs_per_view_without_void": 0.147,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.95,
+     "pixel_ap": 0.861,
+     "voids": 468,
+     "recall": 0.85,
+     "precision": 0.488,
+     "f1": 0.62,
+     "false_blobs_per_view_without_void": 0.514,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.835,
+      "1.0-2.0 K": 0.814,
+      ">= 2.0 K": 0.882
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.7,
+     "voids": 468,
+     "recall": 0.38,
+     "precision": 0.17,
+     "f1": 0.235,
+     "false_blobs_per_view_without_void": 0.697,
+     "views_without_void": 251
+    }
+   },
+   {
+    "test_real": {
+     "threshold": 0.97,
+     "pixel_ap": 0.437,
+     "voids": 468,
+     "recall": 0.0,
+     "precision": 0.0,
+     "f1": 0.0,
+     "false_blobs_per_view_without_void": 0.016,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.0,
+      "1.0-2.0 K": 0.0,
+      ">= 2.0 K": 0.0
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.062,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.009,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.009,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.041,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.97,
+     "pixel_ap": 0.826,
+     "voids": 468,
+     "recall": 0.806,
+     "precision": 0.432,
+     "f1": 0.563,
+     "false_blobs_per_view_without_void": 0.442,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.646,
+      "1.0-2.0 K": 0.795,
+      ">= 2.0 K": 0.868
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.3,
+     "voids": 468,
+     "recall": 0.058,
+     "precision": 0.039,
+     "f1": 0.046,
+     "false_blobs_per_view_without_void": 0.478,
+     "views_without_void": 251
+    }
+   },
+   {
+    "test_real": {
+     "threshold": 0.97,
+     "pixel_ap": 0.448,
+     "voids": 468,
+     "recall": 0.0,
+     "precision": 0.0,
+     "f1": 0.0,
+     "false_blobs_per_view_without_void": 0.012,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.0,
+      "1.0-2.0 K": 0.0,
+      ">= 2.0 K": 0.0
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.019,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.01,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.027,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.015,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.97,
+     "pixel_ap": 0.83,
+     "voids": 468,
+     "recall": 0.799,
+     "precision": 0.475,
+     "f1": 0.596,
+     "false_blobs_per_view_without_void": 0.311,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.696,
+      "1.0-2.0 K": 0.776,
+      ">= 2.0 K": 0.851
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.3,
+     "voids": 468,
+     "recall": 0.124,
+     "precision": 0.081,
+     "f1": 0.098,
+     "false_blobs_per_view_without_void": 0.406,
+     "views_without_void": 251
+    }
+   }
+  ],
+  "ideal": [
+   {
+    "test_real": {
+     "threshold": 0.95,
+     "pixel_ap": 0.616,
+     "voids": 468,
+     "recall": 0.06,
+     "precision": 0.053,
+     "f1": 0.056,
+     "false_blobs_per_view_without_void": 0.068,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.0,
+      "1.0-2.0 K": 0.037,
+      ">= 2.0 K": 0.096
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.099,
+        "precision": 0.072,
+        "f1": 0.083,
+        "false_blobs_per_view_without_void": 0.062,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.07,
+        "precision": 0.045,
+        "f1": 0.055,
+        "false_blobs_per_view_without_void": 0.075,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.028,
+        "precision": 0.048,
+        "f1": 0.035,
+        "false_blobs_per_view_without_void": 0.062,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.032,
+        "precision": 0.022,
+        "f1": 0.026,
+        "false_blobs_per_view_without_void": 0.101,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.071,
+        "precision": 0.059,
+        "f1": 0.064,
+        "false_blobs_per_view_without_void": 0.081,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.077,
+        "precision": 0.104,
+        "f1": 0.089,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.95,
+     "pixel_ap": 0.851,
+     "voids": 468,
+     "recall": 0.823,
+     "precision": 0.485,
+     "f1": 0.61,
+     "false_blobs_per_view_without_void": 0.386,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.709,
+      "1.0-2.0 K": 0.801,
+      ">= 2.0 K": 0.877
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.3,
+     "voids": 468,
+     "recall": 0.455,
+     "precision": 0.235,
+     "f1": 0.31,
+     "false_blobs_per_view_without_void": 0.554,
+     "views_without_void": 251
+    }
+   },
+   {
+    "test_real": {
+     "threshold": 0.98,
+     "pixel_ap": 0.343,
+     "voids": 468,
+     "recall": 0.0,
+     "precision": 0.0,
+     "f1": 0.0,
+     "false_blobs_per_view_without_void": 0.0,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.0,
+      "1.0-2.0 K": 0.0,
+      ">= 2.0 K": 0.0
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.98,
+     "pixel_ap": 0.843,
+     "voids": 468,
+     "recall": 0.767,
+     "precision": 0.502,
+     "f1": 0.607,
+     "false_blobs_per_view_without_void": 0.267,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.595,
+      "1.0-2.0 K": 0.776,
+      ">= 2.0 K": 0.82
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.3,
+     "voids": 468,
+     "recall": 0.038,
+     "precision": 0.043,
+     "f1": 0.04,
+     "false_blobs_per_view_without_void": 0.199,
+     "views_without_void": 251
+    }
+   },
+   {
+    "test_real": {
+     "threshold": 0.97,
+     "pixel_ap": 0.53,
+     "voids": 468,
+     "recall": 0.0,
+     "precision": 0.0,
+     "f1": 0.0,
+     "false_blobs_per_view_without_void": 0.02,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.0,
+      "1.0-2.0 K": 0.0,
+      ">= 2.0 K": 0.0
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.0,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.028,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.021,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.028,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.014,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.0,
+        "precision": 0.0,
+        "f1": 0.0,
+        "false_blobs_per_view_without_void": 0.015,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.97,
+     "pixel_ap": 0.852,
+     "voids": 468,
+     "recall": 0.803,
+     "precision": 0.482,
+     "f1": 0.603,
+     "false_blobs_per_view_without_void": 0.295,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.709,
+      "1.0-2.0 K": 0.789,
+      ">= 2.0 K": 0.846
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.3,
+     "voids": 468,
+     "recall": 0.254,
+     "precision": 0.088,
+     "f1": 0.13,
+     "false_blobs_per_view_without_void": 0.916,
+     "views_without_void": 251
+    }
+   }
+  ],
+  "real": [
+   {
+    "test_real": {
+     "threshold": 0.95,
+     "pixel_ap": 0.879,
+     "voids": 468,
+     "recall": 0.803,
+     "precision": 0.37,
+     "f1": 0.506,
+     "false_blobs_per_view_without_void": 0.713,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.582,
+      "1.0-2.0 K": 0.795,
+      ">= 2.0 K": 0.886
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.792,
+        "precision": 0.37,
+        "f1": 0.505,
+        "false_blobs_per_view_without_void": 1.062,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.888,
+        "precision": 0.399,
+        "f1": 0.55,
+        "false_blobs_per_view_without_void": 0.561,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.722,
+        "precision": 0.338,
+        "f1": 0.46,
+        "false_blobs_per_view_without_void": 0.708,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.783,
+        "precision": 0.297,
+        "f1": 0.431,
+        "false_blobs_per_view_without_void": 0.67,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.871,
+        "precision": 0.477,
+        "f1": 0.617,
+        "false_blobs_per_view_without_void": 0.77,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.756,
+        "precision": 0.368,
+        "f1": 0.495,
+        "false_blobs_per_view_without_void": 0.721,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.95,
+     "pixel_ap": 0.834,
+     "voids": 468,
+     "recall": 0.874,
+     "precision": 0.385,
+     "f1": 0.534,
+     "false_blobs_per_view_without_void": 1.008,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.823,
+      "1.0-2.0 K": 0.857,
+      ">= 2.0 K": 0.904
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.95,
+     "voids": 468,
+     "recall": 0.803,
+     "precision": 0.37,
+     "f1": 0.506,
+     "false_blobs_per_view_without_void": 0.713,
+     "views_without_void": 251
+    }
+   },
+   {
+    "test_real": {
+     "threshold": 0.95,
+     "pixel_ap": 0.85,
+     "voids": 468,
+     "recall": 0.814,
+     "precision": 0.363,
+     "f1": 0.502,
+     "false_blobs_per_view_without_void": 0.924,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.671,
+      "1.0-2.0 K": 0.795,
+      ">= 2.0 K": 0.877
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.782,
+        "precision": 0.387,
+        "f1": 0.518,
+        "false_blobs_per_view_without_void": 1.104,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.888,
+        "precision": 0.362,
+        "f1": 0.514,
+        "false_blobs_per_view_without_void": 0.879,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.756,
+        "precision": 0.351,
+        "f1": 0.48,
+        "false_blobs_per_view_without_void": 0.885,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.764,
+        "precision": 0.281,
+        "f1": 0.411,
+        "false_blobs_per_view_without_void": 1.028,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.91,
+        "precision": 0.488,
+        "f1": 0.635,
+        "false_blobs_per_view_without_void": 0.824,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.769,
+        "precision": 0.359,
+        "f1": 0.49,
+        "false_blobs_per_view_without_void": 0.868,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.95,
+     "pixel_ap": 0.811,
+     "voids": 468,
+     "recall": 0.874,
+     "precision": 0.367,
+     "f1": 0.517,
+     "false_blobs_per_view_without_void": 0.948,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.81,
+      "1.0-2.0 K": 0.857,
+      ">= 2.0 K": 0.908
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.95,
+     "voids": 468,
+     "recall": 0.814,
+     "precision": 0.363,
+     "f1": 0.502,
+     "false_blobs_per_view_without_void": 0.924,
+     "views_without_void": 251
+    }
+   },
+   {
+    "test_real": {
+     "threshold": 0.95,
+     "pixel_ap": 0.839,
+     "voids": 468,
+     "recall": 0.761,
+     "precision": 0.403,
+     "f1": 0.527,
+     "false_blobs_per_view_without_void": 0.606,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.544,
+      "1.0-2.0 K": 0.752,
+      ">= 2.0 K": 0.842
+     },
+     "by": {
+      "camera": {
+       "drone_640": {
+        "views": 180,
+        "voids": 101,
+        "recall": 0.772,
+        "precision": 0.47,
+        "f1": 0.584,
+        "false_blobs_per_view_without_void": 0.708,
+        "views_without_void": 48
+       },
+       "handheld_320": {
+        "views": 384,
+        "voids": 187,
+        "recall": 0.829,
+        "precision": 0.417,
+        "f1": 0.555,
+        "false_blobs_per_view_without_void": 0.551,
+        "views_without_void": 107
+       },
+       "lepton35": {
+        "views": 356,
+        "voids": 180,
+        "recall": 0.683,
+        "precision": 0.357,
+        "f1": 0.469,
+        "false_blobs_per_view_without_void": 0.615,
+        "views_without_void": 96
+       }
+      },
+      "distance": {
+       "1-2.5 m": {
+        "views": 335,
+        "voids": 157,
+        "recall": 0.713,
+        "precision": 0.328,
+        "f1": 0.45,
+        "false_blobs_per_view_without_void": 0.706,
+        "views_without_void": 109
+       },
+       "2.5-3.5 m": {
+        "views": 292,
+        "voids": 155,
+        "recall": 0.877,
+        "precision": 0.529,
+        "f1": 0.66,
+        "false_blobs_per_view_without_void": 0.595,
+        "views_without_void": 74
+       },
+       "3.5-4.5 m": {
+        "views": 293,
+        "voids": 156,
+        "recall": 0.692,
+        "precision": 0.38,
+        "f1": 0.491,
+        "false_blobs_per_view_without_void": 0.456,
+        "views_without_void": 68
+       }
+      }
+     }
+    },
+    "test_ideal": {
+     "threshold": 0.95,
+     "pixel_ap": 0.803,
+     "voids": 468,
+     "recall": 0.863,
+     "precision": 0.422,
+     "f1": 0.567,
+     "false_blobs_per_view_without_void": 0.761,
+     "views_without_void": 251,
+     "recall_by_true_contrast": {
+      "0.5-1.0 K": 0.797,
+      "1.0-2.0 K": 0.845,
+      ">= 2.0 K": 0.899
+     }
+    },
+    "test_real_oracle_threshold": {
+     "threshold": 0.95,
+     "voids": 468,
+     "recall": 0.761,
+     "precision": 0.403,
+     "f1": 0.527,
+     "false_blobs_per_view_without_void": 0.606,
+     "views_without_void": 251
+    }
+   }
+  ]
+ },
+ "baselines": {
+  "local anomaly (15 x 15 median, noise units)": {
+   "threshold": 4.0,
+   "pixel_ap": 0.085,
+   "voids": 468,
+   "recall": 0.013,
+   "precision": 0.001,
+   "f1": 0.002,
+   "false_blobs_per_view_without_void": 8.1,
+   "views_without_void": 251,
+   "recall_by_true_contrast": {
+    "0.5-1.0 K": 0.0,
+    "1.0-2.0 K": 0.019,
+    ">= 2.0 K": 0.013
+   },
+   "by": {
+    "camera": {
+     "drone_640": {
+      "views": 180,
+      "voids": 101,
+      "recall": 0.03,
+      "precision": 0.002,
+      "f1": 0.003,
+      "false_blobs_per_view_without_void": 9.875,
+      "views_without_void": 48
+     },
+     "handheld_320": {
+      "views": 384,
+      "voids": 187,
+      "recall": 0.005,
+      "precision": 0.0,
+      "f1": 0.001,
+      "false_blobs_per_view_without_void": 9.841,
+      "views_without_void": 107
+     },
+     "lepton35": {
+      "views": 356,
+      "voids": 180,
+      "recall": 0.011,
+      "precision": 0.001,
+      "f1": 0.002,
+      "false_blobs_per_view_without_void": 5.271,
+      "views_without_void": 96
+     }
+    },
+    "distance": {
+     "1-2.5 m": {
+      "views": 335,
+      "voids": 157,
+      "recall": 0.006,
+      "precision": 0.001,
+      "f1": 0.001,
+      "false_blobs_per_view_without_void": 6.569,
+      "views_without_void": 109
+     },
+     "2.5-3.5 m": {
+      "views": 292,
+      "voids": 155,
+      "recall": 0.006,
+      "precision": 0.001,
+      "f1": 0.001,
+      "false_blobs_per_view_without_void": 8.0,
+      "views_without_void": 74
+     },
+     "3.5-4.5 m": {
+      "views": 293,
+      "voids": 156,
+      "recall": 0.026,
+      "precision": 0.002,
+      "f1": 0.003,
+      "false_blobs_per_view_without_void": 10.662,
+      "views_without_void": 68
+     }
+    }
+   }
+  },
+  "global hot/cold spot (kelvin from image median)": {
+   "threshold": 1.5,
+   "pixel_ap": 0.201,
+   "voids": 468,
+   "recall": 0.536,
+   "precision": 0.032,
+   "f1": 0.06,
+   "false_blobs_per_view_without_void": 9.375,
+   "views_without_void": 251,
+   "recall_by_true_contrast": {
+    "0.5-1.0 K": 0.0,
+    "1.0-2.0 K": 0.28,
+    ">= 2.0 K": 0.904
+   },
+   "by": {
+    "camera": {
+     "drone_640": {
+      "views": 180,
+      "voids": 101,
+      "recall": 0.515,
+      "precision": 0.076,
+      "f1": 0.132,
+      "false_blobs_per_view_without_void": 4.25,
+      "views_without_void": 48
+     },
+     "handheld_320": {
+      "views": 384,
+      "voids": 187,
+      "recall": 0.551,
+      "precision": 0.05,
+      "f1": 0.091,
+      "false_blobs_per_view_without_void": 5.355,
+      "views_without_void": 107
+     },
+     "lepton35": {
+      "views": 356,
+      "voids": 180,
+      "recall": 0.533,
+      "precision": 0.019,
+      "f1": 0.036,
+      "false_blobs_per_view_without_void": 16.417,
+      "views_without_void": 96
+     }
+    },
+    "distance": {
+     "1-2.5 m": {
+      "views": 335,
+      "voids": 157,
+      "recall": 0.478,
+      "precision": 0.029,
+      "f1": 0.054,
+      "false_blobs_per_view_without_void": 7.22,
+      "views_without_void": 109
+     },
+     "2.5-3.5 m": {
+      "views": 292,
+      "voids": 155,
+      "recall": 0.581,
+      "precision": 0.034,
+      "f1": 0.063,
+      "false_blobs_per_view_without_void": 9.919,
+      "views_without_void": 74
+     },
+     "3.5-4.5 m": {
+      "views": 293,
+      "voids": 156,
+      "recall": 0.551,
+      "precision": 0.033,
+      "f1": 0.062,
+      "false_blobs_per_view_without_void": 12.235,
+      "views_without_void": 68
+     }
+    }
+   }
+  }
+ },
+ "baseline_label_free": {
+  "threshold": 1.5,
+  "pixel_ap": 0.201,
+  "voids": 468,
+  "recall": 0.536,
+  "precision": 0.032,
+  "f1": 0.06,
+  "false_blobs_per_view_without_void": 9.375,
+  "views_without_void": 251,
+  "recall_by_true_contrast": {
+   "0.5-1.0 K": 0.0,
+   "1.0-2.0 K": 0.28,
+   ">= 2.0 K": 0.904
+  },
+  "by": {
+   "camera": {
+    "drone_640": {
+     "views": 180,
+     "voids": 101,
+     "recall": 0.515,
+     "precision": 0.076,
+     "f1": 0.132,
+     "false_blobs_per_view_without_void": 4.25,
+     "views_without_void": 48
+    },
+    "handheld_320": {
+     "views": 384,
+     "voids": 187,
+     "recall": 0.551,
+     "precision": 0.05,
+     "f1": 0.091,
+     "false_blobs_per_view_without_void": 5.355,
+     "views_without_void": 107
+    },
+    "lepton35": {
+     "views": 356,
+     "voids": 180,
+     "recall": 0.533,
+     "precision": 0.019,
+     "f1": 0.036,
+     "false_blobs_per_view_without_void": 16.417,
+     "views_without_void": 96
+    }
+   },
+   "distance": {
+    "1-2.5 m": {
+     "views": 335,
+     "voids": 157,
+     "recall": 0.478,
+     "precision": 0.029,
+     "f1": 0.054,
+     "false_blobs_per_view_without_void": 7.22,
+     "views_without_void": 109
+    },
+    "2.5-3.5 m": {
+     "views": 292,
+     "voids": 155,
+     "recall": 0.581,
+     "precision": 0.034,
+     "f1": 0.063,
+     "false_blobs_per_view_without_void": 9.919,
+     "views_without_void": 74
+    },
+    "3.5-4.5 m": {
+     "views": 293,
+     "voids": 156,
+     "recall": 0.551,
+     "precision": 0.033,
+     "f1": 0.062,
+     "false_blobs_per_view_without_void": 12.235,
+     "views_without_void": 68
+    }
+   }
+  },
+  "name": "global hot/cold spot (kelvin from image median)"
+ },
+ "agent_detector": {
+  "condition": "real",
+  "seed": 0,
+  "threshold": 0.95
+ },
+ "learning_curve": [
+  {
+   "buildings": 5,
+   "views": 200,
+   "epochs": 60,
+   "threshold": 0.95,
+   "pixel_ap": 0.692,
+   "f1": 0.443,
+   "recall": 0.63,
+   "precision": 0.341
+  },
+  {
+   "buildings": 10,
+   "views": 400,
+   "epochs": 60,
+   "threshold": 0.97,
+   "pixel_ap": 0.805,
+   "f1": 0.419,
+   "recall": 0.701,
+   "precision": 0.299
+  },
+  {
+   "buildings": 20,
+   "views": 800,
+   "epochs": 34,
+   "threshold": 0.9,
+   "pixel_ap": 0.851,
+   "f1": 0.494,
+   "recall": 0.84,
+   "precision": 0.35
+  },
+  {
+   "buildings": 45,
+   "views": 1800,
+   "epochs": 15,
+   "threshold": 0.95,
+   "pixel_ap": 0.879,
+   "f1": 0.506,
+   "recall": 0.803,
+   "precision": 0.37
+  }
+ ]
+}

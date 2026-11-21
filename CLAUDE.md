@@ -10,11 +10,12 @@ crawlers): observation from any pose and simulated time through a realistic ther
 labels, a Gymnasium-style environment and a COCO dataset exporter (`thermoscene/embodied/`, `docs/embodied.md`).
 
 Current paper (revision of 2026-11-19, target Automation in Construction, single author Liang Zhang, University of
-Arizona and National Laboratory of the Rockies): *Building energy models as labelled thermal environments for embodied
-inspection agents*. Its sources, figures and upload files are in `../../Automation in Construction Submission/`
+Arizona and National Laboratory of the Rockies): *thermoscene: building energy models as virtual training environments
+for embodied thermal inspection* (title revised 2026-11-20). Its sources, figures and upload files are in `../../Automation in Construction Submission/`
 (`_source/draft_v2_*.md`, `assemble_manuscript.py`, `make_figures.py`, `build_package.py`). Its figures come from
-`case_studies/embodied_figures.py`; its numbers from `case_studies/corpus_survey.py` (RQ1), `measurement_gap.py` (RQ2),
-`inspection_timing.py` and `annual.py` (RQ3) and `env_baselines.py` (agents). Earlier versions: Energy and Buildings
+`case_studies/embodied_figures.py`; its numbers from `case_studies/corpus_survey.py` (RQ1, E1-E2), `detector_train.py`
+(RQ2, E3: detector trained only in generated environments), `env_baselines.py` (RQ2, E4: agents with and without the
+learned detector), `measurement_gap.py` (RQ2, E5-E7), `inspection_timing.py` and `annual.py` (RQ3, E8-E9). Earlier versions: Energy and Buildings
 manuscript in `paper/` (`manuscript_EnB.*`, figures from `paper_figures.py`, numbers from `paper_numbers.py`) and the
 Advanced Engineering Informatics package (desk-rejected 2026-11-18).
 
@@ -53,7 +54,11 @@ python case_studies/paper_figures.py [fig_name ...]        # paper Figs 1-8 + gr
 # embodied-inspection paper (2026-11 revision)
 python case_studies/measurement_gap.py [A|B|C]             # RQ2: pixel gap, contrast fidelity, distance (~70 min) -> docs/measurement_gap.md
 python case_studies/inspection_timing.py                   # RQ3: detectability over a TMY3 year, timing policies (~15 min)
-python case_studies/env_baselines.py                       # agents in InspectionEnv (random / label-free / privileged)
+python case_studies/detector_data.py all --jobs 5          # E3 data: 76 corpus buildings with injected wall voids, 3,040 views (~2 h)
+python case_studies/detector_train.py --epochs 15 --seeds 3 # E3: U-Net on true / idealised / realistic views (~3 h CPU; needs torch)
+                                                           #   models kept in case_studies/detector/ and reused; --report rewrites docs/detector.md
+python case_studies/env_baselines.py                       # E4: 7 agents (random, 2 label-free, 3 learned, privileged), cases B and C
+python case_studies/env_baselines.py --perception          # E4: detectors on views aimed at each case's void (seeing vs finding)
 python case_studies/embodied_figures.py [name ...]         # emb_* figures + graphical abstract -> docs/paper/figures/
 python -m thermoscene dataset <scene.usda> -o out --views N # COCO dataset;  python -m thermoscene episode ... (demo)
 ```
@@ -181,3 +186,12 @@ provenance levels; see `docs/ontology.md`.
   cache directory with `eplusout.sql` but no `eplusout.err` is incomplete (the pipeline re-simulates it).
 - Several example files do not run in EnergyPlus 22.2 as shipped; the corpus survey re-runs the unmodified file
   (design days) to tell EnergyPlus's own failures from thermoscene's.
+- Learning experiments: a decision threshold tuned on a grid must not choose the top of the grid (every detector chose
+  0.9 when the grid ended there; it now runs to 0.99). Detectors are scored at their validation threshold and, as a
+  calibration check, at the threshold best on the test images (`test_real_oracle_threshold`).
+- Agent baselines in `InspectionEnv`: steer with the continuous action mode (turn and tilt by the angle that centres
+  the target). Fixed 30-degree turns toward a target that must be centred within about 7 degrees made every agent swing
+  between two headings, and a "look away for three steps" rule after a false declaration hid the fault whenever it came
+  into view right after one; together they held even the privileged agent to 12 of 30 episodes. Skip directions
+  already declared without a fault instead. Diagnose an agent failure by first scoring its detector on views aimed at
+  the fault in the same building, then tracing the episode frame by frame.

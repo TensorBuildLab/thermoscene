@@ -27,7 +27,7 @@ plt.rcParams.update({"font.family": ["Liberation Sans", "Arial", "DejaVu Sans"],
 
 
 def save(fig, name):
-    fig.savefig(OUT / f"{name}.png", dpi=600 if name.startswith(("emb_obs", "emb_realism", "emb_gallery")) else 300)
+    fig.savefig(OUT / f"{name}.png", dpi=600 if name.startswith(("emb_obs", "emb_realism", "emb_gallery", "emb_fig_detector")) else 300)
     fig.savefig(OUT / f"{name}.pdf")
     plt.close(fig)
 
@@ -253,16 +253,13 @@ def fig_graphical_abstract():
     tc = w.time_index("SUMMER 14:00")
     cam = ThermalCamera.preset("handheld_320", seed=11, hfov_deg=float(np.degrees(2 * np.arctan(tx))))
     f = w.observe(pose, tc, cam, space=space, rng=np.random.default_rng(3))
-    gap = json.loads((CS / "measurement_gap.json").read_text(encoding="utf-8"))
     tim = json.loads((CS / "inspection_timing.json").read_text(encoding="utf-8"))
-    duct = next(r for r in gap["B_contrasts"] if r["pair"].startswith("duct") and r["frame"].startswith("SUMMER"))
-    kept = 100 * duct["realistic_mean_K"] / duct["true_K"]
     g = tim["B duct-insulation gap (Phoenix), 1.2 m"]
     anyt = g["any time"]["p_detect"]; inf = g["model-informed: flowing, supply-plenum difference in its top 20 %"]["p_detect"]
     W, H = 8.0, 3.4
     fig = plt.figure(figsize=(W, H))
     ax = fig.add_axes([0, 0, 1, 1]); ax.set_xlim(0, W); ax.set_ylim(0, H); ax.axis("off")
-    fig.text(0.5, 0.93, "Energy models as labelled thermal worlds for inspection robots", ha="center", va="center",
+    fig.text(0.5, 0.93, "thermoscene: virtual training environments for inspection robots", ha="center", va="center",
              fontsize=14, weight="bold", color="#1a202c")
     bt, bb = "EnergyPlus\nmodel", "simulated\ntemperatures,\nHVAC, people"
     bw_, bh_ = box_size(ax, bt, bb, 12.5, 11)
@@ -278,18 +275,82 @@ def fig_graphical_abstract():
     a2.imshow(f.true, cmap="inferno", vmin=lo, vmax=hi, interpolation="none"); a2.axis("off")
     a2.set_title("true temperature (label)", fontsize=11.5, pad=4)
     x0 = 5.5
-    items = [("Reading ≠ temperature", f"a duct-wrap gap keeps only\n{kept:.0f} % of its contrast"),
+    det = json.loads((CS / "detector_results.json").read_text(encoding="utf-8"))["conditions"]
+    f1 = {c: float(np.mean([r["test_real"]["f1"] for r in runs])) for c, runs in det.items()}
+    items = [("What a robot learns", f"voids in 23 unseen buildings:\nF1 {f1['real']:.2f} if trained on readings,\n"
+                                     f"{f1['true']:.2f} if on true temperatures"),
              ("When to look", f"duct gap: {anyt:.0f} % → {inf:.0f} % detected\nwhen timed by the model"),
              ("What it costs", "steadiest fault signature,\n1 % of a year's cooling")]
-    for i, (tt, b) in enumerate(items):
-        y = 2.42 - i * 0.86
-        ax.text(x0, y + 0.19, tt, fontsize=12, weight="bold", color="#1a202c", va="center")
-        ax.text(x0, y - 0.17, b, fontsize=11, color="#2d3748", va="center", linespacing=1.15)
+    y = 2.78                                                       # stack the items from the top, by their line count
+    for tt, b in items:
+        ax.text(x0, y, tt, fontsize=12, weight="bold", color="#1a202c", va="center")
+        ax.text(x0, y - 0.13, b, fontsize=11, color="#2d3748", va="top", linespacing=1.15)
+        y -= 0.13 + (b.count("\n") + 1) * 11 * 1.15 / 72 + 0.24
     save(fig, "emb_graphical_abstract")
 
 
+# ------------------------------------------------------------------------------------------------ Fig. detector
+def fig_detector(n_cols=5, seed=3):
+    """Views of unseen test buildings (experiment E3): the realistic reading, the active-void label, and the void
+    probability of the detectors trained on the true temperature field, on idealised images and on realistic
+    thermoscene readings. Needs the data and models of case_studies/detector_*.py (git-ignored folder)."""
+    import torch
+    sys.path.insert(0, str(CS))
+    import detector_train as dt
+    split = json.loads((dt.DATA / "split.json").read_text(encoding="utf-8"))
+    X, Y, IGN, META = dt.load(split["test"], kinds=("real",))
+    rng = np.random.default_rng(seed)
+    pos = [i for i, m in enumerate(META) if m["active"] and 150 < Y[i].sum() < 2500]
+    presets = ["lepton35", "handheld_320", "drone_640"]
+    picks = []
+    for p in presets + presets:                                   # spread over camera classes and buildings
+        cand = [i for i in pos if META[i]["preset"] == p and META[i]["building"] not in {META[j]["building"] for j in picks}]
+        if cand and len(picks) < n_cols - 1:
+            picks.append(int(rng.choice(cand)))
+    neg = [i for i, m in enumerate(META) if not Y[i].any() and not IGN[i].any() and m["target"].split("_")[0] in
+           ("Occupant", "Luminaire", "Monitor", "Desk", "Diffuser")]
+    picks.append(int(rng.choice(neg)))
+    Xn = dt.normalise(X["real"][picks])
+    res = json.loads((CS / "detector_results.json").read_text(encoding="utf-8"))
+    thr = {c: runs[0]["test_real"]["threshold"] for c, runs in res["conditions"].items()}
+    probs = {}
+    for cond in ("true", "ideal", "real"):
+        m = dt.UNet()
+        m.load_state_dict(torch.load(dt.DATA / f"model_{cond}_s0.pt", map_location="cpu"))
+        probs[cond] = dt.predict(m, Xn)
+    rows = [("camera reading", None), ("active void (label)", None), ("trained on true\ntemperature field", "true"),
+            ("trained on idealised\nimages", "ideal"), ("trained on realistic\nreadings (thermoscene)", "real")]
+    fig, axs = plt.subplots(len(rows), len(picks), figsize=(7.4, 7.0))
+    names = {"lepton35": "160 × 120", "handheld_320": "320 × 240", "drone_640": "640 × 512"}
+    for j, i in enumerate(picks):
+        img = X["real"][i]
+        lo, hi = lim(img)
+        for r, (title, cond) in enumerate(rows):
+            ax = axs[r, j]
+            if r == 0:
+                ax.imshow(img, cmap="inferno", vmin=lo, vmax=hi)
+                m = META[i]
+                ct = m.get("contrast_true_K")
+                ax.set_title(f"{names[m['preset']]}, {m['distance_m']:.1f} m\n" +
+                             (f"void {ct:+.1f} K".replace("-", "−") if Y[i].any() else "no void"), fontsize=7, pad=2)
+            elif r == 1:
+                ax.imshow(img, cmap="gray", vmin=lo, vmax=hi)
+                ax.imshow(np.ma.masked_where(~Y[i], Y[i]), cmap="autumn", alpha=0.75, vmin=0, vmax=1)
+            else:
+                ax.imshow(img, cmap="gray", vmin=lo, vmax=hi)
+                hit = probs[cond][j] >= thr[cond]
+                ax.imshow(np.ma.masked_where(~hit, hit), cmap="cool", alpha=0.8, vmin=0, vmax=1)
+            ax.set_xticks([]); ax.set_yticks([])
+            if j == 0:
+                ax.set_ylabel(title, fontsize=7)
+    fig.subplots_adjust(left=0.12, right=0.995, top=0.95, bottom=0.01, wspace=0.04, hspace=0.12)
+    save(fig, "emb_fig_detector")
+    return [META[i]["building"] for i in picks]
+
+
 FIGS = {"platform": fig_platform, "observation": fig_observation, "realism": fig_realism, "gap": fig_gap,
-        "timing": fig_timing, "gallery": fig_gallery, "graphical_abstract": fig_graphical_abstract}
+        "timing": fig_timing, "gallery": fig_gallery, "graphical_abstract": fig_graphical_abstract,
+        "detector": fig_detector}
 
 if __name__ == "__main__":
     for name in (sys.argv[1:] or FIGS):

@@ -4,7 +4,7 @@ Detectable: |apparent contrast| >= 3.0 x sigma (spatial variation of the reading
 
 ## B envelope void (Phoenix), inside, 2 m
 
-sigma = 0.326 K (median of 64 camera units x frames; 10th-90th percentile of units 0.252-0.43 K; clean image: 0.0 K), 23716 fault pixels, minimum detectable contrast 0.98 K; contrast 5th/50th/95th percentile [-2.59, 0.45, 6.45] K.
+sigma = 0.326 K (median of 64 camera units x frames; 10th-90th percentile of units 0.252-0.43 K; clean image: 0.0 K), 23716 fault pixels, minimum detectable contrast 0.98 K; contrast 5th/50th/95th percentile [-2.59, 0.45, 6.45] K. Cold signature at 3.3 % of the working-hour steps and 81.5 % of the other steps. Days with both a detectable warm and a detectable cold signature: 260 of 365.
 
 | Inspection-time policy | Share of the year (%) | Detectable (%) | Detectable, noisiest-quietest units (%) | Cold among detections (%) |
 |---|---|---|---|---|
@@ -17,7 +17,7 @@ sigma = 0.326 K (median of 64 camera units x frames; 10th-90th percentile of uni
 
 ## C envelope void (Chicago), inside, 2 m
 
-sigma = 0.348 K (median of 64 camera units x frames; 10th-90th percentile of units 0.267-0.426 K; clean image: 0.0 K), 29472 fault pixels, minimum detectable contrast 1.05 K; contrast 5th/50th/95th percentile [-4.68, -1.6, 4.49] K.
+sigma = 0.348 K (median of 64 camera units x frames; 10th-90th percentile of units 0.267-0.426 K; clean image: 0.0 K), 29472 fault pixels, minimum detectable contrast 1.05 K; contrast 5th/50th/95th percentile [-4.68, -1.6, 4.49] K. Cold signature at 36.6 % of the working-hour steps and 98.7 % of the other steps. Days with both a detectable warm and a detectable cold signature: 290 of 365.
 
 | Inspection-time policy | Share of the year (%) | Detectable (%) | Detectable, noisiest-quietest units (%) | Cold among detections (%) |
 |---|---|---|---|---|
